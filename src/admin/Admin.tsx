@@ -101,8 +101,9 @@ function Shell({ children, right }: { children: ReactNode; right?: ReactNode }) 
     <div className="min-h-screen bg-paper">
       <header className="border-b border-ink/10 bg-ink text-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-4">
-          <a href="#/admin" className="font-display text-lg font-bold tracking-tight">
-            Cube Academy · <span className="text-ember">Gestione corsi</span>
+          <a href="#/admin" className="flex items-center gap-3" aria-label="Cube Academy — Gestione corsi">
+            <img src="/img/logo-cube-academy.png" alt="Cube Academy" width={1000} height={169} className="h-7 w-auto" />
+            <span className="border-l border-white/20 pl-3 font-display text-[15px] font-semibold tracking-tight text-ember">Gestione corsi</span>
           </a>
           <div className="flex items-center gap-3 text-[13px]">
             <a href="#/" className="text-white/70 hover:text-white">Vai al sito</a>

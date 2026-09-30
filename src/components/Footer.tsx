@@ -1,5 +1,5 @@
 import { Mail, MapPin, Phone, ShieldCheck, Lock, FileCheck } from "lucide-react";
-import { COURSES, ORG } from "../data";
+import { ORG, upcomingCourses } from "../data";
 
 export function Footer() {
   return (
@@ -8,14 +8,8 @@ export function Footer() {
       <div className="relative mx-auto max-w-7xl px-5 pb-10 pt-16 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
           <div>
-            <a href="#/" className="flex items-center gap-3" aria-label="Cube Academy">
-              <svg viewBox="0 0 36 36" className="size-10" aria-hidden="true">
-                <path d="M18 2 34 11v14L18 34 2 25V11L18 2Z" fill="none" stroke="#e8321e" strokeWidth="2.4" />
-                <path d="M18 2v16M2 11l16 8 16-8M18 18v16" fill="none" stroke="#e8321e" strokeWidth="1.2" opacity="0.6" />
-              </svg>
-              <span className="font-display text-xl font-bold tracking-tight">
-                Cube<span className="text-flame">·</span>Academy
-              </span>
+            <a href="#/" className="inline-block" aria-label="Cube Academy — Home">
+              <img src="/img/logo-cube-academy.png" alt="Cube Academy" width={1000} height={169} className="h-10 w-auto" />
             </a>
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-white/55">
               Training Provider accreditato iSAQB®. Formiamo gli architetti del software italiani dal 2013 — online, in
@@ -41,7 +35,7 @@ export function Footer() {
           <nav aria-label="Corsi">
             <h3 className="font-mono text-[11px] font-medium uppercase tracking-[0.22em] text-white/40">Corsi</h3>
             <ul className="mt-4 space-y-2.5 text-sm">
-              {COURSES.slice(0, 5).map((c) => (
+              {upcomingCourses().slice(0, 5).map((c) => (
                 <li key={c.slug}>
                   <a href={`#/corso/${c.slug}`} className="link-sweep text-white/65 transition-colors hover:text-white">
                     {c.short}

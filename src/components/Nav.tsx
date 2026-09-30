@@ -51,17 +51,15 @@ export function Nav({ route }: { route: string }) {
         <div className="mx-auto flex h-[68px] max-w-7xl items-center justify-between gap-4 px-5 lg:px-8">
           {/* logo */}
           <a href="#/" className="group flex items-center gap-3" aria-label="Cube Academy — Home">
-            <span className="relative grid size-9 place-items-center">
-              <svg viewBox="0 0 36 36" className="size-9 transition-transform duration-500 group-hover:rotate-90" aria-hidden="true">
-                <path d="M18 2 34 11v14L18 34 2 25V11L18 2Z" fill="none" stroke="#e8321e" strokeWidth="2.4" />
-                <path d="M18 2v16M2 11l16 8 16-8M18 18v16" fill="none" stroke="#e8321e" strokeWidth="1.2" opacity="0.6" />
-              </svg>
-            </span>
-            <span className="font-display text-[17px] font-bold tracking-tight text-white">
-              Cube<span className="text-flame">·</span>Academy
-              <span className="ml-2 hidden rounded-sm border border-white/15 px-1.5 py-0.5 font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-white/55 sm:inline-block">
-                iSAQB®
-              </span>
+            <img
+              src="/img/logo-cube-academy.png"
+              alt="Cube Academy"
+              width={1000}
+              height={169}
+              className="h-7 w-auto sm:h-8"
+            />
+            <span className="hidden rounded-sm border border-white/15 px-1.5 py-0.5 font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-white/55 sm:inline-block">
+              iSAQB®
             </span>
           </a>
 
