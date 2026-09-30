@@ -139,7 +139,17 @@ function Login() {
     setBusy(true);
     setErr("");
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) setErr("Credenziali non valide.");
+    if (error) {
+      // messaggio reale di Supabase: distingue password errata, email non confermata, ecc.
+      const m = error.message.toLowerCase();
+      setErr(
+        m.includes("invalid login")
+          ? "Email o password non corretti (Supabase: invalid login credentials)."
+          : m.includes("not confirmed")
+            ? "Email non confermata: in Supabase apri Authentication → Users e conferma l'utente."
+            : `Accesso non riuscito: ${error.message}`
+      );
+    }
     setBusy(false);
   };
 
@@ -465,6 +475,17 @@ export function Admin({ hash }: { hash: string }) {
     return () => sub.subscription.unsubscribe();
   }, []);
 
+  // l'utente può essere autenticato ma non abilitato (email assente in admin_emails)
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const uid = session?.user.id;
+  useEffect(() => {
+    if (!uid) {
+      setIsAdmin(null);
+      return;
+    }
+    supabase.rpc("is_admin").then(({ data, error }) => setIsAdmin(error ? false : data === true));
+  }, [uid]);
+
   if (!supabaseConfigured)
     return <div className="grid min-h-screen place-items-center px-6 text-center text-err">Supabase non configurato: mancano VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY.</div>;
   if (session === undefined) return <div className="grid min-h-screen place-items-center text-steel">Caricamento…</div>;
@@ -479,7 +500,25 @@ export function Admin({ hash }: { hash: string }) {
         </button>
       }
     >
-      {m ? <Edit key={m[1]} id={m[1]} /> : <List />}
+      {isAdmin === false ? (
+        <div className="max-w-2xl rounded-2xl border border-err/30 bg-white p-6">
+          <h1 className="font-display text-xl font-bold text-err">Accesso riuscito, ma questo utente non è abilitato</h1>
+          <p className="mt-2 text-[14px] text-ink/70">
+            Sei entrato come <strong>{session.user.email}</strong>, ma questa email non è nell'elenco degli amministratori.
+            In Supabase, nel SQL Editor, esegui:
+          </p>
+          <pre className="mt-3 overflow-x-auto rounded-lg bg-ink p-4 text-[12.5px] text-white">
+            {`insert into public.admin_emails (email) values ('${session.user.email}');`}
+          </pre>
+          <p className="mt-3 text-[13px] text-steel">Poi ricarica questa pagina.</p>
+        </div>
+      ) : isAdmin === null ? (
+        <p className="text-steel">Verifica permessi…</p>
+      ) : m ? (
+        <Edit key={m[1]} id={m[1]} />
+      ) : (
+        <List />
+      )}
     </Shell>
   );
 }
