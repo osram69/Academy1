@@ -56,11 +56,8 @@ export function Nav({ route }: { route: string }) {
               alt="Cube Academy"
               width={1000}
               height={169}
-              className="h-7 w-auto sm:h-8"
+              className="h-8 w-auto sm:h-11"
             />
-            <span className="hidden rounded-sm border border-white/15 px-1.5 py-0.5 font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-white/55 sm:inline-block">
-              iSAQB®
-            </span>
           </a>
 
           {/* desktop links */}
