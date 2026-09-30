@@ -1,38 +1,58 @@
 # Cube Academy — sito + gestione corsi
 
-Frontend React/Vite + backend Node/Express che legge i corsi dal database MySQL/MariaDB
-(la stessa tabella `wp_corsi` usata finora da WordPress) e un pannello di amministrazione
-su `#/admin` che sostituisce il plugin WordPress "Cube Academy - Gestione Corsi".
+Sito React/Vite **statico**. I corsi vivono in un database **Supabase** (Postgres) e il sito li legge
+direttamente dal browser: nessun backend da mantenere. Il pannello `#/admin` sostituisce il plugin
+WordPress "Cube Academy - Gestione Corsi".
 
-## Setup
+## Setup Supabase (una tantum)
 
-1. `cp .env.example .env` e compila i dati del database (Hostinger → hPanel → Database → Gestione).
-   `CORSI_TABLE` è `wp_corsi` finché non rinomini la tabella.
-2. `npm install`
-3. Crea il primo utente admin (le password sono salvate come hash bcrypt in `admin_users`):
-   `npm run create-admin -- <utente> <password-di-almeno-10-caratteri>`
-4. Sviluppo: `npm run dev` (API su :3001, sito su :5173 con proxy `/api`).
-5. Produzione: `npm run build && npm start` — Express serve `dist/` e le API sulla stessa porta.
+1. Crea un progetto su supabase.com.
+2. **SQL Editor** → esegui `supabase/schema.sql` (tabella `corsi`, vista pubblica, sicurezza RLS).
+3. **SQL Editor** → esegui `corsi_seed_supabase.sql` (i 19 corsi esistenti, generato dal dump `wp_corsi`;
+   contiene i codici sconto, quindi non è nel repository).
+4. **Authentication → Users → Add user**: crea il tuo utente (email + password).
+   **Authentication → Sign In / Providers → Email**: disattiva "Allow new users to sign up".
+5. Abilita l'utente come amministratore (SQL Editor):
+   ```sql
+   insert into public.admin_emails (email) values ('tua@email.it');
+   ```
+6. **Project Settings → API**: copia *Project URL* e la chiave *anon public*.
 
-All'avvio il server esegue migrazioni idempotenti sulla tabella corsi: aggiunge `data_inizio`,
-`data_fine`, `posti_totali`, `posti_disponibili` e le compila (le date) leggendo il testo di `Data-IT`.
-Crea inoltre la tabella `admin_users`. Le colonne esistenti non vengono modificate.
+## Variabili d'ambiente
 
-## Come i dati del DB diventano le card
+Copia `.env.example` in `.env` (sviluppo) e imposta le stesse due variabili nelle impostazioni di build
+di Hostinger (vengono incorporate nel sito al momento della build):
 
-| Campo DB | Sul sito |
+```
+VITE_SUPABASE_URL=...
+VITE_SUPABASE_ANON_KEY=...
+```
+
+L'URL e la chiave `anon` sono pubblici per progetto: la protezione dei dati è nella RLS del database.
+Non usare mai la chiave `service_role` nel frontend.
+
+## Sviluppo e build
+
+```
+npm install
+npm run dev      # sviluppo
+npm run build    # produzione (dist/)
+```
+
+## Come i dati diventano le card
+
+| Campo | Sul sito |
 | --- | --- |
 | `stato` 0 / 1 / 3 / 4 | edizione in programma (card completa) |
 | `stato` 5 (Completato) | card "Edizione conclusa" nello storico (senza prezzo né CTA) |
 | `stato` 2 (Non visualizzato) | nascosto |
-| `iscrizioni_aperte` = 0 | badge "Lista d'attesa" |
+| `iscrizioni_aperte` = false | badge "Lista d'attesa" |
 | `early_bird_price` + `early_bird_start/end` | prezzo scontato e countdown (il prezzo esplicito ha la precedenza sulla percentuale) |
-| `Luogo-IT` = "Online" | formato Live Online; titolo con "Residential" → Prestige; altrimenti In Aula |
+| `luogo_it` = "Online" | formato Live Online; titolo con "Residential" → Prestige; altrimenti In Aula |
 | `posti_totali` / `posti_disponibili` | barra posti (nascosta se vuoti) |
 
 ## Sicurezza
 
-- Login con cookie `httpOnly` + `SameSite=Strict`, sessione 8 ore, rate limit sui tentativi.
-- Le richieste di modifica richiedono l'header `X-Requested-With` (difesa CSRF aggiuntiva).
-- L'API pubblica (`GET /api/corsi`) non espone codici sconto né l'HTML delle descrizioni.
-- Query sempre parametrizzate; le colonne modificabili sono in whitelist (`server/columns.js`).
+- Il sito legge solo la vista `corsi_public`: solo corsi visibili, senza codici sconto né HTML lungo.
+- La tabella `corsi` è accessibile soltanto agli utenti la cui email è in `admin_emails` (policy RLS).
+- Il pannello usa Supabase Auth (sessione JWT); le registrazioni pubbliche vanno disattivate (punto 4).

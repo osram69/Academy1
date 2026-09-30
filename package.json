@@ -4,20 +4,14 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently -n api,web \"node --watch server/index.js\" \"vite\"",
+    "dev": "vite",
     "build": "vite build",
-    "start": "node server/index.js",
-    "create-admin": "node server/create-admin.js"
+    "preview": "vite preview"
   },
   "dependencies": {
-    "bcryptjs": "^3.0.3",
+    "@supabase/supabase-js": "^2.117.2",
     "clsx": "2.1.1",
-    "cookie-parser": "^1.4.7",
-    "dotenv": "^18.0.4",
-    "express": "^5.2.1",
-    "jsonwebtoken": "^9.0.3",
     "lucide-react": "^1.48.0",
-    "mysql2": "^3.24.5",
     "react": "19.2.6",
     "react-dom": "19.2.6",
     "tailwind-merge": "3.4.0"
@@ -28,13 +22,9 @@
     "@types/react": "19.2.7",
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "5.1.1",
-    "concurrently": "^10.0.5",
     "tailwindcss": "4.1.17",
     "typescript": "5.9.3",
     "vite": "7.3.2",
     "vite-plugin-singlefile": "2.3.0"
-  },
-  "engines": {
-    "node": ">=20"
   }
 }

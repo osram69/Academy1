@@ -1,9 +1,12 @@
 import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from "react";
+import type { Session } from "@supabase/supabase-js";
+import { supabase, supabaseConfigured } from "../lib/supabase";
 
 /* Pannello di gestione corsi (sostituisce il plugin WordPress "Cube Academy - Gestione Corsi").
-   Rotte: #/admin (elenco) · #/admin/corso/new · #/admin/corso/<id> */
+   Rotte: #/admin (elenco) · #/admin/corso/new · #/admin/corso/<id>
+   Accesso: utenti Supabase Auth la cui email è in public.admin_emails (RLS lato database). */
 
-type Row = Record<string, string | number | null>;
+type Row = Record<string, string | number | boolean | null>;
 type Errors = Record<string, string>;
 
 const STATI: Record<number, string> = {
@@ -15,33 +18,72 @@ const STATI: Record<number, string> = {
   5: "Completato",
 };
 const LANGS: [string, string][] = [
-  ["IT", "Italiano"],
-  ["EN", "English"],
-  ["FR", "Français"],
-  ["DE", "Deutsch"],
+  ["it", "Italiano"],
+  ["en", "English"],
+  ["fr", "Français"],
+  ["de", "Deutsch"],
 ];
-// colonne per-lingua: alcune nel DB usano il trattino ("Data-IT"), altre l'underscore
-const DASH = ["Data", "Luogo", "Lingua", "Note"];
-const lc = (base: string, l: string) => `${base}${DASH.includes(base) ? "-" : "_"}${l}`;
 
-async function api<T = unknown>(method: string, url: string, body?: unknown): Promise<T> {
-  const res = await fetch(url, {
-    method,
-    credentials: "same-origin",
-    headers: { "Content-Type": "application/json", "X-Requested-With": "cube" },
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw Object.assign(new Error(data.error || `Errore ${res.status}`), { status: res.status, errors: data.errors });
-  return data as T;
-}
+/* ------------------------ tipi dei campi e conversioni ------------------------ */
 
+const INTS = ["standard_price", "early_bird_price", "posti_totali", "posti_disponibili"];
+const DECS = ["early_bird_percentuale", ...[1, 2, 3].map((i) => `codice_sconto_${i}_percentuale`)];
+const DTS = ["early_bird_start", "early_bird_end", ...[1, 2, 3].flatMap((i) => [`codice_sconto_${i}_data_inizio`, `codice_sconto_${i}_data_fine`])];
+const DATES = ["data_inizio", "data_fine"];
+const BOOLS = ["in_evidenza", "iscrizioni_aperte"];
+// testo NOT NULL nel DB: vuoto = stringa vuota (gli altri testi vuoti diventano NULL)
+const TEXT_REQUIRED = ["titolo", "livello", ...LANGS.flatMap(([l]) => [`link_readmore_${l}`, `link_booking_${l}`, `home_subtitle_${l}`])];
+const URLS = LANGS.flatMap(([l]) => [`link_readmore_${l}`, `link_booking_${l}`]);
+const LIMITS: Record<string, number> = { livello: 10, titolo: 255 };
+
+const pad = (n: number) => String(n).padStart(2, "0");
+/** timestamptz ISO (UTC) -> valore per <input type="datetime-local"> nel fuso del browser */
 const toLocalDT = (v: unknown) => {
-  const s = String(v ?? "");
-  return !s || s.startsWith("0000") ? "" : s.replace(" ", "T").slice(0, 16);
+  if (!v) return "";
+  const d = new Date(String(v));
+  if (isNaN(d.getTime())) return "";
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 };
 const toDate = (v: unknown) => String(v ?? "").slice(0, 10);
 const strip = (h: unknown) => String(h ?? "").replace(/<[^>]+>/g, " ").replace(/&reg;/g, "®").replace(/\s+/g, " ").trim();
+
+/** Valida e converte lo stato del form nel payload per Supabase. */
+function toPayload(f: Row): { data: Row; errors: Errors } {
+  const data: Row = {};
+  const errors: Errors = {};
+  const empty = (v: unknown) => v === undefined || v === null || String(v).trim() === "";
+
+  for (const [k, raw] of Object.entries(f)) {
+    if (k === "id_corso") continue;
+    if (BOOLS.includes(k)) data[k] = raw === true || raw === 1 || raw === "1";
+    else if (k === "stato") data[k] = Number(raw);
+    else if (INTS.includes(k)) {
+      if (empty(raw)) data[k] = null;
+      else if (!Number.isInteger(Number(raw)) || Number(raw) < 0) errors[k] = "numero intero non valido";
+      else data[k] = Number(raw);
+    } else if (DECS.includes(k)) {
+      const n = Number(String(raw).replace(",", "."));
+      if (empty(raw)) data[k] = k === "early_bird_percentuale" ? 0 : null;
+      else if (!Number.isFinite(n) || n < 0 || n > 100) errors[k] = "percentuale non valida";
+      else data[k] = n;
+    } else if (DTS.includes(k)) {
+      if (empty(raw)) data[k] = null;
+      else {
+        const d = new Date(String(raw));
+        if (isNaN(d.getTime())) errors[k] = "data/ora non valida";
+        else data[k] = /[zZ]|[+-]\d\d:?\d\d$/.test(String(raw)) ? String(raw) : d.toISOString(); // il valore locale diventa UTC
+      }
+    } else if (DATES.includes(k)) data[k] = empty(raw) ? null : String(raw).slice(0, 10);
+    else {
+      const v = empty(raw) ? "" : String(raw);
+      if (URLS.includes(k) && v && !/^https?:\/\//i.test(v)) errors[k] = "URL non valido (deve iniziare con http:// o https://)";
+      if (LIMITS[k] && v.length > LIMITS[k]) errors[k] = `massimo ${LIMITS[k]} caratteri`;
+      data[k] = v === "" && !TEXT_REQUIRED.includes(k) ? null : v;
+    }
+  }
+  if (!String(data.titolo ?? "").trim()) errors.titolo = "il titolo è obbligatorio";
+  return { data, errors };
+}
 
 const go = (hash: string) => {
   window.location.hash = hash;
@@ -86,8 +128,8 @@ function Field({ label, error, children, hint }: { label: string; error?: string
 
 /* --------------------------------- login --------------------------------- */
 
-function Login({ onDone }: { onDone: () => void }) {
-  const [username, setU] = useState("");
+function Login() {
+  const [email, setEmail] = useState("");
   const [password, setP] = useState("");
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
@@ -96,14 +138,9 @@ function Login({ onDone }: { onDone: () => void }) {
     e.preventDefault();
     setBusy(true);
     setErr("");
-    try {
-      await api("POST", "/api/admin/login", { username, password });
-      onDone();
-    } catch (x) {
-      setErr((x as Error).message);
-    } finally {
-      setBusy(false);
-    }
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) setErr("Credenziali non valide.");
+    setBusy(false);
   };
 
   return (
@@ -112,8 +149,8 @@ function Login({ onDone }: { onDone: () => void }) {
         <h1 className="font-display text-2xl font-bold tracking-tight">Accesso amministratori</h1>
         <p className="mt-1 text-[13px] text-steel">Gestione corsi Cube Academy</p>
         <div className="mt-6 space-y-4">
-          <Field label="Utente">
-            <input className={inputCls} value={username} onChange={(e) => setU(e.target.value)} autoComplete="username" autoFocus required />
+          <Field label="Email">
+            <input className={inputCls} type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="username" autoFocus required />
           </Field>
           <Field label="Password">
             <input className={inputCls} type="password" value={password} onChange={(e) => setP(e.target.value)} autoComplete="current-password" required />
@@ -133,19 +170,29 @@ function Login({ onDone }: { onDone: () => void }) {
 function List() {
   const [rows, setRows] = useState<Row[] | null>(null);
   const [msg, setMsg] = useState("");
-  const load = useCallback(() => api<Row[]>("GET", "/api/admin/corsi").then(setRows).catch((e) => setMsg(e.message)), []);
+  const [isErr, setIsErr] = useState(false);
+
+  const load = useCallback(async () => {
+    const { data, error } = await supabase
+      .from("corsi")
+      .select("id_corso, titolo, stato, in_evidenza, iscrizioni_aperte, data_it, data_inizio")
+      .order("id_corso", { ascending: false });
+    if (error) {
+      setIsErr(true);
+      setMsg(error.message);
+    }
+    // con RLS un utente non admin riceve semplicemente zero righe
+    setRows((data as Row[]) ?? []);
+  }, []);
   useEffect(() => {
     load();
   }, [load]);
 
-  const act = async (fn: () => Promise<unknown>, ok: string) => {
-    try {
-      await fn();
-      setMsg(ok);
-      await load();
-    } catch (e) {
-      setMsg((e as Error).message);
-    }
+  const act = async (fn: () => PromiseLike<{ error: { message: string } | null }>, ok: string) => {
+    const { error } = await fn();
+    setIsErr(!!error);
+    setMsg(error ? error.message : ok);
+    if (!error) await load();
   };
 
   return (
@@ -154,7 +201,9 @@ function List() {
         <h1 className="font-display text-2xl font-bold tracking-tight">Corsi</h1>
         <button className={btnPrimary} onClick={() => go("#/admin/corso/new")}>+ Nuovo corso</button>
       </div>
-      {msg && <p role="status" className="mt-4 rounded-lg bg-mint/10 px-4 py-2 text-[13px] text-mint">{msg}</p>}
+      {msg && (
+        <p role="status" className={`mt-4 rounded-lg px-4 py-2 text-[13px] ${isErr ? "bg-err/10 text-err" : "bg-mint/10 text-mint"}`}>{msg}</p>
+      )}
       <div className="mt-5 overflow-x-auto rounded-2xl border border-ink/10 bg-white">
         <table className="w-full min-w-[820px] text-left text-[13.5px]">
           <thead className="border-b border-ink/10 bg-sand/40 text-[11.5px] uppercase tracking-wider text-steel">
@@ -166,30 +215,35 @@ function List() {
           </thead>
           <tbody>
             {rows?.map((r) => (
-              <tr key={r.id_corso} className="border-b border-ink/5 last:border-0">
+              <tr key={String(r.id_corso)} className="border-b border-ink/5 last:border-0">
                 <td className="px-4 py-3 font-mono text-[12px] text-steel">{r.id_corso}</td>
-                <td className="px-4 py-3">{strip(r.Titolo)}</td>
+                <td className="px-4 py-3">{strip(r.titolo)}</td>
                 <td className="px-4 py-3">{STATI[Number(r.stato)] ?? "?"}</td>
                 <td className="px-4 py-3">
                   <button
                     className={`rounded-full px-3 py-1 text-[12px] font-semibold ${r.iscrizioni_aperte ? "bg-mint/15 text-mint" : "bg-err/10 text-err"}`}
-                    onClick={() => act(() => api("POST", `/api/admin/corsi/${r.id_corso}/toggle`), "Stato iscrizioni aggiornato.")}
+                    onClick={() =>
+                      act(() => supabase.from("corsi").update({ iscrizioni_aperte: !r.iscrizioni_aperte }).eq("id_corso", r.id_corso as number), "Stato iscrizioni aggiornato.")
+                    }
                   >
                     {r.iscrizioni_aperte ? "Aperte" : "Chiuse"}
                   </button>
                 </td>
-                <td className="px-4 py-3 text-ink/70">{r["Data-IT"]}</td>
+                <td className="px-4 py-3 text-ink/70">{r.data_it}</td>
                 <td className="px-4 py-3">{r.in_evidenza ? "✓" : ""}</td>
                 <td className="whitespace-nowrap px-4 py-3">
                   <button className="mr-3 font-semibold text-flame hover:underline" onClick={() => go(`#/admin/corso/${r.id_corso}`)}>Modifica</button>
                   <button
                     className="mr-3 font-semibold text-ink/70 hover:underline"
-                    onClick={() =>
-                      act(async () => {
-                        const n = await api<{ id_corso: number }>("POST", `/api/admin/corsi/${r.id_corso}/duplicate`);
-                        go(`#/admin/corso/${n.id_corso}`);
-                      }, "Corso duplicato. Modifica i dettagli e salva.")
-                    }
+                    onClick={async () => {
+                      const { data, error } = await supabase.from("corsi").select("*").eq("id_corso", r.id_corso as number).single();
+                      if (error || !data) return act(async () => ({ error: error ?? { message: "Corso non trovato." } }), "");
+                      const copy = { ...(data as Row) };
+                      delete copy.id_corso;
+                      const ins = await supabase.from("corsi").insert(copy).select("id_corso").single();
+                      if (ins.error) return act(async () => ({ error: ins.error }), "");
+                      go(`#/admin/corso/${(ins.data as Row).id_corso}`);
+                    }}
                   >
                     Duplica
                   </button>
@@ -197,7 +251,7 @@ function List() {
                     className="font-semibold text-err hover:underline"
                     onClick={() => {
                       if (confirm("Eliminare definitivamente questo corso? L'operazione non è reversibile."))
-                        act(() => api("DELETE", `/api/admin/corsi/${r.id_corso}`), "Corso eliminato.");
+                        act(() => supabase.from("corsi").delete().eq("id_corso", r.id_corso as number), "Corso eliminato.");
                     }}
                   >
                     Elimina
@@ -206,7 +260,11 @@ function List() {
               </tr>
             ))}
             {rows && !rows.length && (
-              <tr><td colSpan={7} className="px-4 py-8 text-center text-steel">Nessun corso presente.</td></tr>
+              <tr>
+                <td colSpan={7} className="px-4 py-8 text-center text-steel">
+                  Nessun corso visibile. Se sai che ce ne sono, l'email con cui hai fatto l'accesso potrebbe non essere abilitata (tabella admin_emails).
+                </td>
+              </tr>
             )}
             {!rows && (
               <tr><td colSpan={7} className="px-4 py-8 text-center text-steel">Caricamento…</td></tr>
@@ -220,7 +278,7 @@ function List() {
 
 /* --------------------------------- modifica ------------------------------- */
 
-const EMPTY: Row = { Titolo: "", Livello: "Foundation", stato: 0, in_evidenza: 0, iscrizioni_aperte: 0 };
+const EMPTY: Row = { titolo: "", livello: "Foundation", stato: 0, in_evidenza: false, iscrizioni_aperte: false };
 
 function Edit({ id }: { id: string }) {
   const isNew = id === "new";
@@ -228,15 +286,21 @@ function Edit({ id }: { id: string }) {
   const [errors, setErrors] = useState<Errors>({});
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
-  const [lang, setLang] = useState("IT");
+  const [lang, setLang] = useState("it");
 
   useEffect(() => {
-    if (!isNew) api<Row>("GET", `/api/admin/corsi/${id}`).then(setF).catch((e) => setMsg(e.message));
+    if (isNew) return;
+    supabase
+      .from("corsi")
+      .select("*")
+      .eq("id_corso", Number(id))
+      .single()
+      .then(({ data, error }) => (error ? setMsg(error.message) : setF(data as Row)));
   }, [id, isNew]);
 
   if (!f) return <p className="text-steel">{msg || "Caricamento…"}</p>;
 
-  const set = (k: string, v: string | number | null) => setF((p) => ({ ...(p as Row), [k]: v }));
+  const set = (k: string, v: string | number | boolean | null) => setF((p) => ({ ...(p as Row), [k]: v }));
   const text = (k: string, extra: Partial<React.InputHTMLAttributes<HTMLInputElement>> = {}) => (
     <input className={inputCls} value={String(f[k] ?? "")} onChange={(e) => set(k, e.target.value)} {...extra} />
   );
@@ -249,26 +313,27 @@ function Edit({ id }: { id: string }) {
     setBusy(true);
     setErrors({});
     setMsg("");
-    try {
-      if (isNew) {
-        const r = await api<{ id_corso: number }>("POST", "/api/admin/corsi", f);
-        go(`#/admin/corso/${r.id_corso}`);
-      } else {
-        await api("PUT", `/api/admin/corsi/${id}`, f);
-        setMsg("Corso salvato.");
-      }
-    } catch (x) {
-      const err = x as Error & { errors?: Errors };
-      setErrors(err.errors ?? {});
-      setMsg(err.errors ? "Controlla i campi evidenziati." : err.message);
-    } finally {
+    const { data, errors: errs } = toPayload(f);
+    if (Object.keys(errs).length) {
+      setErrors(errs);
+      setMsg("Controlla i campi evidenziati.");
       setBusy(false);
+      return;
     }
+    if (isNew) {
+      const r = await supabase.from("corsi").insert(data).select("id_corso").single();
+      if (r.error) setMsg(r.error.message);
+      else go(`#/admin/corso/${(r.data as Row).id_corso}`);
+    } else {
+      const r = await supabase.from("corsi").update(data).eq("id_corso", Number(id)).select("id_corso");
+      setMsg(r.error ? r.error.message : r.data?.length ? "Corso salvato." : "Nessuna modifica salvata: permessi insufficienti?");
+    }
+    setBusy(false);
   };
 
   const check = (k: string, label: string) => (
     <label className="flex items-center gap-2 text-[14px]">
-      <input type="checkbox" checked={!!Number(f[k])} onChange={(e) => set(k, e.target.checked ? 1 : 0)} className="size-4 accent-flame" />
+      <input type="checkbox" checked={!!f[k]} onChange={(e) => set(k, e.target.checked)} className="size-4 accent-flame" />
       {label}
     </label>
   );
@@ -278,6 +343,7 @@ function Edit({ id }: { id: string }) {
 
   const card = "rounded-2xl border border-ink/10 bg-white p-6";
   const h2 = "mb-4 font-display text-lg font-bold tracking-tight";
+  const failed = Object.keys(errors).length > 0 || /permess|error|violat|denied/i.test(msg);
 
   return (
     <form onSubmit={save} className="space-y-6">
@@ -289,14 +355,14 @@ function Edit({ id }: { id: string }) {
         <button className={btnPrimary} disabled={busy}>{busy ? "Salvataggio…" : "Salva corso"}</button>
       </div>
       {msg && (
-        <p role="status" className={`rounded-lg px-4 py-2 text-[13px] ${Object.keys(errors).length ? "bg-err/10 text-err" : "bg-mint/10 text-mint"}`}>{msg}</p>
+        <p role="status" className={`rounded-lg px-4 py-2 text-[13px] ${failed ? "bg-err/10 text-err" : "bg-mint/10 text-mint"}`}>{msg}</p>
       )}
 
       <section className={card}>
         <h2 className={h2}>Dati generali</h2>
         <div className="grid gap-4 md:grid-cols-2">
-          <div className="md:col-span-2">{F("Titolo", "Titolo (accetta HTML, es. <br>)", text("Titolo", { maxLength: 255, required: true }))}</div>
-          {F("Livello", "Livello", text("Livello", { maxLength: 10 }))}
+          <div className="md:col-span-2">{F("titolo", "Titolo (accetta HTML, es. <br>)", text("titolo", { maxLength: 255, required: true }))}</div>
+          {F("livello", "Livello", text("livello", { maxLength: 10 }))}
           {F("stato", "Stato", (
             <select className={inputCls} value={Number(f.stato)} onChange={(e) => set("stato", Number(e.target.value))}>
               {Object.entries(STATI).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
@@ -357,10 +423,10 @@ function Edit({ id }: { id: string }) {
         </div>
         {LANGS.map(([code]) => (
           <div key={code} hidden={lang !== code} className="grid gap-4 md:grid-cols-2">
-            {F(lc("Data", code), "Data (testo mostrato)", text(lc("Data", code), { maxLength: 60 }), "Es. “25 - 27 Marzo 2026”")}
-            {F(lc("Luogo", code), "Luogo", text(lc("Luogo", code), { maxLength: 15 }))}
-            {F(lc("Lingua", code), "Lingua del corso", text(lc("Lingua", code), { maxLength: 11 }))}
-            {F(lc("Note", code), "Note", text(lc("Note", code), { maxLength: 10 }))}
+            {F(`data_${code}`, "Data (testo mostrato)", text(`data_${code}`, { maxLength: 60 }), "Es. “25 - 27 Marzo 2026”")}
+            {F(`luogo_${code}`, "Luogo", text(`luogo_${code}`, { maxLength: 15 }))}
+            {F(`lingua_${code}`, "Lingua del corso", text(`lingua_${code}`, { maxLength: 11 }))}
+            {F(`note_${code}`, "Note", text(`note_${code}`, { maxLength: 10 }))}
             {F(`link_readmore_${code}`, "Link “Scopri di più”", text(`link_readmore_${code}`, { type: "url", maxLength: 150 }))}
             {F(`link_booking_${code}`, "Link iscrizione (booking)", text(`link_booking_${code}`, { type: "url", maxLength: 150 }))}
             <div className="md:col-span-2">
@@ -387,25 +453,29 @@ function Edit({ id }: { id: string }) {
 /* --------------------------------- entry --------------------------------- */
 
 export function Admin({ hash }: { hash: string }) {
-  const [user, setUser] = useState<string | null | undefined>(undefined);
+  const [session, setSession] = useState<Session | null | undefined>(undefined);
+
   useEffect(() => {
-    api<{ username: string }>("GET", "/api/admin/me")
-      .then((r) => setUser(r.username))
-      .catch(() => setUser(null));
+    if (!supabaseConfigured) {
+      setSession(null);
+      return;
+    }
+    supabase.auth.getSession().then(({ data }) => setSession(data.session));
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setSession(s));
+    return () => sub.subscription.unsubscribe();
   }, []);
 
-  if (user === undefined) return <div className="grid min-h-screen place-items-center text-steel">Caricamento…</div>;
-  if (user === null) return <Login onDone={() => api<{ username: string }>("GET", "/api/admin/me").then((r) => setUser(r.username))} />;
+  if (!supabaseConfigured)
+    return <div className="grid min-h-screen place-items-center px-6 text-center text-err">Supabase non configurato: mancano VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY.</div>;
+  if (session === undefined) return <div className="grid min-h-screen place-items-center text-steel">Caricamento…</div>;
+  if (!session) return <Login />;
 
   const m = hash.match(/^#\/admin\/corso\/([^/]+)/);
   return (
     <Shell
       right={
-        <button
-          className="text-white/70 hover:text-white"
-          onClick={() => api("POST", "/api/admin/logout").finally(() => setUser(null))}
-        >
-          Esci ({user})
+        <button className="text-white/70 hover:text-white" onClick={() => supabase.auth.signOut()}>
+          Esci ({session.user.email})
         </button>
       }
     >

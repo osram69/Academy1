@@ -4,6 +4,8 @@
 /*  (early bird attivo, countdown, edizioni imminenti).                */
 /* ------------------------------------------------------------------ */
 
+import { supabase, supabaseConfigured } from "./lib/supabase";
+
 const DAY = 86400000;
 
 export type CourseFormat = "online" | "aula" | "prestige";
@@ -245,7 +247,7 @@ const F_INCLUDES = [
 ];
 
 /* ------------------------------ corsi ----------------------------- */
-/* I corsi arrivano dal database (GET /api/corsi), gestito dal pannello #/admin. */
+/* I corsi arrivano dal database (vista Supabase corsi_public), gestito dal pannello #/admin. */
 
 export interface ApiCourse {
   id: number;
@@ -350,11 +352,63 @@ function toCourse(a: ApiCourse): Course {
 /** Lista corsi, popolata da loadCourses() prima del render (vedi main.tsx). */
 export let COURSES: Course[] = [];
 
+interface PublicRow {
+  id_corso: number;
+  titolo: string;
+  livello: string;
+  stato: number;
+  iscrizioni_aperte: boolean;
+  standard_price: number | null;
+  early_bird_price: number | null;
+  early_bird_start: string | null;
+  early_bird_end: string | null;
+  early_bird_percentuale: number | string;
+  data_inizio: string | null;
+  data_fine: string | null;
+  posti_totali: number | null;
+  posti_disponibili: number | null;
+  luogo_it: string | null;
+  lingua_it: string | null;
+  link_booking_it: string | null;
+}
+
+const ENTITIES: Record<string, string> = { "&reg;": "®", "&amp;": "&", "&nbsp;": " ", "&quot;": '"', "&#039;": "'", "&trade;": "™" };
+const plain = (html: string) =>
+  html
+    .replace(/<br\s*\/?>/gi, " ")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&[a-z#0-9]+;/gi, (e) => ENTITIES[e.toLowerCase()] ?? e)
+    .replace(/\s+/g, " ")
+    .trim();
+
+const fromRow = (r: PublicRow): ApiCourse => ({
+  id: r.id_corso,
+  title: plain(r.titolo),
+  weekend: /weekend/i.test(r.titolo),
+  residential: /residential/i.test(r.titolo),
+  level: r.livello,
+  stato: r.stato,
+  open: r.iscrizioni_aperte,
+  price: r.standard_price,
+  earlyBirdPrice: r.early_bird_price,
+  earlyBirdPct: Number(r.early_bird_percentuale) / 100,
+  earlyBirdStart: r.early_bird_start,
+  earlyBirdEnd: r.early_bird_end,
+  start: r.data_inizio,
+  end: r.data_fine ?? r.data_inizio,
+  location: { IT: r.luogo_it ?? "" },
+  language: { IT: r.lingua_it ?? "" },
+  bookingUrl: { IT: r.link_booking_it ?? "" },
+  seatsTotal: r.posti_totali,
+  seatsLeft: r.posti_disponibili,
+});
+
 export async function loadCourses(): Promise<void> {
-  const res = await fetch("/api/corsi", { headers: { Accept: "application/json" } });
-  if (!res.ok) throw new Error(`GET /api/corsi → ${res.status}`);
-  const rows = (await res.json()) as ApiCourse[];
-  COURSES = rows.filter((r) => r.start).map(toCourse);
+  if (!supabaseConfigured) throw new Error("Supabase non configurato (VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY)");
+  // vista pubblica: solo corsi visibili e campi sicuri (vedi supabase/schema.sql)
+  const { data, error } = await supabase.from("corsi_public").select("*").order("data_inizio", { ascending: true });
+  if (error) throw error;
+  COURSES = (data as PublicRow[]).map(fromRow).filter((r) => r.start).map(toCourse);
 }
 
 export const upcomingCourses = () =>
