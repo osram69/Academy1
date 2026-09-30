@@ -55,7 +55,7 @@ export function Nav({ route }: { route: string }) {
               src="/img/logo-cube-academy.png"
               alt="Cube Academy"
               width={1000}
-              height={169}
+              height={173}
               className="h-8 w-auto sm:h-11"
             />
           </a>

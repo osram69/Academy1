@@ -9,7 +9,7 @@ export function Footer() {
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
           <div>
             <a href="#/" className="inline-block" aria-label="Cube Academy — Home">
-              <img src="/img/logo-cube-academy.png" alt="Cube Academy" width={1000} height={169} className="h-10 w-auto" />
+              <img src="/img/logo-cube-academy.png" alt="Cube Academy" width={1000} height={173} className="h-10 w-auto" />
             </a>
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-white/55">
               Training Provider accreditato iSAQB®. Formiamo gli architetti del software italiani dal 2013 — online, in
