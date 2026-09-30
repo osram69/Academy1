@@ -353,7 +353,7 @@ export function CourseDetail({ course }: { course: Course }) {
 
       {/* CTA mobile flottante */}
       {course.status !== "waitlist" && (
-        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-ink/10 bg-paper/90 p-3 backdrop-blur-xl lg:hidden">
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-ink/10 bg-paper/90 p-3 lg:hidden">
           <div className="mx-auto flex max-w-lg items-center gap-4">
             <div className="min-w-0 flex-1">
               <p className="truncate font-display text-sm font-bold text-ink">{fmtRange(course.start, course.end)}</p>

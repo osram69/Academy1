@@ -8,7 +8,7 @@ function FloatingCourseCard() {
   const now = useNow(10000);
   void now;
   return (
-    <div className="relative animate-float rounded-2xl border border-white/12 bg-ink/85 p-5 shadow-lift backdrop-blur-xl">
+    <div className="relative animate-float rounded-2xl border border-white/12 bg-ink p-5 shadow-lift">
       <div className="flex items-center justify-between">
         <span className="inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-ember">
           <Timer className="size-3.5" aria-hidden="true" />
@@ -51,7 +51,7 @@ export function Hero() {
       {/* sfondo */}
       <div className="bg-blueprint-dark absolute inset-0" aria-hidden="true" />
       <div
-        className="absolute -right-40 -top-40 size-[560px] rounded-full opacity-35 blur-[130px]"
+        className="absolute -right-40 -top-40 size-[560px] rounded-full opacity-35"
         style={{ background: "radial-gradient(circle, #e8321e 0%, transparent 65%)" }}
         aria-hidden="true"
       />
@@ -61,7 +61,7 @@ export function Hero() {
         {/* colonna testo */}
         <div>
           <Reveal>
-            <p className="inline-flex items-center gap-2.5 rounded-full border border-white/12 bg-white/5 py-2 pl-3 pr-4 text-[12.5px] font-medium text-white/75 backdrop-blur-sm">
+            <p className="inline-flex items-center gap-2.5 rounded-full border border-white/12 bg-white/5 py-2 pl-3 pr-4 text-[12.5px] font-medium text-white/75">
               <ShieldCheck className="size-4 text-flame" aria-hidden="true" />
               Training Provider accreditato <strong className="font-semibold text-white">iSAQB®</strong>
               <span className="hidden text-white/30 sm:inline">· dal 2013</span>
@@ -148,7 +148,7 @@ export function Hero() {
       </div>
 
       {/* marquee */}
-      <div className="relative border-t border-white/10 bg-ink2/70 py-4 backdrop-blur-sm" aria-hidden="true">
+      <div className="relative border-t border-white/10 bg-ink2/70 py-4" aria-hidden="true">
         <div className="flex overflow-hidden">
           <div className="animate-marquee flex shrink-0 items-center gap-10 whitespace-nowrap pr-10">
             {[0, 1].map((copy) => (

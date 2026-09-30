@@ -80,7 +80,7 @@ export function Catalog() {
       <header className="relative overflow-hidden bg-ink pb-20 pt-40 text-white lg:pb-24">
         <div className="bg-blueprint-dark absolute inset-0" aria-hidden="true" />
         <div
-          className="absolute -left-40 top-0 size-[480px] rounded-full opacity-25 blur-[120px]"
+          className="absolute -left-40 top-0 size-[480px] rounded-full opacity-25"
           style={{ background: "radial-gradient(circle, #e8321e 0%, transparent 65%)" }}
           aria-hidden="true"
         />
@@ -103,7 +103,7 @@ export function Catalog() {
       </header>
 
       {/* filtri */}
-      <div className="sticky top-[68px] z-30 border-b border-ink/8 bg-paper/85 py-4 backdrop-blur-xl">
+      <div className="sticky top-[68px] z-30 border-b border-ink/8 bg-paper/95 py-4">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-8 gap-y-3 px-5 lg:px-8">
           <span className="hidden items-center gap-2 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-steel md:inline-flex">
             <ListFilter className="size-4" aria-hidden="true" />
@@ -150,7 +150,7 @@ export function Catalog() {
           <aside className="relative overflow-hidden rounded-[28px] bg-ink p-8 text-white lg:p-12">
             <div className="bg-blueprint-dark absolute inset-0 opacity-50" aria-hidden="true" />
             <div
-              className="absolute -right-24 -top-24 size-80 rounded-full opacity-30 blur-[100px]"
+              className="absolute -right-24 -top-24 size-80 rounded-full opacity-30"
               style={{ background: "radial-gradient(circle, #e8321e 0%, transparent 65%)" }}
               aria-hidden="true"
             />

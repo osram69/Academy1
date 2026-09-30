@@ -135,7 +135,7 @@ function StepConfigure({ course, count, setCount }: { course: Course; count: num
         <div className="relative h-36">
           <img src={course.image} alt="" className="size-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-ink/80 to-ink/10" aria-hidden="true" />
-          <p className="absolute bottom-3 left-5 rounded-full bg-ink/70 px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-white backdrop-blur-sm">
+          <p className="absolute bottom-3 left-5 rounded-full bg-ink/70 px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-white">
             {fmt.label} · Livello {course.level}
           </p>
         </div>
@@ -838,7 +838,7 @@ export function Enroll({ course }: { course: Course }) {
       </header>
 
       {/* barra mobile sticky: progresso + totale */}
-      <div className="sticky top-[68px] z-30 border-b border-ink/10 bg-paper/92 backdrop-blur-xl lg:hidden">
+      <div className="sticky top-[68px] z-30 border-b border-ink/10 bg-paper/92 lg:hidden">
         <div className="flex items-center justify-between gap-3 px-5 py-3">
           <p className="font-mono text-[11px] font-semibold uppercase tracking-widest text-ink/70">
             Passo {step + 1}<span className="text-ink/35">/4</span> — {STEPS[step]}
