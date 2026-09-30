@@ -5,11 +5,10 @@
 /* ------------------------------------------------------------------ */
 
 const DAY = 86400000;
-const d = (daysFromNow: number) => new Date(Date.now() + daysFromNow * DAY);
 
 export type CourseFormat = "online" | "aula" | "prestige";
 export type CourseLevel = "Foundation" | "Advanced" | "Workshop";
-export type CourseStatus = "available" | "few" | "waitlist";
+export type CourseStatus = "available" | "few" | "waitlist" | "concluded";
 export type Lang = "IT" | "EN";
 
 export interface CourseModule {
@@ -25,18 +24,22 @@ export interface Course {
   level: CourseLevel;
   format: CourseFormat;
   status: CourseStatus;
+  concluded: boolean;
   start: Date;
   end: Date;
   effort: string;
   location: string;
   language: Lang;
-  seatsTotal: number;
-  seatsLeft: number;
+  seatsTotal: number | null; // null = non gestito in DB
+  seatsLeft: number | null;
   price: number; // listino, IVA esclusa
   earlyBirdPct: number;
+  earlyBirdPrice: number | null;
+  earlyBirdFrom: Date;
   earlyBirdUntil: Date;
   examIncluded: boolean;
   image: string;
+  bookingUrl: string;
   tagline: string;
   description: string;
   objectives: string[];
@@ -58,6 +61,7 @@ export const STATUS_META: Record<CourseStatus, { label: string }> = {
   available: { label: "Posti disponibili" },
   few: { label: "Ultimi posti" },
   waitlist: { label: "Lista d'attesa" },
+  concluded: { label: "Edizione conclusa" },
 };
 
 /* --------------------------- formattatori ------------------------- */
@@ -91,9 +95,10 @@ export interface LivePrice {
 }
 
 export const getLivePrice = (c: Course): LivePrice => {
-  const active = new Date() < c.earlyBirdUntil && c.status !== "waitlist";
+  const now = new Date();
+  const active = now >= c.earlyBirdFrom && now < c.earlyBirdUntil && c.earlyBirdPct > 0 && c.status !== "waitlist" && !c.concluded;
   return {
-    unit: active ? Math.round(c.price * (1 - c.earlyBirdPct)) : c.price,
+    unit: active ? (c.earlyBirdPrice ?? Math.round(c.price * (1 - c.earlyBirdPct))) : c.price,
     original: active ? c.price : null,
     active,
     until: c.earlyBirdUntil,
@@ -240,267 +245,141 @@ const F_INCLUDES = [
 ];
 
 /* ------------------------------ corsi ----------------------------- */
+/* I corsi arrivano dal database (GET /api/corsi), gestito dal pannello #/admin. */
 
-export const COURSES: Course[] = [
-  {
-    slug: "cpsa-f-online",
-    short: "CPSA-F Live Online",
-    title: "CPSA-Foundation® — Certificazione in Software Architecture",
-    level: "Foundation",
-    format: "online",
-    status: "available",
-    start: d(38),
-    end: d(41),
-    effort: "4 giornate · 32 ore · 9:00–18:00 CET",
-    location: "Aula virtuale live (Zoom)",
-    language: "IT",
-    seatsTotal: 20,
-    seatsLeft: 12,
-    price: 1800,
-    earlyBirdPct: 0.15,
-    earlyBirdUntil: d(10),
-    examIncluded: true,
-    image:
-      "https://images.pexels.com/photos/18999565/pexels-photo-18999565.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
-    tagline: "L'edizione online più intensiva: quattro giornate live, esercitazioni in breakout room e simulazione d'esame il quarto giorno.",
-    description:
-      "Il percorso Foundation copre l'intero curriculum iSAQB 2023: dai fondamenti del ruolo alla progettazione, dalla documentazione alla valutazione della qualità. Le lezioni alternano teoria, casi reali dai progetti del docente e workshop di gruppo con revisione in plenaria. Il quarto giorno si chiude con una simulazione completa d'esame e un piano di studio individuale.",
-    objectives: F_OBJECTIVES,
-    audience: F_AUDIENCE,
-    modules: F_MODULES,
-    prerequisites: F_PREREQUISITES,
-    includes: F_INCLUDES,
-  },
-  {
-    slug: "cpsa-f-milano",
-    short: "CPSA-F Milano",
-    title: "CPSA-Foundation® — Edizione in Aula a Milano",
-    level: "Foundation",
-    format: "aula",
-    status: "few",
-    start: d(66),
-    end: d(69),
-    effort: "4 giornate · 32 ore · 9:00–18:00",
-    location: "Milano — Talent Garden Calabiana",
-    language: "IT",
-    seatsTotal: 18,
-    seatsLeft: 3,
-    price: 1850,
-    earlyBirdPct: 0.15,
-    earlyBirdUntil: d(24),
-    examIncluded: true,
-    image:
-      "https://images.pexels.com/photos/3184328/pexels-photo-3184328.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
-    tagline: "Full immersion in presenza: lavagne, post-it, networking a pranzo con professionisti di tutta Italia.",
-    description:
-      "Stessa qualità del curriculum iSAQB, con l'energia dell'aula fisica: esercitazioni al flipchart, design review a coppie e conversationi che continuano durante le pause. La sede è a due passi dai Navigli, raggiungibile in metro (M2 Porta Genova).",
-    objectives: F_OBJECTIVES,
-    audience: F_AUDIENCE,
-    modules: F_MODULES,
-    prerequisites: F_PREREQUISITES,
-    includes: [...F_INCLUDES, "Pranzi e coffee break inclusi nei 4 giorni"],
-  },
-  {
-    slug: "cpsa-f-prestige-toscana",
-    short: "CPSA-F Prestige · Toscana",
-    title: "CPSA-Foundation® Prestige — Residenziale in Toscana",
-    level: "Foundation",
-    format: "prestige",
-    status: "available",
-    start: d(94),
-    end: d(98),
-    effort: "5 giornate · 32 ore + sessioni serali",
-    location: "Villa Colombai — Greve in Chianti (FI)",
-    language: "IT",
-    seatsTotal: 14,
-    seatsLeft: 8,
-    price: 3400,
-    earlyBirdPct: 0.15,
-    earlyBirdUntil: d(30),
-    examIncluded: true,
-    image:
-      "https://images.pexels.com/photos/38120266/pexels-photo-38120266.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
-    tagline: "Cinque giorni tra le colline del Chianti: corso, hotel 4★, cene conviviali e una masterclass serale sotto le stelle.",
-    description:
-      "Il formato Prestige trasforma la certificazione in un'esperienza: si studia al mattino nella limonaia della villa, si progetta nel pomeriggio sotto il portico, e la sera si discute di architettura davanti a un calice. Il ritmo residenziale — senza pendolarismo e distrazioni — è il modo più profondo che conosciamo per interiorizzare il curriculum. Gruppo volutamente ristretto: massimo 14 partecipanti.",
-    objectives: F_OBJECTIVES,
-    audience: F_AUDIENCE,
-    modules: [
-      ...F_MODULES.slice(0, 3),
-      {
-        title: "Giorno 4 — Qualità ed evoluzione + masterclass serale",
-        hours: 8,
-        topics: [
-          "Valutazione architetturale: scenari e metriche",
-          "Evoluzione e modernizzazione dei legacy system",
-          "Masterclass serale: case study reale raccontato dal docente",
-          "Cena conviviale con i trainer",
-        ],
-      },
-      {
-        title: "Giorno 5 — Simulazione d'esame e commit finale",
-        hours: 6,
-        topics: [
-          "Simulazione completa d'esame CPSA-F con correzione guidata",
-          "Retrospettiva sul sistema progettato nella settimana",
-          "Piano di studio personalizzato e iscrizione all'esame",
-        ],
-      },
-    ],
-    prerequisites: F_PREREQUISITES,
-    includes: [
-      ...F_INCLUDES,
-      "Hotel 4★ nella villa: 4 notti in camera singola",
-      "Tutti i pasti inclusi, dal lunedì al venerdì",
-      "Cena conviviale con degustazione in cantina",
-      "Transfer organizzato da/per Firenze S. M. Novella",
-    ],
-  },
-  {
-    slug: "cpsa-f-online-en",
-    short: "CPSA-F Online (EN)",
-    title: "CPSA-Foundation® — English Live Online Edition",
-    level: "Foundation",
-    format: "online",
-    status: "available",
-    start: d(52),
-    end: d(55),
-    effort: "4 days · 32 hours · 9:00–18:00 CET",
-    location: "Aula virtuale live (Zoom)",
-    language: "EN",
-    seatsTotal: 20,
-    seatsLeft: 11,
-    price: 1800,
-    earlyBirdPct: 0.15,
-    earlyBirdUntil: d(8),
-    examIncluded: true,
-    image:
-      "https://images.pexels.com/photos/18999478/pexels-photo-18999478.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
-    tagline: "English edition with international cohort — ideal for distributed teams across Europe.",
-    description:
-      "The full iSAQB Foundation curriculum taught in English, with participants joining from across Europe. Same structure as the Italian edition: live sessions, group workshops in breakout rooms and a full mock exam on day four.",
-    objectives: F_OBJECTIVES,
-    audience: F_AUDIENCE,
-    modules: F_MODULES,
-    prerequisites: F_PREREQUISITES,
-    includes: F_INCLUDES,
-  },
-  {
-    slug: "adr-masterclass",
-    short: "Masterclass ADR",
-    title: "Masterclass — ADR & Architecture Documentation",
-    level: "Advanced",
-    format: "aula",
-    status: "available",
-    start: d(45),
-    end: d(46),
-    effort: "2 giornate · 16 ore · 9:30–17:30",
-    location: "Bologna — Sede Cube Engineering",
-    language: "IT",
-    seatsTotal: 16,
-    seatsLeft: 6,
-    price: 890,
-    earlyBirdPct: 0.1,
-    earlyBirdUntil: d(18),
-    examIncluded: false,
-    image:
-      "https://images.pexels.com/photos/34774352/pexels-photo-34774352.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
-    tagline: "Due giorni per smettere di documentare 'dopo': decision log vivi, ADR nei pull request e arc42 senza burocrazia.",
-    description:
-      "Una masterclass pratica sul tema che ogni team rimanda: la documentazione d'architettura. Si lavora sul proprio caso reale (portate un sistema che conoscete) impostando decision log, ADR template e una struttura arc42 sostenibile nel tempo.",
-    objectives: [
-      "Scrivere ADR che il team legge davvero, integrati nel flusso di code review",
-      "Impostare un decision log condiviso e ricercabile",
-      "Modellare il sistema con C4 in meno di un'ora",
-      "Ridurre il rischio 'conoscenza nella testa di uno solo'",
-    ],
-    audience: ["Software architect e tech lead", "Team di 3+ persone che vogliono un metodo comune", "Chi ha frequentato CPSA-F e vuole approfondire il tema"],
-    modules: [
-      {
-        title: "Giorno 1 — Decisioni prima di tutto",
-        hours: 8,
-        topics: ["Anatomia di una decisione architetturale", "ADR: template, tono, antipattern", "ADR nei pull request: demo live", "Workshop sul proprio caso"],
-      },
-      {
-        title: "Giorno 2 — Struttura che dura",
-        hours: 8,
-        topics: ["arc42 essenziale: le 6 sezioni che contano", "C4 model hands-on", "Automatizzare gli snippet dal codice", "Design review finale sui casi dei partecipanti"],
-      },
-    ],
-    prerequisites: ["Esperienza su almeno un progetto in produzione", "Portare un'architettura reale su cui lavorare (anche anonimizzata)"],
-    includes: ["Template library ADR + arc42 in italiano e inglese", "Pranzi inclusi", "Attestato di partecipazione"],
-  },
-  {
-    slug: "exam-sprint",
-    short: "Exam Sprint",
-    title: "CPSA-F Exam Readiness Sprint",
-    level: "Workshop",
-    format: "online",
-    status: "available",
-    start: d(20),
-    end: d(21),
-    effort: "2 mezze giornate · 8 ore · 14:00–18:00 CET",
-    location: "Aula virtuale live (Zoom)",
-    language: "IT",
-    seatsTotal: 24,
-    seatsLeft: 15,
-    price: 590,
-    earlyBirdPct: 0.1,
-    earlyBirdUntil: d(5),
-    examIncluded: false,
-    image:
-      "https://images.pexels.com/photos/3184317/pexels-photo-3184317.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
-    tagline: "Hai già studiato? Due pomeriggi di simulazioni, correzione guidata e strategy per arrivare all'esame senza ansia.",
-    description:
-      "Uno sprint pensato per chi ha completato un corso Foundation (con noi o altrove) e vuole misurarsi con il formato d'esame: due simulazioni cronometrate, analisi delle domande trabocchetto e tecniche di gestione del tempo.",
-    objectives: [
-      "Completare due simulazioni d'esame in condizioni reali",
-      "Riconoscere gli schemi ricorrenti delle domande iSAQB",
-      "Colmare in modo mirato i gap emersi, con piano di ripasso",
-    ],
-    audience: ["Chi ha già frequentato un corso CPSA-F", "Self-learner che studiano sul curriculum pubblico", "Chi deve riprovare l'esame"],
-    modules: [
-      { title: "Pomeriggio 1 — Simulazione e diagnosi", hours: 4, topics: ["Simulazione cronometrata n. 1", "Correzione guidata e diagnosi dei gap", "Tecniche di gestione del tempo"] },
-      { title: "Pomeriggio 2 — AllTricks e simulazione finale", hours: 4, topics: ["Domande trabocchetto: pattern e contromisure", "Simulazione cronometrata n. 2", "Piano di ripasso personalizzato"] },
-    ],
-    prerequisites: ["Aver già studiato il curriculum Foundation (corso o auto-studio)"],
-    includes: ["Banca dati di 160 domande commentate", "Registrazioni disponibili per 14 giorni"],
-  },
-  {
-    slug: "cpsa-f-prestige-como",
-    short: "CPSA-F Prestige · Como",
-    title: "CPSA-Foundation® Prestige — Residenziale Lago di Como",
-    level: "Foundation",
-    format: "prestige",
-    status: "waitlist",
-    start: d(150),
-    end: d(154),
-    effort: "5 giornate · 32 ore + sessioni serali",
-    location: "Villa Serbellini — Tremezzo (CO)",
-    language: "IT",
-    seatsTotal: 14,
-    seatsLeft: 0,
-    price: 3400,
-    earlyBirdPct: 0.15,
-    earlyBirdUntil: d(60),
-    examIncluded: true,
-    image:
-      "https://images.pexels.com/photos/13829917/pexels-photo-13829917.png?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
-    tagline: "L'edizione più richiesta dell'anno: attualmente al completo, con lista d'attesa aperta.",
-    description:
-      "Il formato Prestige sul Lago di Como. Edizione al completo: iscrivendoti alla lista d'attesa sarai ricontattato in caso di rinuncia e avrai accesso prioritario alla prossima data.",
-    objectives: F_OBJECTIVES,
-    audience: F_AUDIENCE,
-    modules: F_MODULES,
-    prerequisites: F_PREREQUISITES,
-    includes: F_INCLUDES,
-  },
-];
+export interface ApiCourse {
+  id: number;
+  title: string;
+  weekend: boolean;
+  residential: boolean;
+  level: string;
+  stato: number;
+  open: boolean;
+  price: number | null;
+  earlyBirdPrice: number | null;
+  earlyBirdPct: number;
+  earlyBirdStart: string | null;
+  earlyBirdEnd: string | null;
+  start: string | null;
+  end: string | null;
+  location: Record<string, string>;
+  language: Record<string, string>;
+  bookingUrl: Record<string, string>;
+  seatsTotal: number | null;
+  seatsLeft: number | null;
+}
 
-export const nextCourse = () =>
-  COURSES.filter((c) => c.status !== "waitlist").sort((a, b) => a.start.getTime() - b.start.getTime())[0];
+const FORMAT_COPY: Record<CourseFormat, { image: string; tagline: string; description: string }> = {
+  online: {
+    image: "https://images.pexels.com/photos/18999565/pexels-photo-18999565.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
+    tagline: "Aula virtuale live: esercitazioni in breakout room e simulazione d'esame con il trainer.",
+    description:
+      "Il percorso Foundation copre l'intero curriculum iSAQB: dai fondamenti del ruolo alla progettazione, dalla documentazione alla valutazione della qualità. Le lezioni alternano teoria, casi reali dai progetti del docente e workshop di gruppo con revisione in plenaria.",
+  },
+  aula: {
+    image: "https://images.pexels.com/photos/3184328/pexels-photo-3184328.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
+    tagline: "Full immersion in presenza: lavagne, post-it e networking con professionisti di tutta Italia.",
+    description:
+      "Stessa qualità del curriculum iSAQB, con l'energia dell'aula fisica: esercitazioni al flipchart, design review a coppie e conversazioni che continuano durante le pause.",
+  },
+  prestige: {
+    image: "https://images.pexels.com/photos/38120266/pexels-photo-38120266.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
+    tagline: "Corso e soggiorno in una location d'eccezione: formazione intensiva senza distrazioni.",
+    description:
+      "Il percorso Foundation in formato residenziale: l'intero curriculum iSAQB, esercitazioni di gruppo e simulazione d'esame, con soggiorno in una location selezionata.",
+  },
+};
+
+const toDate = (iso: string | null, endOfDay = false) =>
+  new Date(`${(iso || "").slice(0, 10)}T${endOfDay ? "18:00" : "09:00"}:00`);
+
+function toCourse(a: ApiCourse): Course {
+  const online = /online/i.test(a.location.IT || "");
+  const format: CourseFormat = a.residential ? "prestige" : online ? "online" : "aula";
+  const start = toDate(a.start);
+  const end = toDate(a.end || a.start, true);
+  const days = a.weekend ? 4 : Math.max(1, Math.round((end.getTime() - start.getTime()) / DAY) + 1);
+  const concluded = a.stato === 5;
+  const seatsLeft = a.seatsLeft;
+  const status: CourseStatus = concluded
+    ? "concluded"
+    : !a.open
+      ? "waitlist"
+      : seatsLeft != null && seatsLeft <= 5
+        ? "few"
+        : "available";
+  const price = a.price ?? 0;
+  const copy = FORMAT_COPY[format];
+  // se ci sono entrambi i prezzi, lo sconto mostrato è quello reale tra i due
+  const pct = a.earlyBirdPrice && price ? 1 - a.earlyBirdPrice / price : a.earlyBirdPct;
+  const loc = a.location.IT || "";
+  const short = `CPSA-F ${a.weekend ? "Weekend" : online ? "Online" : loc} · ${fmtDate(start)}`;
+  return {
+    slug: String(a.id),
+    short,
+    title: a.title,
+    level: (a.level as CourseLevel) || "Foundation",
+    format,
+    status,
+    concluded,
+    start,
+    end,
+    effort: `${days} giornate · ${days * 8} ore`,
+    location: online ? "Aula virtuale live" : loc,
+    language: /^ital/i.test(a.language.IT || "") ? "IT" : "EN",
+    seatsTotal: a.seatsTotal,
+    seatsLeft,
+    price,
+    earlyBirdPct: pct > 0 ? pct : 0,
+    earlyBirdPrice: a.earlyBirdPrice,
+    earlyBirdFrom: a.earlyBirdStart ? new Date(a.earlyBirdStart) : new Date(0),
+    earlyBirdUntil: a.earlyBirdEnd ? new Date(a.earlyBirdEnd) : new Date(0),
+    examIncluded: true,
+    image: copy.image,
+    tagline: copy.tagline,
+    description: copy.description,
+    bookingUrl: a.bookingUrl.IT || "",
+    objectives: F_OBJECTIVES,
+    audience: F_AUDIENCE,
+    modules: F_MODULES,
+    prerequisites: F_PREREQUISITES,
+    includes: F_INCLUDES,
+  };
+}
+
+/** Lista corsi, popolata da loadCourses() prima del render (vedi main.tsx). */
+export let COURSES: Course[] = [];
+
+export async function loadCourses(): Promise<void> {
+  const res = await fetch("/api/corsi", { headers: { Accept: "application/json" } });
+  if (!res.ok) throw new Error(`GET /api/corsi → ${res.status}`);
+  const rows = (await res.json()) as ApiCourse[];
+  COURSES = rows.filter((r) => r.start).map(toCourse);
+}
+
+export const upcomingCourses = () =>
+  COURSES.filter((c) => !c.concluded).sort((a, b) => a.start.getTime() - b.start.getTime());
+
+export const concludedCourses = () =>
+  COURSES.filter((c) => c.concluded).sort((a, b) => b.start.getTime() - a.start.getTime());
+
+/** Prossima edizione con iscrizioni aperte (fallback: la prima in programma, poi l'ultima conclusa). */
+export const nextCourse = (): Course => {
+  const up = upcomingCourses();
+  return up.find((c) => c.status !== "waitlist") ?? up[0] ?? concludedCourses()[0] ?? EMPTY_COURSE;
+};
 
 export const bySlug = (slug: string) => COURSES.find((c) => c.slug === slug);
+
+const EMPTY_COURSE: Course = {
+  ...toCourse({
+    id: 0, title: "CPSA-Foundation®", weekend: false, residential: false, level: "Foundation", stato: 0, open: false,
+    price: 0, earlyBirdPrice: null, earlyBirdPct: 0, earlyBirdStart: null, earlyBirdEnd: null,
+    start: new Date().toISOString(), end: new Date().toISOString(), location: {}, language: {}, bookingUrl: {},
+    seatsTotal: null, seatsLeft: null,
+  }),
+};
+
 
 /* ------------------------------ numeri ---------------------------- */
 

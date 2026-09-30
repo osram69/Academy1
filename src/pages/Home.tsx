@@ -15,9 +15,9 @@ import {
 } from "lucide-react";
 import { cn } from "../utils/cn";
 import { Hero } from "../components/Hero";
-import { CourseCard } from "../components/CourseCard";
+import { ConcludedSection, CourseCard } from "../components/CourseCard";
 import { Btn, IsoCube, Reveal, Tag } from "../components/ui";
-import { COURSES, FAQS, TESTIMONIALS, TRAINER, fmtRange, nextCourse } from "../data";
+import { FAQS, TESTIMONIALS, TRAINER, concludedCourses, fmtRange, nextCourse, upcomingCourses } from "../data";
 
 /* ============================ cos'è CPSA-F ============================ */
 
@@ -257,9 +257,8 @@ function FormatsSection() {
 /* ========================== prossime edizioni ======================== */
 
 function EditionsSection() {
-  const upcoming = COURSES.filter((c) => c.status !== "waitlist")
-    .sort((a, b) => a.start.getTime() - b.start.getTime())
-    .slice(0, 3);
+  const upcoming = upcomingCourses().slice(0, 3);
+  const concluded = concludedCourses();
   return (
     <section className="relative overflow-hidden bg-paper py-24 lg:py-32" aria-labelledby="editions-title">
       <div className="bg-blueprint pointer-events-none absolute inset-0 opacity-50" aria-hidden="true" />
@@ -288,6 +287,7 @@ function EditionsSection() {
             </Reveal>
           ))}
         </div>
+        <ConcludedSection courses={concluded} limit={3} />
       </div>
     </section>
   );

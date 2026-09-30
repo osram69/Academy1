@@ -1,4 +1,4 @@
-import { ArrowUpRight, CalendarDays, Clock, Globe, MapPin } from "lucide-react";
+import { ArrowUpRight, CalendarDays, CheckCircle2, Clock, Globe, MapPin } from "lucide-react";
 import { cn } from "../utils/cn";
 import {
   FORMAT_META,
@@ -7,7 +7,7 @@ import {
   getLivePrice,
   type Course,
 } from "../data";
-import { Btn, EarlyBirdChip, SeatsBar, StatusPill } from "./ui";
+import { Btn, EarlyBirdChip, Reveal, SeatsBar, StatusPill, Tag } from "./ui";
 
 /**
  * CourseCard — sostituisce la riga della vecchia "tabella listino".
@@ -16,6 +16,7 @@ import { Btn, EarlyBirdChip, SeatsBar, StatusPill } from "./ui";
  * CTA secondaria "Iscriviti" con aria-label esplicito.
  */
 export function CourseCard({ course, index = 0 }: { course: Course; index?: number }) {
+  if (course.concluded) return <ConcludedCard course={course} />;
   const price = getLivePrice(course);
   const fmt = FORMAT_META[course.format];
   const waitlist = course.status === "waitlist";
@@ -129,6 +130,70 @@ export function CourseCard({ course, index = 0 }: { course: Course; index?: numb
         </div>
       </div>
     </article>
+  );
+}
+
+
+/** Card compatta per le edizioni concluse: vetrina di storico, senza prezzo né CTA. */
+function ConcludedCard({ course }: { course: Course }) {
+  const fmt = FORMAT_META[course.format];
+  return (
+    <article
+      aria-label={`${course.title}, edizione conclusa, ${fmtRange(course.start, course.end)}, ${course.location}`}
+      className="relative flex h-full flex-col overflow-hidden rounded-[22px] border border-ink/10 bg-white/70"
+    >
+      <div className="relative aspect-[16/7] overflow-hidden">
+        <img src={course.image} alt="" loading="lazy" className="size-full object-cover grayscale" />
+        <div className="absolute inset-0 bg-gradient-to-t from-ink/75 via-ink/25 to-ink/10" aria-hidden="true" />
+        <span className="absolute left-4 top-4 rounded-full bg-ink/75 px-3 py-1.5 font-mono text-[10.5px] font-semibold uppercase tracking-[0.16em] text-white">
+          {fmt.label}
+        </span>
+        <span className="absolute bottom-3 right-4 inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-ink">
+          <CheckCircle2 className="size-3.5 text-mint" aria-hidden="true" />
+          Concluso
+        </span>
+      </div>
+      <div className="flex flex-1 flex-col p-5">
+        <h3 className="font-display text-[17px] font-bold leading-snug tracking-tight text-ink/80">{course.title}</h3>
+        <ul className="mt-3 space-y-1.5 text-[13px] text-ink/60">
+          <li className="flex items-center gap-2.5">
+            <CalendarDays className="size-4 shrink-0 text-steel" aria-hidden="true" />
+            <span className="font-semibold text-ink/75">{fmtRange(course.start, course.end)}</span>
+          </li>
+          <li className="flex items-center gap-2.5">
+            <MapPin className="size-4 shrink-0 text-steel" aria-hidden="true" />
+            {course.location}
+            <span className="text-steel">·</span>
+            <Globe className="size-3.5 text-steel" aria-hidden="true" />
+            {course.language}
+          </li>
+        </ul>
+      </div>
+    </article>
+  );
+}
+
+/** Sezione "Edizioni concluse": mostra le ultime edizioni erogate. */
+export function ConcludedSection({ courses, limit = 6 }: { courses: Course[]; limit?: number }) {
+  if (!courses.length) return null;
+  return (
+    <section className="mt-20" aria-labelledby="concluded-title">
+      <Reveal>
+        <Tag>Storico</Tag>
+      </Reveal>
+      <Reveal delay={80}>
+        <h2 id="concluded-title" className="mt-5 font-display text-[clamp(1.6rem,3vw,2.4rem)] font-bold leading-tight tracking-[-0.02em] text-ink">
+          Edizioni <em className="font-serif italic text-flame">concluse.</em>
+        </h2>
+      </Reveal>
+      <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+        {courses.slice(0, limit).map((c, i) => (
+          <Reveal key={c.slug} delay={(i % 3) * 90}>
+            <ConcludedCard course={c} />
+          </Reveal>
+        ))}
+      </div>
+    </section>
   );
 }
 

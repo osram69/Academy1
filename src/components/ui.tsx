@@ -129,7 +129,7 @@ export function Btn({
 
 /* --------------------------- Status pill -------------------------- */
 
-export function StatusPill({ status, seatsLeft, dark = false }: { status: CourseStatus; seatsLeft?: number; dark?: boolean }) {
+export function StatusPill({ status, seatsLeft, dark = false }: { status: CourseStatus; seatsLeft?: number | null; dark?: boolean }) {
   const map = {
     available: {
       cls: dark ? "bg-emerald-400/10 text-emerald-300 ring-emerald-300/25" : "bg-emerald-50 text-mint ring-mint/25",
@@ -146,11 +146,16 @@ export function StatusPill({ status, seatsLeft, dark = false }: { status: Course
       dot: "bg-steel",
       label: "Lista d'attesa",
     },
+    concluded: {
+      cls: dark ? "bg-white/10 text-white/60 ring-white/15" : "bg-ink/5 text-steel ring-ink/15",
+      dot: "bg-steel",
+      label: "Edizione conclusa",
+    },
   } as const;
   const s = map[status];
   return (
     <span className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1", s.cls)}>
-      <span className={cn("inline-block size-1.5 rounded-full", s.dot, status !== "waitlist" && "animate-pulse-dot")} aria-hidden="true" />
+      <span className={cn("inline-block size-1.5 rounded-full", s.dot, (status === "available" || status === "few") && "animate-pulse-dot")} aria-hidden="true" />
       {s.label}
     </span>
   );
@@ -191,23 +196,25 @@ export function EarlyBirdChip({ course, dark = false, className }: { course: Cou
 /* ---------------------------- Seats bar --------------------------- */
 
 export function SeatsBar({ course, dark = false }: { course: Course; dark?: boolean }) {
-  const pct = Math.round(((course.seatsTotal - course.seatsLeft) / course.seatsTotal) * 100);
+  const { seatsTotal, seatsLeft } = course;
+  if (seatsTotal == null || seatsLeft == null || seatsTotal <= 0 || course.concluded) return null;
+  const pct = Math.round(((seatsTotal - seatsLeft) / seatsTotal) * 100);
   return (
     <div>
       <div className={cn("flex items-center justify-between text-[11.5px] font-medium", dark ? "text-white/55" : "text-steel")}>
         <span className="inline-flex items-center gap-1.5">
           <Users className="size-3.5" aria-hidden="true" />
-          {course.status === "waitlist" ? "Edizione al completo" : `${course.seatsLeft} posti rimasti su ${course.seatsTotal}`}
+          {course.status === "waitlist" ? "Edizione al completo" : `${seatsLeft} posti rimasti su ${seatsTotal}`}
         </span>
         <span className="font-mono">{pct}%</span>
       </div>
       <div
         className={cn("mt-1.5 h-1 overflow-hidden rounded-full", dark ? "bg-white/10" : "bg-ink/8")}
         role="progressbar"
-        aria-valuenow={course.seatsTotal - course.seatsLeft}
+        aria-valuenow={seatsTotal - seatsLeft}
         aria-valuemin={0}
-        aria-valuemax={course.seatsTotal}
-        aria-label={`Posti occupati: ${course.seatsTotal - course.seatsLeft} su ${course.seatsTotal}`}
+        aria-valuemax={seatsTotal}
+        aria-label={`Posti occupati: ${seatsTotal - seatsLeft} su ${seatsTotal}`}
       >
         <div
           className={cn("h-full rounded-full transition-[width] duration-700", course.status === "few" ? "bg-amber-400" : "bg-flame")}

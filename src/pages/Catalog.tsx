@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { ListFilter, UsersRound } from "lucide-react";
 import { cn } from "../utils/cn";
-import { CourseCard } from "../components/CourseCard";
+import { ConcludedSection, CourseCard } from "../components/CourseCard";
 import { Reveal, Tag } from "../components/ui";
 import { COURSES, FORMAT_META, type CourseFormat, type CourseLevel, type Lang } from "../data";
 
@@ -63,15 +63,23 @@ export function Catalog() {
   const [level, setLevel] = useState<CourseLevel | "all">("all");
   const [lang, setLang] = useState<Lang | "all">("all");
 
-  const results = useMemo(
+  const filtered = useMemo(
     () =>
       COURSES.filter(
         (c) =>
           (format === "all" || c.format === format) &&
           (level === "all" || c.level === level) &&
           (lang === "all" || c.language === lang)
-      ).sort((a, b) => a.start.getTime() - b.start.getTime()),
+      ),
     [format, level, lang]
+  );
+  const results = useMemo(
+    () => filtered.filter((c) => !c.concluded).sort((a, b) => a.start.getTime() - b.start.getTime()),
+    [filtered]
+  );
+  const concluded = useMemo(
+    () => filtered.filter((c) => c.concluded).sort((a, b) => b.start.getTime() - a.start.getTime()),
+    [filtered]
   );
 
   return (
@@ -144,6 +152,8 @@ export function Catalog() {
             ))}
           </div>
         )}
+
+        <ConcludedSection courses={concluded} />
 
         {/* banner team */}
         <Reveal className="mt-16">

@@ -5,12 +5,14 @@ import { Home } from "./pages/Home";
 import { Catalog } from "./pages/Catalog";
 import { CourseDetail } from "./pages/CourseDetail";
 import { Enroll } from "./pages/Enroll";
+import { Admin } from "./admin/Admin";
 import { bySlug } from "./data";
 
-type Route = { page: "home" } | { page: "catalog" } | { page: "course"; slug: string } | { page: "enroll"; slug: string };
+type Route = { page: "home" } | { page: "admin" } | { page: "catalog" } | { page: "course"; slug: string } | { page: "enroll"; slug: string };
 
 function parseRoute(hash: string): Route {
   const parts = hash.replace(/^#\/?/, "").split("/").filter(Boolean);
+  if (parts[0] === "admin") return { page: "admin" };
   if (parts[0] === "corsi") return { page: "catalog" };
   if (parts[0] === "corso" && parts[1]) return { page: "course", slug: parts[1] };
   if (parts[0] === "iscriviti" && parts[1]) return { page: "enroll", slug: parts[1] };
@@ -39,17 +41,19 @@ export default function App() {
       break;
     case "course": {
       const course = bySlug(route.slug);
-      page = course ? <CourseDetail course={course} /> : <Catalog />;
+      page = course && !course.concluded ? <CourseDetail course={course} /> : <Catalog />;
       break;
     }
     case "enroll": {
       const course = bySlug(route.slug);
-      page = course ? <Enroll key={course.slug} course={course} /> : <Catalog />;
+      page = course && !course.concluded ? <Enroll key={course.slug} course={course} /> : <Catalog />;
       break;
     }
     default:
       page = <Home />;
   }
+
+  if (route.page === "admin") return <Admin hash={hash} />;
 
   return (
     <div className="min-h-screen bg-paper">

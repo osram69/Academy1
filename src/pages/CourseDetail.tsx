@@ -141,7 +141,7 @@ function Block({ id, n, title, children }: { id: string; n: string; title: strin
 export function CourseDetail({ course }: { course: Course }) {
   const [openModule, setOpenModule] = useState(0);
   const price = getLivePrice(course);
-  const related = COURSES.filter((c) => c.slug !== course.slug)
+  const related = COURSES.filter((c) => c.slug !== course.slug && !c.concluded)
     .sort((a, b) => a.start.getTime() - b.start.getTime())
     .slice(0, 3);
   const fmt = FORMAT_META[course.format];
@@ -194,8 +194,10 @@ export function CourseDetail({ course }: { course: Course }) {
             <p className="max-w-2xl text-[16px] leading-[1.75] text-ink/70">{course.description}</p>
             <div className="mt-8 grid gap-4 sm:grid-cols-3">
               {[
-                { v: `${course.seatsTotal}`, l: "posti per edizione" },
-                { v: course.format === "prestige" ? "5 gg" : "4 gg", l: "di formazione live" },
+                course.seatsTotal != null
+                  ? { v: `${course.seatsTotal}`, l: "posti per edizione" }
+                  : { v: course.location, l: "sede" },
+                { v: `${course.effort.split(" ")[0]} gg`, l: "di formazione live" },
                 { v: price.active ? `−${Math.round(course.earlyBirdPct * 100)}%` : eur(price.unit), l: price.active ? "early bird attivo ora" : "prezzo a persona + IVA" },
               ].map((s) => (
                 <div key={s.l} className="rounded-2xl border border-ink/10 bg-white p-5">
@@ -358,7 +360,7 @@ export function CourseDetail({ course }: { course: Course }) {
             <div className="min-w-0 flex-1">
               <p className="truncate font-display text-sm font-bold text-ink">{fmtRange(course.start, course.end)}</p>
               <p className="font-mono text-[11px] text-steel">
-                {eur(getLivePrice(course).unit)} + IVA · <span className="text-flame">{course.seatsLeft} posti</span>
+                {eur(getLivePrice(course).unit)} + IVA{course.seatsLeft != null && <> · <span className="text-flame">{course.seatsLeft} posti</span></>}
               </p>
             </div>
             <Btn href={`#/iscriviti/${course.slug}`} ariaLabel={`Iscriviti a ${course.short}`}>

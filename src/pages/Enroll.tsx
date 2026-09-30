@@ -148,10 +148,12 @@ function StepConfigure({ course, count, setCount }: { course: Course; count: num
             <a href="#/corsi" className="link-sweep text-[13px] font-semibold text-flame">
               Cambia edizione o corso →
             </a>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-mint/10 px-3 py-1 text-[12px] font-semibold text-mint">
-              <BadgeCheck className="size-3.5" aria-hidden="true" />
-              {course.seatsLeft} posti disponibili
-            </span>
+            {course.seatsLeft != null && (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-mint/10 px-3 py-1 text-[12px] font-semibold text-mint">
+                <BadgeCheck className="size-3.5" aria-hidden="true" />
+                {course.seatsLeft} posti disponibili
+              </span>
+            )}
           </div>
         </div>
       </div>
@@ -180,7 +182,7 @@ function StepConfigure({ course, count, setCount }: { course: Course; count: num
             ))}
           </div>
         </div>
-        <p className="field-note">Massimo {course.seatsLeft} posti per questa edizione · prezzo a persona {eur(price.unit)} + IVA</p>
+        <p className="field-note">{course.seatsLeft != null && <>Massimo {course.seatsLeft} posti per questa edizione · </>}Prezzo a persona {eur(price.unit)} + IVA</p>
         {count >= 8 && (
           <div className="mt-4 flex items-start gap-3 rounded-xl border border-gold/30 bg-amber-50 p-4 text-[13px] leading-snug text-ink/75">
             <Users className="mt-0.5 size-4.5 shrink-0 text-gold" aria-hidden="true" />
