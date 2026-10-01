@@ -45,11 +45,11 @@ function PriceRail({ course }: { course: Course }) {
           <div className="mt-5 flex items-end gap-3">
             <p className="font-display text-[42px] font-bold leading-none tracking-tight">
               {eur(price.unit)}
-              {waitlist && <span className="text-lg text-white/40">*</span>}
+              {waitlist && <span className="text-lg text-white/56">*</span>}
             </p>
-            {price.original && <p className="pb-1 text-lg text-white/35 line-through">{eur(price.original)}</p>}
+            {price.original && <p className="pb-1 text-lg text-white/52 line-through">{eur(price.original)}</p>}
           </div>
-          <p className="mt-1.5 text-[12.5px] text-white/50">
+          <p className="mt-1.5 text-[12.5px] text-white/64">
             a persona + IVA 22%{waitlist ? " · prezzo indicativo per la prossima data" : ""}
           </p>
           {price.active && (
@@ -154,7 +154,7 @@ export function CourseDetail({ course }: { course: Course }) {
         <img src={course.image} alt="" className="absolute inset-0 size-full object-cover opacity-20" />
         <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/75 to-ink/40" aria-hidden="true" />
         <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
-          <nav aria-label="Breadcrumb" className="flex items-center gap-2 font-mono text-[11.5px] uppercase tracking-widest text-white/45">
+          <nav aria-label="Breadcrumb" className="flex items-center gap-2 font-mono text-[11.5px] uppercase tracking-widest text-white/60">
             <a href="#/" className="transition-colors hover:text-white">Home</a>
             <ChevronRight className="size-3.5" aria-hidden="true" />
             <a href="#/corsi" className="transition-colors hover:text-white">Catalogo</a>
@@ -183,7 +183,7 @@ export function CourseDetail({ course }: { course: Course }) {
           <h1 className="mt-7 max-w-4xl font-display text-[clamp(2.2rem,5vw,4rem)] font-bold leading-[1.03] tracking-[-0.025em]">
             {course.title}
           </h1>
-          <p className="mt-6 max-w-2xl font-serif text-[19px] italic leading-relaxed text-white/65">{course.tagline}</p>
+          <p className="mt-6 max-w-2xl font-serif text-[19px] italic leading-relaxed text-white/76">{course.tagline}</p>
         </div>
       </header>
 

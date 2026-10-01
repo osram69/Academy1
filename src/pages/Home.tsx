@@ -115,7 +115,7 @@ function CertificationSection() {
               />
               <div className="min-w-0">
                 <p className="font-display text-[15px] font-semibold">{TRAINER.name}</p>
-                <p className="mt-0.5 text-[13px] leading-snug text-white/55">{TRAINER.role}</p>
+                <p className="mt-0.5 text-[13px] leading-snug text-white/68">{TRAINER.role}</p>
               </div>
               <a
                 href="#/corso/cpsa-f-online"
@@ -182,7 +182,7 @@ function FormatsSection() {
             </Reveal>
           </div>
           <Reveal delay={160}>
-            <p className="max-w-sm text-[15px] leading-relaxed text-white/50">
+            <p className="max-w-sm text-[15px] leading-relaxed text-white/64">
               Scegli in base ad agenda e budget: il voucher d'esame CPSA-F e i docenti accreditati sono identici in ogni
               formato.
             </p>
@@ -221,13 +221,13 @@ function FormatsSection() {
                     >
                       <f.icon className="size-5.5" aria-hidden="true" />
                     </span>
-                    <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-white/35">
+                    <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-white/52">
                       0{i + 1}
                     </span>
                   </div>
                   <h3 className="mt-6 font-display text-2xl font-bold tracking-tight">{f.title}</h3>
-                  <p className={cn("mt-1 font-serif text-lg italic", f.dark ? "text-ember" : "text-white/60")}>{f.claim}</p>
-                  <p className="mt-4 text-[14.5px] leading-relaxed text-white/55">{f.text}</p>
+                  <p className={cn("mt-1 font-serif text-lg italic", f.dark ? "text-ember" : "text-white/72")}>{f.claim}</p>
+                  <p className="mt-4 text-[14.5px] leading-relaxed text-white/68">{f.text}</p>
                   <ul className="mt-6 space-y-2.5 border-t border-white/10 pt-5 [margin-top:auto]">
                     {f.points.map((p) => (
                       <li key={p} className="flex items-start gap-2.5 text-[13.5px] font-medium text-white/75">
@@ -445,7 +445,7 @@ function CtaSection() {
           </h2>
         </Reveal>
         <Reveal delay={180}>
-          <p className="mt-6 max-w-xl text-[16.5px] leading-relaxed text-white/60">
+          <p className="mt-6 max-w-xl text-[16.5px] leading-relaxed text-white/72">
             {next.short} · {fmtRange(next.start, next.end)} · {next.location}. Early bird attivo: blocchi il prezzo ora,
             pensiamo noi a voucher d'esame e materiali.
           </p>

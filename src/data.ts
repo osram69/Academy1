@@ -441,7 +441,7 @@ export const STATS = [
   { value: "740+", label: "professionisti certificati" },
   { value: "98,4%", label: "esame superato al primo tentativo" },
   { value: "4,9/5", label: "valutazione media · 212 recensioni" },
-  { value: "13", label: "anni di corsi, dal 2013" },
+  { value: "2", label: "anni di corsi, dal 2024" },
 ];
 
 /* --------------------------- testimonianze ------------------------ */

@@ -17,7 +17,7 @@ function FloatingCourseCard() {
         <EarlyBirdChip course={course} dark />
       </div>
       <p className="mt-3 font-display text-lg font-bold leading-tight tracking-tight text-white">{course.short}</p>
-      <div className="mt-2.5 space-y-1.5 text-[12.5px] text-white/60">
+      <div className="mt-2.5 space-y-1.5 text-[12.5px] text-white/72">
         <p className="flex items-center gap-2">
           <CalendarDays className="size-3.5 text-flame" aria-hidden="true" />
           {fmtRange(course.start, course.end)}
@@ -34,7 +34,7 @@ function FloatingCourseCard() {
         <p className="font-display text-xl font-bold text-white">
           {eur(price.unit)}
           {price.original && (
-            <span className="ml-2 align-middle text-[12px] font-normal text-white/40 line-through">{eur(price.original)}</span>
+            <span className="ml-2 align-middle text-[12px] font-normal text-white/56 line-through">{eur(price.original)}</span>
           )}
         </p>
         <Btn href={`#/iscriviti/${course.slug}`} size="sm" ariaLabel="Iscriviti alla prossima edizione">
@@ -64,7 +64,7 @@ export function Hero() {
             <p className="inline-flex items-center gap-2.5 rounded-full border border-white/12 bg-white/5 py-2 pl-3 pr-4 text-[12.5px] font-medium text-white/75">
               <ShieldCheck className="size-4 text-flame" aria-hidden="true" />
               Training Provider accreditato <strong className="font-semibold text-white">iSAQB®</strong>
-              <span className="hidden text-white/30 sm:inline">· dal 2013</span>
+              <span className="hidden text-white/65 sm:inline">· dal 2024</span>
             </p>
           </Reveal>
 
@@ -75,12 +75,12 @@ export function Hero() {
               del software si{" "}
               <em className="font-serif font-normal italic tracking-[-0.01em] text-flame">disegna.</em>
               <br />
-              <span className="text-white/45">E si certifica.</span>
+              <span className="text-white/60">E si certifica.</span>
             </h1>
           </Reveal>
 
           <Reveal delay={180}>
-            <p className="mt-7 max-w-xl text-[17px] leading-relaxed text-white/60">
+            <p className="mt-7 max-w-xl text-[17px] leading-relaxed text-white/72">
               Corsi <strong className="font-semibold text-white/85">CPSA-Foundation®</strong> con docenti che progettano
               sistemi veri, voucher d'esame incluso e formati per ogni agenda: online, in aula o residenziale in una
               villa toscana.
@@ -102,7 +102,7 @@ export function Hero() {
                 <div key={s.label}>
                   <dt className="sr-only">{s.label}</dt>
                   <dd className="font-display text-[26px] font-bold tracking-tight text-white">{s.value}</dd>
-                  <dd className="mt-1 text-[11.5px] leading-snug text-white/45">{s.label}</dd>
+                  <dd className="mt-1 text-[11.5px] leading-snug text-white/60">{s.label}</dd>
                 </div>
               ))}
             </dl>
@@ -113,7 +113,7 @@ export function Hero() {
         <Reveal delay={200} className="relative hidden lg:block">
           <div className="relative mr-6">
             {/* HUD labels */}
-            <p className="absolute -top-7 left-2 font-mono text-[10px] uppercase tracking-[0.28em] text-white/35" aria-hidden="true">
+            <p className="absolute -top-7 left-2 font-mono text-[10px] uppercase tracking-[0.28em] text-white/52" aria-hidden="true">
               FIG. 01 — STRUCTURE / STRATEGY
             </p>
             <div className="ticks ticks-light p-3">
@@ -124,7 +124,7 @@ export function Hero() {
                   className="aspect-[4/4.6] w-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-ink/50 to-transparent" aria-hidden="true" />
-                <p className="absolute bottom-4 left-4 font-mono text-[10px] uppercase tracking-[0.28em] text-white/55" aria-hidden="true">
+                <p className="absolute bottom-4 left-4 font-mono text-[10px] uppercase tracking-[0.28em] text-white/68" aria-hidden="true">
                   CPSA-F · Foundation Level
                 </p>
               </div>
@@ -161,7 +161,7 @@ export function Hero() {
                   "Rimborso 100% fino a 14 giorni prima",
                   "Fatturazione elettronica SDI",
                 ].map((t) => (
-                  <span key={t} className="flex items-center gap-10 font-mono text-[11.5px] uppercase tracking-[0.24em] text-white/45">
+                  <span key={t} className="flex items-center gap-10 font-mono text-[11.5px] uppercase tracking-[0.24em] text-white/60">
                     {t}
                     <span className="inline-block size-[7px] rotate-45 bg-flame" aria-hidden="true" />
                   </span>

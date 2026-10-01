@@ -826,14 +826,14 @@ export function Enroll({ course }: { course: Course }) {
       <header className="relative overflow-hidden bg-ink pb-16 pt-32 text-white lg:pt-36">
         <div className="bg-blueprint-dark absolute inset-0" aria-hidden="true" />
         <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
-          <p className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/5 px-3.5 py-1.5 font-mono text-[10.5px] font-semibold uppercase tracking-[0.2em] text-white/65">
+          <p className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/5 px-3.5 py-1.5 font-mono text-[10.5px] font-semibold uppercase tracking-[0.2em] text-white/76">
             <CheckCircle2 className="size-3.5 text-mint" aria-hidden="true" />
             Iscrizione guidata · 4 passi · circa 4 minuti
           </p>
           <h1 className="mt-5 max-w-2xl font-display text-[clamp(1.9rem,4.5vw,3.2rem)] font-bold leading-[1.05] tracking-[-0.025em]">
             Iscriviti a <em className="font-serif italic text-flame">{course.short}.</em>
           </h1>
-          <p className="mt-3 text-[14.5px] text-white/55">
+          <p className="mt-3 text-[14.5px] text-white/68">
             {fmtRange(course.start, course.end)} · {course.effort} · {course.location}
           </p>
         </div>

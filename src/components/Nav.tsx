@@ -69,7 +69,7 @@ export function Nav({ route }: { route: string }) {
                 onClick={go(l.href, l.section)}
                 className={cn(
                   "link-sweep text-[13.5px] font-medium transition-colors",
-                  isActive(l.href) && !l.section ? "text-white" : "text-white/60 hover:text-white"
+                  isActive(l.href) && !l.section ? "text-white" : "text-white/72 hover:text-white"
                 )}
               >
                 {l.label}
@@ -107,7 +107,7 @@ export function Nav({ route }: { route: string }) {
                         }}
                         className={cn(
                           "w-full px-4 py-2 text-left font-mono text-[11px] tracking-widest transition-colors",
-                          l === lang ? "bg-flame/15 text-flame" : "text-white/60 hover:bg-white/5 hover:text-white"
+                          l === lang ? "bg-flame/15 text-flame" : "text-white/72 hover:bg-white/5 hover:text-white"
                         )}
                       >
                         {l}
@@ -175,7 +175,7 @@ export function Nav({ route }: { route: string }) {
               onClick={() => setLang(l)}
               className={cn(
                 "rounded-full border px-3 py-1.5 font-mono text-[11px] tracking-widest",
-                l === lang ? "border-flame bg-flame/15 text-flame" : "border-white/15 text-white/50"
+                l === lang ? "border-flame bg-flame/15 text-flame" : "border-white/15 text-white/64"
               )}
             >
               {l}

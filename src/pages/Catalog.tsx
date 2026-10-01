@@ -102,7 +102,7 @@ export function Catalog() {
             </h1>
           </Reveal>
           <Reveal delay={160}>
-            <p className="mt-6 max-w-xl text-[16px] leading-relaxed text-white/55">
+            <p className="mt-6 max-w-xl text-[16px] leading-relaxed text-white/68">
               Niente più tabelle da foglio di calcolo: ogni corso è una scheda con posti, early bird e prezzo in tempo
               reale. Filtra per formato, livello e lingua.
             </p>
@@ -172,7 +172,7 @@ export function Catalog() {
                 <h2 className="font-display text-2xl font-bold tracking-tight lg:text-3xl">
                   Hai un team da certificare?
                 </h2>
-                <p className="mt-2 max-w-2xl text-[15px] leading-relaxed text-white/60">
+                <p className="mt-2 max-w-2xl text-[15px] leading-relaxed text-white/72">
                   Da 8 persone in su: edizione privata con casi di studio sul vostro dominio, nella vostra sede, online
                   o in formato Prestige. Preventivo in 48 ore.
                 </p>

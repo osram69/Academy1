@@ -11,7 +11,7 @@ export function Footer() {
             <a href="#/" className="inline-block" aria-label="Cube Academy — Home">
               <img src="/img/logo-cube-academy.png" alt="Cube Academy" width={1000} height={173} className="h-10 w-auto" />
             </a>
-            <p className="mt-5 max-w-xs text-sm leading-relaxed text-white/55">
+            <p className="mt-5 max-w-xs text-sm leading-relaxed text-white/68">
               Training Provider accreditato iSAQB®. Formiamo gli architetti del software italiani dal 2013 — online, in
               aula e nelle residenze Prestige.
             </p>
@@ -23,7 +23,7 @@ export function Footer() {
               ].map((b) => (
                 <span
                   key={b.label}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-white/12 px-3 py-1.5 text-[11px] font-medium text-white/65"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-white/12 px-3 py-1.5 text-[11px] font-medium text-white/76"
                 >
                   <b.icon className="size-3.5 text-flame" aria-hidden="true" />
                   {b.label}
@@ -33,11 +33,11 @@ export function Footer() {
           </div>
 
           <nav aria-label="Corsi">
-            <h3 className="font-mono text-[11px] font-medium uppercase tracking-[0.22em] text-white/40">Corsi</h3>
+            <h3 className="font-mono text-[11px] font-medium uppercase tracking-[0.22em] text-white/56">Corsi</h3>
             <ul className="mt-4 space-y-2.5 text-sm">
               {upcomingCourses().slice(0, 5).map((c) => (
                 <li key={c.slug}>
-                  <a href={`#/corso/${c.slug}`} className="link-sweep text-white/65 transition-colors hover:text-white">
+                  <a href={`#/corso/${c.slug}`} className="link-sweep text-white/76 transition-colors hover:text-white">
                     {c.short}
                   </a>
                 </li>
@@ -51,7 +51,7 @@ export function Footer() {
           </nav>
 
           <nav aria-label="Academy">
-            <h3 className="font-mono text-[11px] font-medium uppercase tracking-[0.22em] text-white/40">Academy</h3>
+            <h3 className="font-mono text-[11px] font-medium uppercase tracking-[0.22em] text-white/56">Academy</h3>
             <ul className="mt-4 space-y-2.5 text-sm">
               {[
                 { label: "La certificazione CPSA-F", section: "certificazione" },
@@ -67,14 +67,14 @@ export function Footer() {
                       if (window.location.hash !== "#/") window.location.hash = "#/";
                       setTimeout(() => document.getElementById(l.section)?.scrollIntoView({ behavior: "smooth" }), 120);
                     }}
-                    className="link-sweep text-white/65 transition-colors hover:text-white"
+                    className="link-sweep text-white/76 transition-colors hover:text-white"
                   >
                     {l.label}
                   </a>
                 </li>
               ))}
               <li>
-                <a href={`mailto:${ORG.email}`} className="link-sweep text-white/65 transition-colors hover:text-white">
+                <a href={`mailto:${ORG.email}`} className="link-sweep text-white/76 transition-colors hover:text-white">
                   Formazione per team
                 </a>
               </li>
@@ -82,8 +82,8 @@ export function Footer() {
           </nav>
 
           <div>
-            <h3 className="font-mono text-[11px] font-medium uppercase tracking-[0.22em] text-white/40">Contatti</h3>
-            <ul className="mt-4 space-y-3 text-sm text-white/65">
+            <h3 className="font-mono text-[11px] font-medium uppercase tracking-[0.22em] text-white/56">Contatti</h3>
+            <ul className="mt-4 space-y-3 text-sm text-white/76">
               <li className="flex items-start gap-2.5">
                 <MapPin className="mt-0.5 size-4 shrink-0 text-flame" aria-hidden="true" />
                 {ORG.address}
@@ -101,7 +101,7 @@ export function Footer() {
                 </a>
               </li>
             </ul>
-            <p className="mt-5 font-mono text-[11px] leading-relaxed text-white/35">
+            <p className="mt-5 font-mono text-[11px] leading-relaxed text-white/52">
               Lun–Ven 9:00–18:00 CET
               <br />
               Rispondiamo entro 4 ore lavorative
@@ -109,7 +109,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-14 flex flex-col items-start justify-between gap-3 border-t border-white/10 pt-6 font-mono text-[11px] text-white/40 sm:flex-row sm:items-center">
+        <div className="mt-14 flex flex-col items-start justify-between gap-3 border-t border-white/10 pt-6 font-mono text-[11px] text-white/56 sm:flex-row sm:items-center">
           <p>
             © 2026 {ORG.company} · {ORG.vat}
           </p>

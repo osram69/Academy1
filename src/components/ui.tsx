@@ -59,7 +59,7 @@ export function Tag({ children, dark = false, className }: { children: ReactNode
     <span
       className={cn(
         "inline-flex items-center gap-2.5 font-mono text-[11px] font-medium uppercase tracking-[0.22em]",
-        dark ? "text-white/60" : "text-steel",
+        dark ? "text-white/72" : "text-steel",
         className
       )}
     >
@@ -147,7 +147,7 @@ export function StatusPill({ status, seatsLeft, dark = false }: { status: Course
       label: "Lista d'attesa",
     },
     concluded: {
-      cls: dark ? "bg-white/10 text-white/60 ring-white/15" : "bg-ink/5 text-steel ring-ink/15",
+      cls: dark ? "bg-white/10 text-white/72 ring-white/15" : "bg-ink/5 text-steel ring-ink/15",
       dot: "bg-steel",
       label: "Edizione conclusa",
     },
@@ -201,7 +201,7 @@ export function SeatsBar({ course, dark = false }: { course: Course; dark?: bool
   const pct = Math.round(((seatsTotal - seatsLeft) / seatsTotal) * 100);
   return (
     <div>
-      <div className={cn("flex items-center justify-between text-[11.5px] font-medium", dark ? "text-white/55" : "text-steel")}>
+      <div className={cn("flex items-center justify-between text-[11.5px] font-medium", dark ? "text-white/68" : "text-steel")}>
         <span className="inline-flex items-center gap-1.5">
           <Users className="size-3.5" aria-hidden="true" />
           {course.status === "waitlist" ? "Edizione al completo" : `${seatsLeft} posti rimasti su ${seatsTotal}`}
