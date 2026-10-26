@@ -2,8 +2,6 @@
 // <NOME> per il live, <NOME>_TEST per la sandbox. Il modo è scelto da PAYMENTS_TEST_MODE (default: true).
 import Stripe from "stripe";
 
-export const testMode = () => String(process.env.PAYMENTS_TEST_MODE ?? "true").toLowerCase() !== "false";
-
 const env = (name, test) => (test ? process.env[`${name}_TEST`] : process.env[name]);
 
 export const stripeSecret = (t) => env("STRIPE_SECRET", t);
@@ -26,14 +24,24 @@ export const bankDetails = () => ({
   bic: process.env.BANK_BIC || "",
 });
 
-export function configured(t = testMode()) {
-  const p = paypalCreds(t), s = sumupCreds(t);
-  return {
-    stripe: !!stripeSecret(t),
-    paypal: !!(p.clientId && p.secret),
-    sumup: !!(s.apiKey && s.merchantCode),
-    bonifico: !!bankDetails().iban,
-  };
+/** Nomi delle variabili d'ambiente richieste per ogni metodo (sandbox / live). */
+const REQUIRED = {
+  stripe: (t) => [t ? "STRIPE_SECRET_TEST" : "STRIPE_SECRET"],
+  paypal: (t) => (t ? ["PAYPAL_CLIENT_ID_TEST", "PAYPAL_SECRET_TEST"] : ["PAYPAL_CLIENT_ID", "PAYPAL_SECRET"]),
+  sumup: (t) => (t ? ["SUMUP_API_KEY_TEST", "SUMUP_MERCHANT_CODE_TEST"] : ["SUMUP_API_KEY", "SUMUP_MERCHANT_CODE"]),
+  bonifico: () => ["BANK_IBAN"],
+};
+
+/** Stato di ogni metodo: abilitato dal pannello, chiavi presenti, modalità sandbox. */
+export function methodStatus(settings) {
+  const out = {};
+  for (const id of Object.keys(REQUIRED)) {
+    const cfg = settings.methods[id];
+    const sandbox = id === "bonifico" ? false : cfg.sandbox;
+    const missing = REQUIRED[id](sandbox).filter((n) => !process.env[n]);
+    out[id] = { enabled: cfg.enabled, sandbox, configured: missing.length === 0, missing, available: cfg.enabled && missing.length === 0 };
+  }
+  return out;
 }
 
 // Tutti i provider tornano su una rotta server che verifica il pagamento e poi reindirizza alla SPA.

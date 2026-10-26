@@ -15,6 +15,7 @@ import { cn } from "../utils/cn";
 import { Hero } from "../components/Hero";
 import { ConcludedSection, CourseCard } from "../components/CourseCard";
 import { Btn, IsoCube, Reveal, Tag } from "../components/ui";
+import { ModalitaSection } from "../components/ModalitaSection";
 import { FAQS, TRAINER, concludedCourses, fmtRange, nextCourse, upcomingCourses } from "../data";
 
 /* ============================ cos'è CPSA-F ============================ */
@@ -425,6 +426,7 @@ export function Home() {
     <>
       <Hero />
       <CertificationSection />
+      <ModalitaSection />
       <FormatsSection />
       <EditionsSection />
       <FaqSection />

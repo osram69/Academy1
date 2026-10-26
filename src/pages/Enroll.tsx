@@ -28,11 +28,11 @@ import {
 } from "lucide-react";
 import { cn } from "../utils/cn";
 import { Btn } from "../components/ui";
+import { computeTotals } from "../../shared/pricing.mjs";
 import { checkCoupon, createOrder, getConfig, type ApiConfig } from "../lib/api";
 import {
   FORMAT_META,
   PAYMENT_METHODS,
-  VAT,
   eur,
   eur2,
   fmtFull,
@@ -567,17 +567,29 @@ function StepPayment({
 
 /* ============================ rail riepilogo ========================= */
 
-function OrderRail({ course, count, coupon, step, goTo, maxStep }: {
-  course: Course; count: number; coupon: { code: string; pct: number } | null;
+/** Totali dell'ordine: stessa funzione usata dal server, che resta l'unica fonte dell'importo addebitato. */
+function orderTotals(course: Course, count: number, coupon: { code: string; pct: number } | null, billingType: string, privatePct: number) {
+  const price = getLivePrice(course);
+  return {
+    price,
+    t: computeTotals({
+      listEuro: course.price, earlyEuro: price.active ? price.unit : null, seats: count, billingType,
+      privatePct: privatePct / 100, couponPct: coupon?.pct ?? 0, couponCode: coupon?.code ?? null,
+    }),
+  };
+}
+
+function OrderRail({ course, count, coupon, billingType, privatePct, step, goTo, maxStep }: {
+  course: Course; count: number; coupon: { code: string; pct: number } | null; billingType: string; privatePct: number;
   step: number; goTo: (s: number) => void; maxStep: number;
 }) {
-  const price = getLivePrice(course);
-  const sub = price.unit * count;
+  const { price, t } = orderTotals(course, count, coupon, billingType, privatePct);
+  const sub = t.subtotal_cents / 100;
   const ebSave = price.active ? (course.price - price.unit) * count : 0;
-  const couponAmt = coupon ? sub * coupon.pct : 0;
-  const net = sub - couponAmt;
-  const vat = net * VAT;
-  const total = net + vat;
+  const extraSave = t.discount_cents / 100 - ebSave; // sconto privati o codice
+  const net = (t.subtotal_cents - t.discount_cents) / 100;
+  const vat = t.vat_cents / 100;
+  const total = t.total_cents / 100;
 
   return (
     <div className="space-y-5">
@@ -612,10 +624,10 @@ function OrderRail({ course, count, coupon, step, goTo, maxStep }: {
                 <dd className="font-semibold tabular-nums">−{eur(ebSave)}</dd>
               </div>
             )}
-            {coupon && (
+            {t.applied && extraSave > 0 && (
               <div className="flex justify-between gap-4 text-mint">
-                <dt className="font-medium">Coupon {coupon.code}</dt>
-                <dd className="font-semibold tabular-nums">−{eur(couponAmt)}</dd>
+                <dt className="font-medium">{t.applied === "PRIVATO" ? `Sconto privati −${privatePct}% sul listino` : `Codice ${t.applied}`}</dt>
+                <dd className="font-semibold tabular-nums">−{eur(extraSave)}</dd>
               </div>
             )}
             <div className="flex justify-between gap-4">
@@ -718,7 +730,6 @@ export function Enroll({ course }: { course: Course }) {
   const [busy, setBusy] = useState(false);
   const [mobileSummary, setMobileSummary] = useState(false);
 
-  const price = getLivePrice(course);
   useEffect(() => {
     getConfig().then(setConfig).catch(() => setConfig(null));
   }, []);
@@ -796,7 +807,7 @@ export function Enroll({ course }: { course: Course }) {
     const code = couponInput.trim();
     if (!code) return;
     try {
-      setCoupon(await checkCoupon(Number(course.slug), code));
+      setCoupon(await checkCoupon(Number(course.slug), code, billing.type));
       setCouponError(null);
     } catch (e) {
       setCoupon(null);
@@ -822,9 +833,7 @@ export function Enroll({ course }: { course: Course }) {
   };
 
   /* ------------------------------ prezzo ----------------------------- */
-  const sub = price.unit * count;
-  const couponAmt = coupon ? sub * coupon.pct : 0;
-  const total = (sub - couponAmt) * (1 + VAT);
+  const total = orderTotals(course, count, coupon, billing.type, config?.privateDiscount ?? 0).t.total_cents / 100;
 
   /* ------------------------------ wizard ----------------------------- */
   return (
@@ -863,7 +872,7 @@ export function Enroll({ course }: { course: Course }) {
         </div>
         {mobileSummary && (
           <div className="border-t border-ink/8 px-5 pb-5 pt-4">
-            <OrderRail course={course} count={count} coupon={coupon} step={step} goTo={goTo} maxStep={maxStep} />
+            <OrderRail course={course} count={count} coupon={coupon} billingType={billing.type} privatePct={config?.privateDiscount ?? 0} step={step} goTo={goTo} maxStep={maxStep} />
           </div>
         )}
       </div>
@@ -931,7 +940,7 @@ export function Enroll({ course }: { course: Course }) {
         {/* rail desktop */}
         <div className="hidden lg:block">
           <div className="sticky top-24">
-            <OrderRail course={course} count={count} coupon={coupon} step={step} goTo={goTo} maxStep={maxStep} />
+            <OrderRail course={course} count={count} coupon={coupon} billingType={billing.type} privatePct={config?.privateDiscount ?? 0} step={step} goTo={goTo} maxStep={maxStep} />
           </div>
         </div>
       </main>

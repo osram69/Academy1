@@ -5,8 +5,9 @@ import path from "node:path";
 import fs from "node:fs";
 import { fileURLToPath } from "node:url";
 import { createClient } from "@supabase/supabase-js";
-import { MAX_SEATS, computeTotals, findCoupon } from "./pricing.mjs";
-import { bankDetails, configured, createSession, isPaid, paypalVerifyWebhook, stripeClient, stripeWebhookSecret, testMode } from "./payments.mjs";
+import { MAX_SEATS, computeTotals, earlyPriceEuro } from "../shared/pricing.mjs";
+import { bankDetails, createSession, isPaid, methodStatus, paypalVerifyWebhook, stripeClient, stripeWebhookSecret } from "./payments.mjs";
+import { findGlobalCoupon, getSettings, invalidateSettings } from "./settings.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DIST = path.join(__dirname, "..", "dist");
@@ -102,7 +103,8 @@ app.post("/api/webhook/paypal", express.raw({ type: "*/*" }), async (req, res) =
   if (!db) return res.sendStatus(503);
   let event;
   try { event = JSON.parse(req.body.toString("utf8")); } catch { return res.sendStatus(400); }
-  if (!(await paypalVerifyWebhook(testMode(), req.headers, event).catch(() => false))) return res.status(400).send("Firma webhook non valida");
+  const okSig = (await paypalVerifyWebhook(true, req.headers, event).catch(() => false)) || (await paypalVerifyWebhook(false, req.headers, event).catch(() => false));
+  if (!okSig) return res.status(400).send("Firma webhook non valida");
   if (event.event_type === "PAYMENT.CAPTURE.COMPLETED") {
     const ref = event.resource?.custom_id;
     const order = ref && (await getOrder(ref));
@@ -115,13 +117,36 @@ app.use(express.json({ limit: "100kb" }));
 
 /* ------------------------------- API ------------------------------- */
 
-app.get("/api/config", (_req, res) => res.json({ testMode: testMode(), methods: configured() }));
+/** Codice valido per questo corso (codici del corso nel DB + codici globali del pannello). */
+function resolveCoupon(course, settings, code, billingType) {
+  const wanted = String(code || "").trim().toUpperCase();
+  if (!wanted) return null;
+  for (const n of [1, 2, 3]) {
+    const cd = course[`codice_sconto_${n}`];
+    if (!cd || cd.toUpperCase() !== wanted) continue;
+    const from = course[`codice_sconto_${n}_data_inizio`];
+    const to = course[`codice_sconto_${n}_data_fine`];
+    const now = new Date();
+    if ((from && now < new Date(from)) || (to && now > new Date(to))) continue;
+    const pct = Number(course[`codice_sconto_${n}_percentuale`]);
+    if (pct > 0 && pct <= 100) return { code: cd.toUpperCase(), pct: pct / 100 };
+  }
+  return findGlobalCoupon(settings, wanted, billingType);
+}
+
+app.get("/api/config", async (_req, res) => {
+  const settings = await getSettings(db);
+  const st = methodStatus(settings);
+  const methods = Object.fromEntries(Object.entries(st).map(([k, v]) => [k, v.available]));
+  const sandbox = Object.entries(st).some(([k, v]) => v.available && v.sandbox && k !== "bonifico");
+  res.json({ testMode: sandbox, methods, privateDiscount: settings.private.enabled ? settings.private.percent : 0 });
+});
 
 app.post("/api/coupon", limit(20, 60000), async (req, res) => {
   if (!needDb(res)) return;
   const c = await getCourse(Number(req.body?.courseId));
-  const found = c && findCoupon(c, req.body?.code);
-  if (!found) return fail(res, 404, "Codice non valido o scaduto");
+  const found = c && resolveCoupon(c, await getSettings(db), req.body?.code, String(req.body?.billingType || ""));
+  if (!found) return fail(res, 404, "Codice non valido o scaduto per questa tipologia di fatturazione");
   res.json({ code: found.code, pct: found.pct });
 });
 
@@ -133,8 +158,10 @@ app.post("/api/orders", limit(10, 60000), async (req, res) => {
     const b = req.body || {};
     const method = b.method;
     if (!["stripe", "paypal", "sumup", "bonifico"].includes(method)) return fail(res, 400, "Metodo di pagamento non valido.");
-    const test = testMode();
-    if (!configured(test)[method]) return fail(res, 503, "Questo metodo di pagamento non è ancora attivo. Scegline un altro o scrivi a academy@cubeng.eu.");
+    const settings = await getSettings(db);
+    const status = methodStatus(settings)[method];
+    if (!status.available) return fail(res, 503, "Questo metodo di pagamento non è attivo. Scegline un altro o scrivi a academy@cubeng.eu.");
+    const test = status.sandbox;
 
     const course = await getCourse(Number(b.courseId));
     if (!course || !course.iscrizioni_aperte || course.stato === 5 || course.stato === 2) return fail(res, 400, "Le iscrizioni a questo corso non sono aperte.");
@@ -155,13 +182,18 @@ app.post("/api/orders", limit(10, 60000), async (req, res) => {
     const available = Math.min(MAX_SEATS - (await seatsTaken(course.id_corso)), course.posti_disponibili ?? Infinity);
     if (seats > available) return fail(res, 409, available > 0 ? `Sono rimasti solo ${available} posti.` : "Edizione al completo.");
 
-    const coupon = b.coupon ? findCoupon(course, b.coupon) : null;
+    if (!["privato", "pro", "azienda", "estera"].includes(billing.type)) return fail(res, 400, "Tipologia di fatturazione non valida.");
+    const coupon = b.coupon ? resolveCoupon(course, settings, b.coupon, billing.type) : null;
     if (b.coupon && !coupon) return fail(res, 400, "Codice sconto non valido o scaduto.");
-    const totals = computeTotals(course, seats, coupon);
+    const t = computeTotals({
+      listEuro: course.standard_price ?? 0, earlyEuro: earlyPriceEuro(course), seats, billingType: billing.type,
+      privatePct: settings.private.enabled ? settings.private.percent / 100 : 0, couponPct: coupon?.pct ?? 0, couponCode: coupon?.code ?? null,
+    });
+    const { applied, early_active: _e, ...totals } = t; // eslint-disable-line no-unused-vars
     if (totals.total_cents <= 0) return fail(res, 400, "Prezzo del corso non disponibile.");
 
     const ref = `CUBE-${new Date().getFullYear()}-${crypto.randomBytes(5).toString("hex").toUpperCase()}`;
-    const row = { ref, id_corso: course.id_corso, method, test_mode: test, seats, ...totals, coupon: coupon?.code ?? null, participants, billing };
+    const row = { ref, id_corso: course.id_corso, method, test_mode: test, seats, ...totals, coupon: applied, participants, billing };
     const ins = await db.from("iscrizioni").insert(row).select("*").single();
     if (ins.error) throw ins.error;
 
@@ -213,6 +245,34 @@ app.get("/pagamento/ritorno", limit(60, 60000), async (req, res) => {
   to("pending");
 });
 
+/* ----------------------- API riservate agli admin -------------------- */
+// il browser admin invia il JWT Supabase; il server verifica utente e appartenenza a admin_emails
+
+async function adminOnly(req, res, next) {
+  if (!db) return fail(res, 503, "Database non configurato.");
+  const token = String(req.headers.authorization || "").replace(/^Bearer /i, "");
+  const { data } = token ? await db.auth.getUser(token) : { data: null };
+  const email = data?.user?.email?.toLowerCase();
+  if (!email) return fail(res, 401, "Accesso richiesto.");
+  const { data: row } = await db.from("admin_emails").select("email").ilike("email", email).maybeSingle();
+  if (!row) return fail(res, 403, "Utente non abilitato.");
+  next();
+}
+
+// stato dei metodi di pagamento: quali variabili d'ambiente mancano (solo i nomi, mai i valori)
+app.get("/api/admin/status", adminOnly, async (_req, res) => {
+  invalidateSettings();
+  res.json({ methods: methodStatus(await getSettings(db)), siteUrl: process.env.SITE_URL || null });
+});
+
+app.get("/api/admin/orders", adminOnly, async (_req, res) => {
+  const { data, error } = await db.from("iscrizioni")
+    .select("ref,id_corso,created_at,paid_at,status,method,test_mode,seats,total_cents,coupon,participants,billing")
+    .order("created_at", { ascending: false }).limit(200);
+  if (error) return fail(res, 500, error.message);
+  res.json(data);
+});
+
 app.use("/api", (_req, res) => fail(res, 404, "Endpoint inesistente."));
 
 /* ------------------------------ statico ---------------------------- */
@@ -223,4 +283,4 @@ app.get("*", (_req, res) => {
   else res.status(503).send("Build mancante: esegui `npm run build`.");
 });
 
-app.listen(PORT, () => console.log(`Cube Academy in ascolto su :${PORT} (pagamenti ${testMode() ? "SANDBOX" : "LIVE"}, db ${db ? "ok" : "non configurato"})`));
+app.listen(PORT, () => console.log(`Cube Academy in ascolto su :${PORT} (db ${db ? "ok" : "non configurato"})`));

@@ -1,3 +1,5 @@
+import { computeTotals } from "../../shared/pricing.mjs";
+import { useConfig } from "../lib/useConfig";
 import { useState } from "react";
 import {
   BadgeCheck,
@@ -33,6 +35,11 @@ import {
 
 function PriceRail({ course }: { course: Course }) {
   const price = getLivePrice(course);
+  const cfg = useConfig();
+  const privateTotals = cfg && cfg.privateDiscount > 0 && !course.concluded
+    ? computeTotals({ listEuro: course.price, earlyEuro: price.active ? price.unit : null, seats: 1, billingType: "privato", privatePct: cfg.privateDiscount / 100 })
+    : null;
+  const privateUnit = privateTotals ? (privateTotals.subtotal_cents - privateTotals.discount_cents) / 100 : null;
   const waitlist = course.status === "waitlist";
   return (
     <aside className="lg:sticky lg:top-24" aria-label="Riepilogo iscrizione">
@@ -52,6 +59,11 @@ function PriceRail({ course }: { course: Course }) {
           <p className="mt-1.5 text-[12.5px] text-white/64">
             a persona + IVA 22%{waitlist ? " · prezzo indicativo per la prossima data" : ""}
           </p>
+          {privateUnit != null && (
+            <p className="mt-3 rounded-lg bg-white/10 px-3 py-2 text-[12.5px] font-medium text-white">
+              Privati (senza P.IVA): {eur(privateUnit)} + IVA, sconto −{cfg!.privateDiscount}% sul listino
+            </p>
+          )}
           {price.active && (
             <p className="mt-3 rounded-lg bg-flame/15 px-3 py-2 text-[12.5px] font-medium text-ember">
               Early bird −{Math.round(course.earlyBirdPct * 100)}% fino al {fmtFull(course.earlyBirdUntil)}
@@ -65,6 +77,7 @@ function PriceRail({ course }: { course: Course }) {
             {[
               { icon: CalendarDays, text: `${fmtRange(course.start, course.end)}` },
               { icon: Clock, text: course.effort },
+              { icon: CalendarDays, text: course.orario },
               { icon: MapPin, text: course.location },
               { icon: Globe, text: course.language === "IT" ? "Docenza in italiano" : "Taught in English" },
             ].map((r) => (

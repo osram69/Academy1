@@ -9,6 +9,39 @@ import { supabase, supabaseConfigured } from "./lib/supabase";
 const DAY = 86400000;
 
 export type CourseFormat = "online" | "aula" | "prestige";
+/** Come sono distribuite le 24 ore del corso. */
+export type Modalita = "intensivo" | "weekend" | "serale" | "mezze_giornate";
+
+export const MODALITA: Record<Modalita, { label: string; short: string; effort: string; schedule: string; forWho: string }> = {
+  intensivo: {
+    label: "Intensivo · 3 giorni",
+    short: "3 giorni",
+    effort: "3 giornate · 24 ore",
+    schedule: "3 giornate consecutive, 9:00–17:30",
+    forWho: "Chi può liberarsi per tre giorni e vuole finire subito.",
+  },
+  weekend: {
+    label: "Weekend · 4 giornate",
+    short: "Weekend",
+    effort: "4 giornate · 24 ore",
+    schedule: "Sabato e domenica per due weekend, 9:00–16:00",
+    forWho: "Lavoratori dipendenti: nessun giorno di ferie e nessun permesso.",
+  },
+  serale: {
+    label: "Serale · 8 serate",
+    short: "Serale",
+    effort: "8 serate · 24 ore",
+    schedule: "Due sere a settimana per 4 settimane, 18:00–21:00",
+    forWho: "Chi lavora di giorno: si segue dopo l'orario d'ufficio, senza ferie.",
+  },
+  mezze_giornate: {
+    label: "Mezze giornate · 6 mattine",
+    short: "Mezze giornate",
+    effort: "6 mezze giornate · 24 ore",
+    schedule: "Due mattine a settimana per 3 settimane, 9:00–13:00",
+    forWho: "Chi ottiene dall'azienda permessi di formazione di mezza giornata.",
+  },
+};
 export type CourseLevel = "Foundation" | "Advanced" | "Workshop";
 export type CourseStatus = "available" | "few" | "waitlist" | "concluded";
 export type Lang = "IT" | "EN";
@@ -30,6 +63,8 @@ export interface Course {
   start: Date;
   end: Date;
   effort: string;
+  modalita: Modalita;
+  orario: string;
   location: string;
   language: Lang;
   seatsTotal: number | null; // null = non gestito in DB
@@ -239,6 +274,8 @@ export interface ApiCourse {
   id: number;
   title: string;
   weekend: boolean;
+  modalita: Modalita;
+  orario: string;
   residential: boolean;
   level: string;
   stato: number;
@@ -286,7 +323,7 @@ function toCourse(a: ApiCourse): Course {
   const format: CourseFormat = a.residential ? "prestige" : online ? "online" : "aula";
   const start = toDate(a.start);
   const end = toDate(a.end || a.start, true);
-  const days = a.weekend ? 4 : Math.max(1, Math.round((end.getTime() - start.getTime()) / DAY) + 1);
+  const days = Math.max(1, Math.round((end.getTime() - start.getTime()) / DAY) + 1);
   const concluded = a.stato === 5;
   const seatsLeft = a.seatsLeft;
   const status: CourseStatus = concluded
@@ -301,7 +338,8 @@ function toCourse(a: ApiCourse): Course {
   // se ci sono entrambi i prezzi, lo sconto mostrato è quello reale tra i due
   const pct = a.earlyBirdPrice && price ? 1 - a.earlyBirdPrice / price : a.earlyBirdPct;
   const loc = a.location.IT || "";
-  const short = `CPSA-F ${a.weekend ? "Weekend" : online ? "Online" : loc} · ${fmtDate(start)}`;
+  const mod = MODALITA[a.modalita];
+  const short = `CPSA-F ${a.modalita !== "intensivo" ? mod.short : online ? "Online" : loc} · ${fmtDate(start)}`;
   return {
     slug: String(a.id),
     short,
@@ -312,7 +350,9 @@ function toCourse(a: ApiCourse): Course {
     concluded,
     start,
     end,
-    effort: `${days} giornate · ${days * 8} ore`,
+    effort: a.modalita !== "intensivo" ? mod.effort : days === 3 ? mod.effort : `${days} giornate · ${days * 8} ore`,
+    modalita: a.modalita,
+    orario: a.orario || mod.schedule,
     location: online ? "Aula virtuale live" : loc,
     language: /^ital/i.test(a.language.IT || "") ? "IT" : "EN",
     seatsTotal: a.seatsTotal,
@@ -354,6 +394,8 @@ interface PublicRow {
   posti_totali: number | null;
   posti_disponibili: number | null;
   luogo_it: string | null;
+  modalita: string | null;
+  orario_it: string | null;
   lingua_it: string | null;
   link_booking_it: string | null;
 }
@@ -371,6 +413,8 @@ const fromRow = (r: PublicRow): ApiCourse => ({
   id: r.id_corso,
   title: plain(r.titolo),
   weekend: /weekend/i.test(r.titolo),
+  modalita: (r.modalita && r.modalita in MODALITA ? r.modalita : /weekend/i.test(r.titolo) ? "weekend" : "intensivo") as Modalita,
+  orario: r.orario_it ?? "",
   residential: /residential/i.test(r.titolo),
   level: r.livello,
   stato: r.stato,
@@ -413,7 +457,7 @@ export const bySlug = (slug: string) => COURSES.find((c) => c.slug === slug);
 
 const EMPTY_COURSE: Course = {
   ...toCourse({
-    id: 0, title: "CPSA-Foundation®", weekend: false, residential: false, level: "Foundation", stato: 0, open: false,
+    id: 0, title: "CPSA-Foundation®", weekend: false, modalita: "intensivo", orario: "", residential: false, level: "Foundation", stato: 0, open: false,
     price: 0, earlyBirdPrice: null, earlyBirdPct: 0, earlyBirdStart: null, earlyBirdEnd: null,
     start: new Date().toISOString(), end: new Date().toISOString(), location: {}, language: {}, bookingUrl: {},
     seatsTotal: null, seatsLeft: null,

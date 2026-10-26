@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase, supabaseConfigured } from "../lib/supabase";
+import { MODALITA } from "../data";
+import { SettingsPage } from "./Settings";
+import { OrdersPage } from "./Orders";
 
 /* Pannello di gestione corsi (sostituisce il plugin WordPress "Cube Academy - Gestione Corsi").
    Rotte: #/admin (elenco) · #/admin/corso/new · #/admin/corso/<id>
@@ -81,6 +84,7 @@ function toPayload(f: Row): { data: Row; errors: Errors } {
       data[k] = v === "" && !TEXT_REQUIRED.includes(k) ? null : v;
     }
   }
+  if (!data.modalita) data.modalita = "intensivo";
   if (!String(data.titolo ?? "").trim()) errors.titolo = "il titolo è obbligatorio";
   return { data, errors };
 }
@@ -91,10 +95,10 @@ const go = (hash: string) => {
 
 /* ------------------------------- UI helpers ------------------------------ */
 
-const inputCls =
+export const inputCls =
   "w-full rounded-lg border border-ink/20 bg-white px-3 py-2 text-[14px] text-ink outline-none focus:border-flame focus:ring-2 focus:ring-flame/20";
-const btnCls = "inline-flex items-center rounded-full px-4 py-2 text-[13px] font-semibold transition-colors";
-const btnPrimary = `${btnCls} bg-ink text-white hover:bg-flame disabled:opacity-50`;
+export const btnCls = "inline-flex items-center rounded-full px-4 py-2 text-[13px] font-semibold transition-colors";
+export const btnPrimary = `${btnCls} bg-ink text-white hover:bg-flame disabled:opacity-50`;
 
 function Shell({ children, right }: { children: ReactNode; right?: ReactNode }) {
   return (
@@ -103,8 +107,13 @@ function Shell({ children, right }: { children: ReactNode; right?: ReactNode }) 
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-4">
           <a href="#/admin" className="flex items-center gap-3" aria-label="Cube Academy — Gestione corsi">
             <img src="/img/logo-cube-academy.png" alt="Cube Academy" width={1000} height={173} className="h-7 w-auto" />
-            <span className="border-l border-white/20 pl-3 font-display text-[15px] font-semibold tracking-tight text-ember">Gestione corsi</span>
+            <span className="border-l border-white/20 pl-3 font-display text-[15px] font-semibold tracking-tight text-ember">Gestione</span>
           </a>
+          <nav className="flex items-center gap-5 text-[13px] font-medium" aria-label="Sezioni del pannello">
+            {[["#/admin", "Corsi"], ["#/admin/iscrizioni", "Iscrizioni"], ["#/admin/impostazioni", "Impostazioni"]].map(([h, l]) => (
+              <a key={h} href={h} className="text-white/75 hover:text-white">{l}</a>
+            ))}
+          </nav>
           <div className="flex items-center gap-3 text-[13px]">
             <a href="#/" className="text-white/70 hover:text-white">Vai al sito</a>
             {right}
@@ -116,7 +125,7 @@ function Shell({ children, right }: { children: ReactNode; right?: ReactNode }) 
   );
 }
 
-function Field({ label, error, children, hint }: { label: string; error?: string; children: ReactNode; hint?: string }) {
+export function Field({ label, error, children, hint }: { label: string; error?: string; children: ReactNode; hint?: string }) {
   return (
     <label className="block">
       <span className="mb-1 block text-[12px] font-semibold text-ink/70">{label}</span>
@@ -289,7 +298,7 @@ function List() {
 
 /* --------------------------------- modifica ------------------------------- */
 
-const EMPTY: Row = { titolo: "", livello: "Foundation", stato: 0, in_evidenza: false, iscrizioni_aperte: false };
+const EMPTY: Row = { titolo: "", livello: "Foundation", modalita: "intensivo", stato: 0, in_evidenza: false, iscrizioni_aperte: false };
 
 function Edit({ id }: { id: string }) {
   const isNew = id === "new";
@@ -381,6 +390,12 @@ function Edit({ id }: { id: string }) {
           ), "“Completato” mostra la card tra le edizioni concluse; “Non visualizzato” la nasconde dal sito.")}
           {F("data_inizio", "Data inizio", <input type="date" className={inputCls} value={toDate(f.data_inizio)} onChange={(e) => set("data_inizio", e.target.value)} />, "Usata per ordinamento e calendario sul sito.")}
           {F("data_fine", "Data fine", <input type="date" className={inputCls} value={toDate(f.data_fine)} onChange={(e) => set("data_fine", e.target.value)} />)}
+          {F("modalita", "Modalità di fruizione", (
+            <select className={inputCls} value={String(f.modalita ?? "intensivo")} onChange={(e) => set("modalita", e.target.value)}>
+              {Object.entries(MODALITA).map(([v, m]) => <option key={v} value={v}>{m.label}</option>)}
+            </select>
+          ), "Come sono distribuite le 24 ore del corso.")}
+          {F("orario_it", "Calendario sessioni (testo mostrato)", text("orario_it", { maxLength: 160, placeholder: "Es. Martedì e giovedì, 18:00–21:00" }), "Opzionale: se vuoto si usa il testo standard della modalità.")}
           {F("posti_totali", "Posti totali", text("posti_totali", { type: "number", min: 0 }), "Opzionale: se vuoto, il sito non mostra la barra dei posti.")}
           {F("posti_disponibili", "Posti disponibili", text("posti_disponibili", { type: "number", min: 0 }))}
           <div className="flex flex-wrap items-center gap-6 md:col-span-2">
@@ -517,6 +532,10 @@ export function Admin({ hash }: { hash: string }) {
         <p className="text-steel">Verifica permessi…</p>
       ) : m ? (
         <Edit key={m[1]} id={m[1]} />
+      ) : /^#\/admin\/impostazioni/.test(hash) ? (
+        <SettingsPage session={session} />
+      ) : /^#\/admin\/iscrizioni/.test(hash) ? (
+        <OrdersPage session={session} />
       ) : (
         <List />
       )}

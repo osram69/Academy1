@@ -11,16 +11,25 @@ vivono in un database **Supabase** (Postgres) e il sito li legge dal browser; is
 2. Build command `npm ci && npm run build`, start command `npm start`, Node 20+.
 3. **Environment variables**: copia i nomi da `.env.example` (stessi nomi di romaofficesharing:
    `STRIPE_SECRET_TEST`, `PAYPAL_CLIENT_ID_TEST`, `SUMUP_API_KEY_TEST`, `BANK_IBAN`, ...) più
-   `SITE_URL`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `PAYMENTS_TEST_MODE=true` e le due `VITE_*`
+   `SITE_URL`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` e le due `VITE_*`
    (servono al momento della build).
-4. Supabase → SQL Editor: esegui `supabase/orders.sql` (tabella `iscrizioni`, accessibile solo al server).
+4. Supabase → SQL Editor: esegui `supabase/orders.sql` (tabella `iscrizioni`, accessibile solo al server) e poi
+   `supabase/migrazione-2.sql` (modalità di fruizione dei corsi e tabella `impostazioni`).
 5. Webhook: Stripe → `https://<dominio>/api/webhook/stripe`, PayPal → `https://<dominio>/api/webhook/paypal`.
    (SumUp non ha webhook firmati: il pagamento è verificato dal server al ritorno dal checkout.)
-6. Per passare in produzione: valorizza le chiavi live e imposta `PAYMENTS_TEST_MODE=false`.
+6. Per passare in produzione: valorizza le chiavi live e, da `#/admin/impostazioni`, porta il metodo da Sandbox a Live.
 
 Il server calcola prezzo, sconti e IVA da solo (il browser non decide l'importo), accetta al massimo
 12 partecipanti per edizione (limite iSAQB con un solo docente) e verifica ogni pagamento direttamente
 sul provider prima di segnare l'ordine come pagato. Un metodo senza chiavi configurate resta disattivato.
+
+## Pannello di gestione (`#/admin`)
+
+- **Corsi**: edizioni, prezzi, early bird, posti, modalità di fruizione e calendario delle sessioni.
+- **Iscrizioni**: elenco degli ordini (sandbox marcati "prova").
+- **Impostazioni**: metodi di pagamento attivi, sandbox/live per ogni provider (con l'elenco delle variabili
+  d'ambiente mancanti), sconto privati (default 50% sul listino, in aggiunta all'early bird) e codici sconto
+  globali con periodo di validità e tipologie di fatturazione. Le modifiche valgono entro pochi secondi.
 
 Sviluppo locale: `npm run server` (porta 3000) e, in un altro terminale, `npm run dev`.
 
