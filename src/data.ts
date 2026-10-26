@@ -238,7 +238,7 @@ const F_MODULES: CourseModule[] = [
 ];
 
 const F_INCLUDES = [
-  "Voucher d'esame CPSA-F incluso (valore € 250)",
+  "Corso sincrono con docente accreditato iSAQB® (max 12 partecipanti)",
   "Slide, workbook e repository di esercizi in PDF",
   "Registrazioni delle sessioni disponibili per 30 giorni",
   "Attestato di partecipazione Cube Academy",
@@ -336,7 +336,7 @@ function toCourse(a: ApiCourse): Course {
     earlyBirdPrice: a.earlyBirdPrice,
     earlyBirdFrom: a.earlyBirdStart ? new Date(a.earlyBirdStart) : new Date(0),
     earlyBirdUntil: a.earlyBirdEnd ? new Date(a.earlyBirdEnd) : new Date(0),
-    examIncluded: true,
+    examIncluded: false,
     image: copy.image,
     tagline: copy.tagline,
     description: copy.description,
@@ -475,7 +475,7 @@ export const TESTIMONIALS = [
 export const FAQS = [
   {
     q: "L'esame di certificazione è incluso nel prezzo?",
-    a: "Sì, per tutti i corsi Foundation il voucher d'esame CPSA-F (valore € 250) è incluso: prenotiamo noi la sessione presso l'ente certificatore. L'esame è online, in italiano o inglese, con proctoring da remoto quando preferisci tu.",
+    a: "No. La tassa d'esame CPSA-F (280 € + IVA) non è inclusa nel prezzo del corso e si paga separatamente all'ente di certificazione autorizzato iSAQB®, con cui organizzi l'esame in autonomia al termine del corso. Durante l'ultima giornata svolgiamo una simulazione d'esame con discussione e correzione.",
   },
   {
     q: "Posso pagare con bonifico e fattura alla mia azienda?",
@@ -487,7 +487,7 @@ export const FAQS = [
   },
   {
     q: "Cosa comprende il formato Prestige residenziale?",
-    a: "Corso completo, voucher d'esame, 4 notti in hotel 4★ in camera singola, tutti i pasti, la cena conviviale con degustazione e il transfer da Firenze o Como. Porta solo il laptop: gruppi da massimo 14 persone.",
+    a: "Corso completo, 4 notti in hotel 4★ in camera singola, tutti i pasti, la cena conviviale con degustazione e il transfer da Firenze o Como. Porta solo il laptop: gruppi da massimo 12 persone.",
   },
   {
     q: "Serve esperienza da architetto per iscriversi?",
@@ -502,8 +502,8 @@ export const FAQS = [
 export const ORG = {
   name: "Cube Academy",
   company: "Cube Engineering S.r.l.",
-  vat: "P.IVA 04871201201",
+  vat: "",
   email: "academy@cubeng.eu",
-  phone: "+39 051 042 1234",
-  address: "Via dell'Innovazione 12, 40126 Bologna",
+  phone: "+39 06 92.92.87.80",
+  address: "Via Venti Settembre, 118 - 00187 Roma",
 };

@@ -172,10 +172,10 @@ export function CourseDetail({ course }: { course: Course }) {
             <span className="rounded-full border border-white/20 px-3.5 py-1.5 font-mono text-[10.5px] font-semibold uppercase tracking-[0.16em] text-white/75">
               {course.language === "IT" ? "Italiano" : "English"}
             </span>
-            {course.examIncluded && (
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300/30 bg-emerald-400/10 px-3.5 py-1.5 font-mono text-[10.5px] font-semibold uppercase tracking-[0.16em] text-emerald-300">
+            {!course.examIncluded && (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-300/30 bg-amber-400/10 px-3.5 py-1.5 font-mono text-[10.5px] font-semibold uppercase tracking-[0.16em] text-amber-300">
                 <BadgeCheck className="size-3.5" aria-hidden="true" />
-                Voucher esame incluso
+                Esame non incluso · 280 € + IVA
               </span>
             )}
           </div>

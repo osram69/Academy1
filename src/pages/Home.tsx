@@ -140,7 +140,7 @@ const FORMATS = [
     title: "Live Online",
     claim: "L'aula viene da te.",
     text: "Zoom con docente live, breakout room per i workshop, lavagna condivisa Miro. Registrazioni disponibili 30 giorni.",
-    points: ["32 ore su 4 giornate", "Max 20 partecipanti", "Zero trasferte"],
+    points: ["24 ore su 3 giornate", "Max 12 partecipanti", "Zero trasferte"],
     dark: false,
     img: null as string | null,
   },
@@ -150,7 +150,7 @@ const FORMATS = [
     title: "In Aula",
     claim: "Full immersion, networking vero.",
     text: "Milano e Bologna. Lavagne, post-it e pranzi inclusi: le conversazioni fuori dalle sessioni valgono quanto il corso.",
-    points: ["Sedi centrali, raggiungibili in metro", "Pranzi e coffee break inclusi", "Max 18 partecipanti"],
+    points: ["Sedi centrali, raggiungibili in metro", "Pranzi e coffee break inclusi", "Max 12 partecipanti"],
     dark: false,
     img: null as string | null,
   },
@@ -159,7 +159,7 @@ const FORMATS = [
     icon: BedDouble,
     title: "Prestige Residenziale",
     claim: "Certificarsi è un'esperienza.",
-    text: "Cinque giorni in ville italiane d'eccezione: corso, hotel 4★, pasti e cena conviviale inclusi. Gruppi di massimo 14, ritmo residenziale.",
+    text: "Cinque giorni in ville italiane d'eccezione: corso, hotel 4★, pasti e cena conviviale inclusi. Gruppi di massimo 12, ritmo residenziale.",
     points: ["Hotel 4★ + tutti i pasti inclusi", "Masterclass serale con il docente", "Transfer dalla stazione"],
     dark: true,
     img: "https://images.pexels.com/photos/38115059/pexels-photo-38115059.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
@@ -183,7 +183,7 @@ function FormatsSection() {
           </div>
           <Reveal delay={160}>
             <p className="max-w-sm text-[15px] leading-relaxed text-white/64">
-              Scegli in base ad agenda e budget: il voucher d'esame CPSA-F e i docenti accreditati sono identici in ogni
+              Scegli in base ad agenda e budget: il docente accreditato iSAQB® e il programma sono identici in ogni
               formato.
             </p>
           </Reveal>
@@ -368,7 +368,7 @@ function FaqSection() {
             </span>
             <span className="inline-flex items-center gap-2 rounded-full border border-ink/12 bg-white px-4 py-2 text-[13px] font-medium text-ink/75">
               <BadgeCheck className="size-4 text-flame" aria-hidden="true" />
-              Voucher esame incluso
+              Esame iSAQB® a parte
             </span>
           </Reveal>
         </div>
@@ -447,7 +447,7 @@ function CtaSection() {
         <Reveal delay={180}>
           <p className="mt-6 max-w-xl text-[16.5px] leading-relaxed text-white/72">
             {next.short} · {fmtRange(next.start, next.end)} · {next.location}. Early bird attivo: blocchi il prezzo ora,
-            pensiamo noi a voucher d'esame e materiali.
+            il materiale del corso è incluso nel prezzo.
           </p>
         </Reveal>
         <Reveal delay={260} className="mt-10 flex flex-wrap gap-4">

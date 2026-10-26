@@ -82,8 +82,8 @@ export function Hero() {
           <Reveal delay={180}>
             <p className="mt-7 max-w-xl text-[17px] leading-relaxed text-white/72">
               Corsi <strong className="font-semibold text-white/85">CPSA-Foundation®</strong> con docenti che progettano
-              sistemi veri, voucher d'esame incluso e formati per ogni agenda: online, in aula o residenziale in una
-              villa toscana.
+              sistemi veri, in formato online o in aula. L'esame di certificazione si sostiene a parte, presso gli
+              enti autorizzati iSAQB®.
             </p>
           </Reveal>
 
@@ -156,7 +156,7 @@ export function Hero() {
                 {[
                   "iSAQB® Accredited Training Provider",
                   "CPSA-Foundation Level",
-                  "Voucher d'esame incluso",
+                  "Esame iSAQB® a parte (280 € + IVA)",
                   "Corsi in IT · EN · FR · DE",
                   "Rimborso 100% fino a 14 giorni prima",
                   "Fatturazione elettronica SDI",

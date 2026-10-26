@@ -111,7 +111,7 @@ export function Footer() {
 
         <div className="mt-14 flex flex-col items-start justify-between gap-3 border-t border-white/10 pt-6 font-mono text-[11px] text-white/56 sm:flex-row sm:items-center">
           <p>
-            © 2026 {ORG.company} · {ORG.vat}
+            © 2026 {ORG.company}{ORG.vat ? ` · ${ORG.vat}` : ""}
           </p>
           <p className="flex gap-5">
             <a href="#/" className="transition-colors hover:text-white/70">Privacy</a>
