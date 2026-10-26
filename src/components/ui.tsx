@@ -4,6 +4,7 @@ import { cn } from "../utils/cn";
 import type { Course, CourseStatus } from "../data";
 import { getLivePrice } from "../data";
 
+import { t } from "../i18n";
 /* ----------------------------- hooks ------------------------------ */
 
 export function useNow(interval = 1000) {
@@ -134,22 +135,22 @@ export function StatusPill({ status, seatsLeft, dark = false }: { status: Course
     available: {
       cls: dark ? "bg-emerald-400/10 text-emerald-300 ring-emerald-300/25" : "bg-emerald-50 text-mint ring-mint/25",
       dot: "bg-emerald-400",
-      label: "Posti disponibili",
+      label: t("Posti disponibili"),
     },
     few: {
       cls: dark ? "bg-amber-400/10 text-amber-300 ring-amber-300/25" : "bg-amber-50 text-gold ring-gold/30",
       dot: "bg-amber-400",
-      label: seatsLeft ? `Ultimi ${seatsLeft} posti` : "Ultimi posti",
+      label: seatsLeft ? t("Ultimi {n} posti", { n: seatsLeft }) : t("Ultimi posti"),
     },
     waitlist: {
       cls: dark ? "bg-white/10 text-white/70 ring-white/20" : "bg-ink/5 text-steel ring-ink/15",
       dot: "bg-steel",
-      label: "Lista d'attesa",
+      label: t("Lista d'attesa"),
     },
     concluded: {
       cls: dark ? "bg-white/10 text-white/72 ring-white/15" : "bg-ink/5 text-steel ring-ink/15",
       dot: "bg-steel",
-      label: "Edizione conclusa",
+      label: t("Edizione conclusa"),
     },
   } as const;
   const s = map[status];
@@ -185,8 +186,8 @@ export function EarlyBirdChip({ course, dark = false, className }: { course: Cou
         −{Math.round(course.earlyBirdPct * 100)}%
       </span>
       <span aria-hidden="true" className="opacity-50">·</span>
-      <time aria-label={` early bird termina tra ${days} giorni e ${hrs} ore`}>
-        {days > 0 ? `${days}g ` : ""}
+      <time aria-label={t("Early bird: termina tra {days} giorni e {hrs} ore", { days, hrs })}>
+        {days > 0 ? `${days}${t("g")} ` : ""}
         {String(hrs).padStart(2, "0")}:{String(mins).padStart(2, "0")}:{String(secs).padStart(2, "0")}
       </time>
     </span>
@@ -204,7 +205,7 @@ export function SeatsBar({ course, dark = false }: { course: Course; dark?: bool
       <div className={cn("flex items-center justify-between text-[11.5px] font-medium", dark ? "text-white/68" : "text-steel")}>
         <span className="inline-flex items-center gap-1.5">
           <Users className="size-3.5" aria-hidden="true" />
-          {course.status === "waitlist" ? "Edizione al completo" : `${seatsLeft} posti rimasti su ${seatsTotal}`}
+          {course.status === "waitlist" ? t("Edizione al completo") : t("{left} posti rimasti su {total}", { left: seatsLeft, total: seatsTotal })}
         </span>
         <span className="font-mono">{pct}%</span>
       </div>
@@ -214,7 +215,7 @@ export function SeatsBar({ course, dark = false }: { course: Course; dark?: bool
         aria-valuenow={seatsTotal - seatsLeft}
         aria-valuemin={0}
         aria-valuemax={seatsTotal}
-        aria-label={`Posti occupati: ${seatsTotal - seatsLeft} su ${seatsTotal}`}
+        aria-label={t("Posti occupati: {taken} su {total}", { taken: seatsTotal - seatsLeft, total: seatsTotal })}
       >
         <div
           className={cn("h-full rounded-full transition-[width] duration-700", course.status === "few" ? "bg-amber-400" : "bg-flame")}

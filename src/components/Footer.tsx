@@ -1,6 +1,7 @@
 import { Mail, MapPin, Phone, ShieldCheck, Lock, FileCheck } from "lucide-react";
 import { ORG, upcomingCourses } from "../data";
 
+import { t } from "../i18n";
 export function Footer() {
   return (
     <footer className="relative overflow-hidden bg-ink text-white">
@@ -8,18 +9,16 @@ export function Footer() {
       <div className="relative mx-auto max-w-7xl px-5 pb-10 pt-16 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
           <div>
-            <a href="#/" className="inline-block" aria-label="Cube Academy — Home">
-              <img src="/img/logo-cube-academy.png" alt="Cube Academy" width={1000} height={173} className="h-10 w-auto" />
+            <a href="#/" className="inline-block" aria-label={t("Cube Academy — Home")}>
+              <img src="/img/logo-cube-academy.png" alt={t("Cube Academy")} width={1000} height={173} className="h-10 w-auto" />
             </a>
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-white/68">
-              Training Provider accreditato iSAQB® dal 2024. Formiamo gli architetti del software italiani — online e
-              in aula a Roma.
-            </p>
+              {t("Training Provider accreditato iSAQB® dal 2024. Formiamo gli architetti del software italiani — online e in aula a Roma.")}</p>
             <div className="mt-6 flex flex-wrap gap-2">
               {[
-                { icon: ShieldCheck, label: "Accreditato iSAQB®" },
-                { icon: Lock, label: "Pagamenti sicuri" },
-                { icon: FileCheck, label: "Fattura elettronica" },
+                { icon: ShieldCheck, label: t("Accreditato iSAQB®") },
+                { icon: Lock, label: t("Pagamenti sicuri") },
+                { icon: FileCheck, label: t("Fattura elettronica") },
               ].map((b) => (
                 <span
                   key={b.label}
@@ -32,8 +31,8 @@ export function Footer() {
             </div>
           </div>
 
-          <nav aria-label="Corsi">
-            <h3 className="font-mono text-[11px] font-medium uppercase tracking-[0.22em] text-white/56">Corsi</h3>
+          <nav aria-label={t("Corsi")}>
+            <h3 className="font-mono text-[11px] font-medium uppercase tracking-[0.22em] text-white/56">{t("Corsi")}</h3>
             <ul className="mt-4 space-y-2.5 text-sm">
               {upcomingCourses().slice(0, 5).map((c) => (
                 <li key={c.slug}>
@@ -44,20 +43,18 @@ export function Footer() {
               ))}
               <li>
                 <a href="#/corsi" className="link-sweep font-medium text-flame">
-                  Tutto il calendario →
-                </a>
+                  {t("Tutto il calendario →")}</a>
               </li>
             </ul>
           </nav>
 
-          <nav aria-label="Academy">
-            <h3 className="font-mono text-[11px] font-medium uppercase tracking-[0.22em] text-white/56">Academy</h3>
+          <nav aria-label={t("Academy")}>
+            <h3 className="font-mono text-[11px] font-medium uppercase tracking-[0.22em] text-white/56">{t("Academy")}</h3>
             <ul className="mt-4 space-y-2.5 text-sm">
               {[
-                { label: "La certificazione CPSA-F", section: "certificazione" },
-                { label: "I formati", section: "formati" },
-                { label: "Testimonianze", section: "voci" },
-                { label: "FAQ", section: "faq" },
+                { label: t("La certificazione CPSA-F"), section: "certificazione" },
+                { label: t("I formati"), section: "formati" },
+                { label: t("FAQ"), section: "faq" },
               ].map((l) => (
                 <li key={l.label}>
                   <a
@@ -75,14 +72,13 @@ export function Footer() {
               ))}
               <li>
                 <a href={`mailto:${ORG.email}`} className="link-sweep text-white/76 transition-colors hover:text-white">
-                  Formazione per team
-                </a>
+                  {t("Formazione per team")}</a>
               </li>
             </ul>
           </nav>
 
           <div>
-            <h3 className="font-mono text-[11px] font-medium uppercase tracking-[0.22em] text-white/56">Contatti</h3>
+            <h3 className="font-mono text-[11px] font-medium uppercase tracking-[0.22em] text-white/56">{t("Contatti")}</h3>
             <ul className="mt-4 space-y-3 text-sm text-white/76">
               <li className="flex items-start gap-2.5">
                 <MapPin className="mt-0.5 size-4 shrink-0 text-flame" aria-hidden="true" />
@@ -101,11 +97,6 @@ export function Footer() {
                 </a>
               </li>
             </ul>
-            <p className="mt-5 font-mono text-[11px] leading-relaxed text-white/52">
-              Lun–Ven 9:00–18:00 CET
-              <br />
-              Rispondiamo entro 4 ore lavorative
-            </p>
           </div>
         </div>
 
@@ -114,9 +105,9 @@ export function Footer() {
             © 2026 {ORG.company}{ORG.vat ? ` · ${ORG.vat}` : ""}
           </p>
           <p className="flex gap-5">
-            <a href="#/" className="transition-colors hover:text-white/70">Privacy</a>
-            <a href="#/" className="transition-colors hover:text-white/70">Cookie</a>
-            <a href="#/" className="transition-colors hover:text-white/70">Termini</a>
+            <a href="#/" className="transition-colors hover:text-white/70">{t("Privacy")}</a>
+            <a href="#/" className="transition-colors hover:text-white/70">{t("Cookie")}</a>
+            <a href="#/" className="transition-colors hover:text-white/70">{t("Termini")}</a>
           </p>
         </div>
       </div>
@@ -124,8 +115,7 @@ export function Footer() {
       {/* watermark */}
       <div className="pointer-events-none relative select-none overflow-hidden" aria-hidden="true">
         <p className="text-outline -mb-[0.23em] text-center font-display text-[24vw] font-bold leading-none tracking-tight">
-          CUBE
-        </p>
+          {t("CUBE")}</p>
       </div>
     </footer>
   );

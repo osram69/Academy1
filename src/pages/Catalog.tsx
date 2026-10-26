@@ -5,22 +5,23 @@ import { ConcludedSection, CourseCard } from "../components/CourseCard";
 import { Reveal, Tag } from "../components/ui";
 import { COURSES, FORMAT_META, type CourseFormat, type CourseLevel, type Lang } from "../data";
 
+import { t } from "../i18n";
 const FORMAT_FILTERS: { id: CourseFormat | "all"; label: string }[] = [
-  { id: "all", label: "Tutti i formati" },
-  { id: "online", label: "Live Online" },
-  { id: "aula", label: "In Aula" },
-  { id: "prestige", label: "Prestige" },
+  { id: "all", label: t("Tutti i formati") },
+  { id: "online", label: t("Live Online") },
+  { id: "aula", label: t("In Aula") },
+  { id: "prestige", label: t("Prestige") },
 ];
 const LEVEL_FILTERS: { id: CourseLevel | "all"; label: string }[] = [
-  { id: "all", label: "Tutti i livelli" },
-  { id: "Foundation", label: "Foundation" },
-  { id: "Advanced", label: "Advanced" },
-  { id: "Workshop", label: "Workshop" },
+  { id: "all", label: t("Tutti i livelli") },
+  { id: "Foundation", label: t("Foundation") },
+  { id: "Advanced", label: t("Advanced") },
+  { id: "Workshop", label: t("Workshop") },
 ];
 const LANG_FILTERS: { id: Lang | "all"; label: string }[] = [
-  { id: "all", label: "IT + EN" },
-  { id: "IT", label: "Italiano" },
-  { id: "EN", label: "English" },
+  { id: "all", label: t("IT + EN") },
+  { id: "IT", label: t("Italiano") },
+  { id: "EN", label: t("English") },
 ];
 
 function FilterGroup<T extends string>({
@@ -94,18 +95,16 @@ export function Catalog() {
         />
         <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
           <Reveal>
-            <Tag dark>Catalogo 2026</Tag>
+            <Tag dark>{t("Catalogo 2026")}</Tag>
           </Reveal>
           <Reveal delay={80}>
             <h1 className="mt-6 max-w-3xl font-display text-[clamp(2.6rem,6vw,4.6rem)] font-bold leading-[1.0] tracking-[-0.03em]">
-              Ogni edizione. <em className="font-serif italic text-flame">Una sola schermata.</em>
+              {t("Ogni edizione.")}{" "}<em className="font-serif italic text-flame">{t("Una sola schermata.")}</em>
             </h1>
           </Reveal>
           <Reveal delay={160}>
             <p className="mt-6 max-w-xl text-[16px] leading-relaxed text-white/68">
-              Niente più tabelle da foglio di calcolo: ogni corso è una scheda con posti, early bird e prezzo in tempo
-              reale. Filtra per formato, livello e lingua.
-            </p>
+              {t("Niente più tabelle da foglio di calcolo: ogni corso è una scheda con posti, early bird e prezzo in tempo reale. Filtra per formato, livello e lingua.")}</p>
           </Reveal>
         </div>
       </header>
@@ -115,13 +114,12 @@ export function Catalog() {
         <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-8 gap-y-3 px-5 lg:px-8">
           <span className="hidden items-center gap-2 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-steel md:inline-flex">
             <ListFilter className="size-4" aria-hidden="true" />
-            Filtra
-          </span>
-          <FilterGroup label="Formato" options={FORMAT_FILTERS} value={format} onChange={setFormat} />
-          <FilterGroup label="Livello" options={LEVEL_FILTERS} value={level} onChange={setLevel} />
-          <FilterGroup label="Lingua" options={LANG_FILTERS} value={lang} onChange={setLang} />
+            {t("Filtra")}</span>
+          <FilterGroup label={t("Formato")} options={FORMAT_FILTERS} value={format} onChange={setFormat} />
+          <FilterGroup label={t("Livello")} options={LEVEL_FILTERS} value={level} onChange={setLevel} />
+          <FilterGroup label={t("Lingua")} options={LANG_FILTERS} value={lang} onChange={setLang} />
           <p className="ml-auto font-mono text-[11.5px] uppercase tracking-widest text-steel" role="status" aria-live="polite">
-            {results.length} {results.length === 1 ? "edizione" : "edizioni"}
+            {results.length} {results.length === 1 ? t("edizione") : t("edizioni")}
           </p>
         </div>
       </div>
@@ -130,8 +128,8 @@ export function Catalog() {
       <main className="mx-auto max-w-7xl px-5 py-16 lg:px-8 lg:py-20">
         {results.length === 0 ? (
           <div className="rounded-[24px] border border-dashed border-ink/20 p-16 text-center">
-            <p className="font-display text-xl font-semibold text-ink">Nessuna edizione con questi filtri</p>
-            <p className="mt-2 text-sm text-ink/55">Prova ad allargare formato o lingua — oppure scrivici per un'edizione dedicata.</p>
+            <p className="font-display text-xl font-semibold text-ink">{t("Nessuna edizione con questi filtri")}</p>
+            <p className="mt-2 text-sm text-ink/55">{t("Prova ad allargare formato o lingua — oppure scrivici per un'edizione dedicata.")}</p>
             <button
               onClick={() => {
                 setFormat("all");
@@ -140,8 +138,7 @@ export function Catalog() {
               }}
               className="mt-6 rounded-full bg-ink px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-flame"
             >
-              Azzera i filtri
-            </button>
+              {t("Azzera i filtri")}</button>
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 lg:pb-12">
@@ -170,19 +167,15 @@ export function Catalog() {
               </span>
               <div className="min-w-0 flex-1 basis-72">
                 <h2 className="font-display text-2xl font-bold tracking-tight lg:text-3xl">
-                  Hai un team da certificare?
-                </h2>
+                  {t("Hai un team da certificare?")}</h2>
                 <p className="mt-2 max-w-2xl text-[15px] leading-relaxed text-white/72">
-                  Da 8 persone in su: edizione privata con casi di studio sul vostro dominio, nella vostra sede, online
-                  o in formato Prestige. Preventivo in 48 ore.
-                </p>
+                  {t("Ogni edizione ha al massimo 12 partecipanti. Per gruppi aziendali o edizioni dedicate scrivici: valutiamo insieme la soluzione.")}</p>
               </div>
               <a
                 href="mailto:academy@cubeng.eu?subject=Edizione%20privata%20per%20il%20nostro%20team"
                 className="inline-flex items-center gap-2.5 rounded-full bg-white px-7 py-3.5 font-display text-sm font-semibold text-ink transition-all duration-300 hover:bg-flame hover:text-white hover:shadow-flame"
               >
-                Richiedi un'offerta
-              </a>
+                {t("Richiedi un'offerta")}</a>
             </div>
           </aside>
         </Reveal>

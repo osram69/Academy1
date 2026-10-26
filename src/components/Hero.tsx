@@ -2,6 +2,7 @@ import { ShieldCheck, ArrowDownRight, Timer, CalendarDays, MapPin } from "lucide
 import { nextCourse, fmtRange, getLivePrice, eur, STATS } from "../data";
 import { Btn, EarlyBirdChip, IsoCube, Reveal, SeatsBar, useNow } from "./ui";
 
+import { t } from "../i18n";
 function FloatingCourseCard() {
   const course = nextCourse();
   const price = getLivePrice(course);
@@ -12,8 +13,7 @@ function FloatingCourseCard() {
       <div className="flex items-center justify-between">
         <span className="inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-ember">
           <Timer className="size-3.5" aria-hidden="true" />
-          Prossima edizione
-        </span>
+          {t("Prossima edizione")}</span>
         <EarlyBirdChip course={course} dark />
       </div>
       <p className="mt-3 font-display text-lg font-bold leading-tight tracking-tight text-white">{course.short}</p>
@@ -37,9 +37,8 @@ function FloatingCourseCard() {
             <span className="ml-2 align-middle text-[12px] font-normal text-white/56 line-through">{eur(price.original)}</span>
           )}
         </p>
-        <Btn href={`#/iscriviti/${course.slug}`} size="sm" ariaLabel="Iscriviti alla prossima edizione">
-          Blocca il posto
-        </Btn>
+        <Btn href={`#/iscriviti/${course.slug}`} size="sm" ariaLabel={t("Iscriviti alla prossima edizione")}>
+          {t("Blocca il posto")}</Btn>
       </div>
     </div>
   );
@@ -47,7 +46,7 @@ function FloatingCourseCard() {
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden bg-ink text-white" aria-label="Introduzione">
+    <section className="relative overflow-hidden bg-ink text-white" aria-label={t("Introduzione")}>
       {/* sfondo */}
       <div className="bg-blueprint-dark absolute inset-0" aria-hidden="true" />
       <div
@@ -63,37 +62,31 @@ export function Hero() {
           <Reveal>
             <p className="inline-flex items-center gap-2.5 rounded-full border border-white/12 bg-white/5 py-2 pl-3 pr-4 text-[12.5px] font-medium text-white/75">
               <ShieldCheck className="size-4 text-flame" aria-hidden="true" />
-              Training Provider accreditato <strong className="font-semibold text-white">iSAQB®</strong>
-              <span className="hidden text-white/65 sm:inline">· dal 2024</span>
+              {t("Training Provider accreditato")}{" "}<strong className="font-semibold text-white">{t("iSAQB®")}</strong>
+              <span className="hidden text-white/65 sm:inline">{t("· dal 2024")}</span>
             </p>
           </Reveal>
 
           <Reveal delay={90}>
             <h1 className="mt-7 font-display text-[clamp(2.9rem,7.2vw,5.6rem)] font-bold leading-[0.98] tracking-[-0.03em]">
-              L'architettura
+              {t("L'architettura")}<br />
+              {t("del software si")}{" "}
+              <em className="font-serif font-normal italic tracking-[-0.01em] text-flame">{t("disegna.")}</em>
               <br />
-              del software si{" "}
-              <em className="font-serif font-normal italic tracking-[-0.01em] text-flame">disegna.</em>
-              <br />
-              <span className="text-white/60">E si certifica.</span>
+              <span className="text-white/60">{t("E si certifica.")}</span>
             </h1>
           </Reveal>
 
           <Reveal delay={180}>
             <p className="mt-7 max-w-xl text-[17px] leading-relaxed text-white/72">
-              Corsi <strong className="font-semibold text-white/85">CPSA-Foundation®</strong> con docenti che progettano
-              sistemi veri, in formato online o in aula. L'esame di certificazione si sostiene a parte, presso gli
-              enti autorizzati iSAQB®.
-            </p>
+              {t("Corsi")}{" "}<strong className="font-semibold text-white/85">{t("CPSA-Foundation®")}</strong>{" "}{t("con docenti che progettano sistemi veri, in formato online o in aula. L'esame di certificazione si sostiene a parte, presso gli enti autorizzati iSAQB®.")}</p>
           </Reveal>
 
           <Reveal delay={260} className="mt-9 flex flex-wrap items-center gap-4">
-            <Btn href={`#/iscriviti/${nextCourse().slug}`} size="lg" withArrow ariaLabel="Vai all'iscrizione della prossima edizione">
-              Iscriviti alla prossima edizione
-            </Btn>
+            <Btn href={`#/iscriviti/${nextCourse().slug}`} size="lg" withArrow ariaLabel={t("Vai all'iscrizione della prossima edizione")}>
+              {t("Iscriviti alla prossima edizione")}</Btn>
             <Btn href="#/corsi" variant="line-dark" size="lg">
-              Calendario completo
-            </Btn>
+              {t("Calendario completo")}</Btn>
           </Reveal>
 
           <Reveal delay={340}>
@@ -114,19 +107,17 @@ export function Hero() {
           <div className="relative mr-6">
             {/* HUD labels */}
             <p className="absolute -top-7 left-2 font-mono text-[10px] uppercase tracking-[0.28em] text-white/52" aria-hidden="true">
-              FIG. 01 — STRUCTURE / STRATEGY
-            </p>
+              {t("FIG. 01 — STRUCTURE / STRATEGY")}</p>
             <div className="ticks ticks-light p-3">
               <div className="relative overflow-hidden rounded-xl">
                 <img
                   src="/img/hero-structure.jpg"
-                  alt="Scultura astratta di cubi isometrici illuminati di rosso: la metafora visiva di Cube Academy, struttura e rigore"
+                  alt={t("Scultura astratta di cubi isometrici illuminati di rosso: la metafora visiva di Cube Academy, struttura e rigore")}
                   className="aspect-[4/4.6] w-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-ink/50 to-transparent" aria-hidden="true" />
                 <p className="absolute bottom-4 left-4 font-mono text-[10px] uppercase tracking-[0.28em] text-white/68" aria-hidden="true">
-                  CPSA-F · Foundation Level
-                </p>
+                  {t("CPSA-F · Foundation Level")}</p>
               </div>
             </div>
             {/* card flottante */}
@@ -156,10 +147,10 @@ export function Hero() {
                 {[
                   "iSAQB® Accredited Training Provider",
                   "CPSA-Foundation Level",
-                  "Esame iSAQB® a parte (280 € + IVA)",
-                  "Corsi in IT · EN · FR",
-                  "Rimborso se il corso non parte",
-                  "Fatturazione elettronica SDI",
+                  t("Esame iSAQB® a parte (280 € + IVA)"),
+                  t("Corsi in IT · EN · FR"),
+                  t("Rimborso se il corso non parte"),
+                  t("Fatturazione elettronica SDI"),
                 ].map((t) => (
                   <span key={t} className="flex items-center gap-10 font-mono text-[11.5px] uppercase tracking-[0.24em] text-white/60">
                     {t}

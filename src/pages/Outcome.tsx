@@ -17,6 +17,7 @@ import { cn } from "../utils/cn";
 import { eur2, fmtRange, PAYMENT_METHODS, type Course, type MethodId } from "../data";
 import type { BankDetails } from "../lib/api";
 
+import { t } from "../i18n";
 export type OutcomeVariant = "success" | "pending" | "bank" | "cancelled" | "error";
 
 export interface OrderInfo {
@@ -48,11 +49,11 @@ function CopyRow({ label, value }: { label: string; value: string }) {
       </div>
       <button
         onClick={copy}
-        aria-label={`Copia ${label}`}
+        aria-label={t("Copia {label}", { label })}
         className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-ink/15 px-3 py-1.5 text-[11.5px] font-semibold text-ink/70 transition-colors hover:border-ink hover:text-ink"
       >
         {copied ? <Check className="size-3.5 text-mint" aria-hidden="true" /> : <Copy className="size-3.5" aria-hidden="true" />}
-        {copied ? "Copiato" : "Copia"}
+        {copied ? t("Copiato") : t("Copia")}
       </button>
     </div>
   );
@@ -63,28 +64,28 @@ function RecapCard({ order }: { order: OrderInfo }) {
   return (
     <dl className="grid gap-3 rounded-2xl border border-ink/10 bg-white p-5 text-sm sm:grid-cols-2">
       <div>
-        <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-steel">Corso</dt>
+        <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-steel">{t("Corso")}</dt>
         <dd className="mt-1 flex items-center gap-1.5 font-semibold text-ink">
           <CalendarDays className="size-3.5 text-flame" aria-hidden="true" />
           {order.course.short} · {fmtRange(order.course.start, order.course.end)}
         </dd>
       </div>
       <div>
-        <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-steel">Partecipanti</dt>
+        <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-steel">{t("Partecipanti")}</dt>
         <dd className="mt-1 font-semibold text-ink">
-          {order.count} {order.count === 1 ? "persona" : "persone"}
+          {order.count} {order.count === 1 ? t("persona") : t("persone")}
         </dd>
       </div>
       <div>
-        <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-steel">Metodo</dt>
+        <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-steel">{t("Metodo")}</dt>
         <dd className="mt-1 font-semibold text-ink">{method.label}</dd>
       </div>
       <div>
-        <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-steel">Riferimento ordine</dt>
+        <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-steel">{t("Riferimento ordine")}</dt>
         <dd className="mt-1 font-mono text-[13px] font-semibold text-ink">{order.orderRef}</dd>
       </div>
       <div className="sm:col-span-2 border-t border-ink/8 pt-3">
-        <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-steel">Totale (IVA inclusa)</dt>
+        <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-steel">{t("Totale (IVA inclusa)")}</dt>
         <dd className="mt-1 font-display text-2xl font-bold tracking-tight text-ink">{eur2(order.total)}</dd>
       </div>
     </dl>
@@ -98,37 +99,37 @@ export function Outcome({ variant, order }: { variant: OutcomeVariant; order: Or
   const head: Record<OutcomeVariant, { icon: React.ReactNode; kicker: string; title: string; sub: string; tone: string }> = {
     success: {
       icon: <CheckCircle2 className="size-16 text-mint" strokeWidth={1.4} aria-hidden="true" />,
-      kicker: "Pagamento riuscito",
-      title: "Sei dei nostri. Aula confermata.",
-      sub: "Abbiamo registrato il pagamento. Ti scriviamo all'indirizzo indicato con le istruzioni per partecipare al corso. Conserva il riferimento dell'ordine.",
+      kicker: t("Pagamento riuscito"),
+      title: t("Sei dei nostri. Aula confermata."),
+      sub: t("Abbiamo registrato il pagamento. Ti scriviamo all'indirizzo indicato con le istruzioni per partecipare al corso. Conserva il riferimento dell'ordine."),
       tone: "border-mint/40 bg-emerald-50",
     },
     pending: {
       icon: <Clock className="size-16 text-flame" strokeWidth={1.4} aria-hidden="true" />,
-      kicker: "Pagamento in verifica",
-      title: "Stiamo aspettando la conferma del circuito.",
-      sub: "Il pagamento non risulta ancora confermato. Se hai completato l'operazione, ricarica questa pagina tra qualche minuto; in caso di dubbi scrivi a academy@cubeng.eu indicando il riferimento dell'ordine.",
+      kicker: t("Pagamento in verifica"),
+      title: t("Stiamo aspettando la conferma del circuito."),
+      sub: t("Il pagamento non risulta ancora confermato. Se hai completato l'operazione, ricarica questa pagina tra qualche minuto; in caso di dubbi scrivi a academy@cubeng.eu indicando il riferimento dell'ordine."),
       tone: "border-flame/40 bg-flame/5",
     },
     bank: {
       icon: <Clock className="size-16 text-gold" strokeWidth={1.4} aria-hidden="true" />,
-      kicker: "Iscrizione registrata",
-      title: "Manca solo il bonifico.",
-      sub: "I posti restano riservati per alcuni giorni lavorativi. L'iscrizione è confermata alla ricezione del pagamento: se serve più tempo, scrivici.",
+      kicker: t("Iscrizione registrata"),
+      title: t("Manca solo il bonifico."),
+      sub: t("I posti restano riservati per alcuni giorni lavorativi. L'iscrizione è confermata alla ricezione del pagamento: se serve più tempo, scrivici."),
       tone: "border-gold/40 bg-amber-50",
     },
     cancelled: {
       icon: <XCircle className="size-16 text-steel" strokeWidth={1.4} aria-hidden="true" />,
-      kicker: "Pagamento annullato",
-      title: "Nessun addebito effettuato.",
-      sub: "Hai annullato l'operazione sul circuito di pagamento. I dati inseriti sono ancora qui: puoi riprendere da dove eri rimasto, anche cambiando metodo.",
+      kicker: t("Pagamento annullato"),
+      title: t("Nessun addebito effettuato."),
+      sub: t("Hai annullato l'operazione sul circuito di pagamento. I dati inseriti sono ancora qui: puoi riprendere da dove eri rimasto, anche cambiando metodo."),
       tone: "border-ink/15 bg-white",
     },
     error: {
       icon: <AlertTriangle className="size-16 text-err" strokeWidth={1.4} aria-hidden="true" />,
-      kicker: "Qualcosa non ha funzionato",
-      title: "Il pagamento non è andato a buon fine.",
-      sub: "Riprova o scegli un altro metodo. Per assistenza scrivi a academy@cubeng.eu.",
+      kicker: t("Qualcosa non ha funzionato"),
+      title: t("Il pagamento non è andato a buon fine."),
+      sub: t("Riprova o scegli un altro metodo. Per assistenza scrivi a academy@cubeng.eu."),
       tone: "border-err/30 bg-red-50/60",
     },
   };
@@ -138,8 +139,7 @@ export function Outcome({ variant, order }: { variant: OutcomeVariant; order: Or
     <div className="mx-auto max-w-3xl">
       {order.testMode && (
         <p className="mb-6 rounded-xl border border-dashed border-ink/25 bg-white/70 px-4 py-3 text-center font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-steel">
-          Ambiente di prova: nessun addebito reale
-        </p>
+          {t("Ambiente di prova: nessun addebito reale")}</p>
       )}
 
       <div className={cn("overflow-hidden rounded-[28px] border shadow-card", h.tone)}>
@@ -156,35 +156,32 @@ export function Outcome({ variant, order }: { variant: OutcomeVariant; order: Or
           <RecapCard order={order} />
 
           {variant === "bank" && order.bank && (
-            <div className="mt-5 space-y-2.5" aria-label="Coordinate bancarie per il bonifico">
+            <div className="mt-5 space-y-2.5" aria-label={t("Coordinate bancarie per il bonifico")}>
               <p className="flex items-center gap-2 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-steel">
                 <Landmark className="size-4 text-gold" aria-hidden="true" />
-                Coordinate per il bonifico
-              </p>
-              <CopyRow label="Intestatario" value={order.bank.holder} />
-              <CopyRow label="IBAN" value={order.bank.iban} />
-              {order.bank.bank && <CopyRow label="Banca" value={order.bank.bank} />}
-              <CopyRow label="Causale" value={causale} />
+                {t("Coordinate per il bonifico")}</p>
+              <CopyRow label={t("Intestatario")} value={order.bank.holder} />
+              <CopyRow label={t("IBAN")} value={order.bank.iban} />
+              {order.bank.bank && <CopyRow label={t("Banca")} value={order.bank.bank} />}
+              <CopyRow label={t("Causale")} value={causale} />
               <div className="flex items-start gap-2.5 rounded-xl border border-gold/30 bg-amber-50 px-4 py-3 text-[13px] leading-snug text-ink/75">
                 <Clock className="mt-0.5 size-4 shrink-0 text-gold" aria-hidden="true" />
                 <span>
-                  <strong className="font-semibold text-ink">Posti riservati per alcuni giorni lavorativi.</strong>{" "}
-                  Invia la distinta a{" "}
+                  <strong className="font-semibold text-ink">{t("Posti riservati per alcuni giorni lavorativi.")}</strong>{" "}
+                  {t("Invia la distinta a")}{" "}
                   <a className="link-sweep font-semibold text-flame" href="mailto:academy@cubeng.eu">
-                    academy@cubeng.eu
-                  </a>{" "}
-                  per accelerare la conferma.
-                </span>
+                    {t("academy@cubeng.eu")}</a>{" "}
+                  {t("per accelerare la conferma.")}</span>
               </div>
             </div>
           )}
 
           {variant === "success" && (
-            <ol className="mt-5 space-y-3" aria-label="Prossimi passi">
+            <ol className="mt-5 space-y-3" aria-label={t("Prossimi passi")}>
               {[
-                { t: "Conferma", d: "ti scriviamo all'email del partecipante con le istruzioni per collegarti al corso (Zoom)." },
-                { t: "Fattura", d: "Cube Engineering emette la fattura elettronica ai dati di fatturazione indicati." },
-                { t: "Esame iSAQB®", d: "non è incluso: si organizza a parte con gli enti autorizzati (280 € + IVA)." },
+                { t: t("Conferma"), d: t("ti scriviamo all'email del partecipante con le istruzioni per collegarti al corso (Zoom).") },
+                { t: t("Fattura"), d: t("Cube Engineering emette la fattura elettronica ai dati di fatturazione indicati.") },
+                { t: t("Esame iSAQB®"), d: t("non è incluso: si organizza a parte con gli enti autorizzati (280 € + IVA).") },
               ].map((s, i) => (
                 <li key={s.t} className="flex gap-4 rounded-xl border border-ink/10 bg-white px-4 py-3.5">
                   <span className="grid size-7 shrink-0 place-items-center rounded-full bg-mint/12 font-mono text-[11px] font-bold text-mint">
@@ -202,13 +199,11 @@ export function Outcome({ variant, order }: { variant: OutcomeVariant; order: Or
             {variant === "success" || variant === "pending" || variant === "bank" ? (
               <>
                 <a href="#/" className="inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 font-display text-sm font-semibold text-white transition-colors hover:bg-flame">
-                  Torna alla home
-                  <ArrowRight className="size-4" aria-hidden="true" />
+                  {t("Torna alla home")}<ArrowRight className="size-4" aria-hidden="true" />
                 </a>
                 <a href="#/corsi" className="inline-flex items-center gap-2 rounded-full border border-ink/20 px-6 py-3 font-display text-sm font-semibold text-ink transition-colors hover:border-ink">
                   <ReceiptText className="size-4" aria-hidden="true" />
-                  Vedi altri corsi
-                </a>
+                  {t("Vedi altri corsi")}</a>
               </>
             ) : (
               <>
@@ -217,15 +212,13 @@ export function Outcome({ variant, order }: { variant: OutcomeVariant; order: Or
                   className="inline-flex items-center gap-2 rounded-full bg-flame px-6 py-3 font-display text-sm font-semibold text-white shadow-flame transition-colors hover:bg-ink"
                 >
                   <RotateCcw className="size-4" aria-hidden="true" />
-                  Riprendi l'iscrizione
-                </button>
+                  {t("Riprendi l'iscrizione")}</button>
                 <a
                   href="mailto:academy@cubeng.eu"
                   className="inline-flex items-center gap-2 rounded-full border border-ink/20 px-6 py-3 font-display text-sm font-semibold text-ink transition-colors hover:border-ink"
                 >
                   <Mail className="size-4" aria-hidden="true" />
-                  Scrivici: ti aiutiamo noi
-                </a>
+                  {t("Scrivici: ti aiutiamo noi")}</a>
               </>
             )}
           </div>

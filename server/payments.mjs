@@ -45,13 +45,14 @@ export function methodStatus(settings) {
 }
 
 // Tutti i provider tornano su una rotta server che verifica il pagamento e poi reindirizza alla SPA.
-export async function createSession({ provider, order, description, email, origin }) {
+export async function createSession({ provider, order, description, email, origin, lang = "it" }) {
   const back = (ref, prov, outcome) => `${origin}/pagamento/ritorno?ref=${encodeURIComponent(ref)}&provider=${prov}&outcome=${outcome}`;
   const t = order.test_mode;
   if (provider === "stripe") {
     const stripe = new Stripe(stripeSecret(t));
     const s = await stripe.checkout.sessions.create({
       mode: "payment",
+      locale: lang,
       customer_email: email || undefined,
       line_items: [{ quantity: 1, price_data: { currency: "eur", unit_amount: order.total_cents, product_data: { name: description } } }],
       metadata: { ref: order.ref },

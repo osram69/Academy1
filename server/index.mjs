@@ -10,7 +10,7 @@ import { bankDetails, createSession, isPaid, methodStatus, paypalVerifyWebhook, 
 import { findGlobalCoupon, getSettings, invalidateSettings } from "./settings.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DIST = path.join(__dirname, "..", "dist");
+const DIST = process.env.DIST_DIR || path.join(__dirname, "..", "dist");
 const PORT = Number(process.env.PORT) || 3000;
 
 // carica un eventuale .env locale (in produzione le variabili vengono dal pannello Hostinger)
@@ -201,7 +201,7 @@ app.post("/api/orders", limit(10, 60000), async (req, res) => {
 
     const description = `${String(course.titolo).replace(/&reg;/g, "®").replace(/<[^>]+>/g, "")} · ${course.data_inizio}`;
     try {
-      const s = await createSession({ provider: method, order: ins.data, description, email: participants[0].email, origin: origin(req) });
+      const s = await createSession({ provider: method, order: ins.data, description, email: participants[0].email, origin: origin(req), lang: ["it", "en", "fr", "de"].includes(b.lang) ? b.lang : "it" });
       await db.from("iscrizioni").update({ provider_ref: s.providerRef }).eq("ref", ref);
       res.json({ ref, url: s.url });
     } catch (e) {

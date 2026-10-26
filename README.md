@@ -23,6 +23,14 @@ Il server calcola prezzo, sconti e IVA da solo (il browser non decide l'importo)
 12 partecipanti per edizione (limite iSAQB con un solo docente) e verifica ogni pagamento direttamente
 sul provider prima di segnare l'ordine come pagato. Un metodo senza chiavi configurate resta disattivato.
 
+## Lingue (IT · EN · FR · DE)
+
+Il sito pubblico è tradotto in quattro lingue; il pannello `#/admin` resta in italiano. La lingua si sceglie
+dal selettore in alto (si ricorda nel browser; al primo accesso segue la lingua del browser).
+I testi stanno in `src/i18n/{en,fr,de}.ts`: la chiave è il testo italiano usato nel codice con `t("...")`.
+Un testo senza traduzione compare in italiano. Luogo e lingua dei corsi vengono dalle colonne
+`luogo_xx`/`lingua_xx` del database, già modificabili dal pannello.
+
 ## Pannello di gestione (`#/admin`)
 
 - **Corsi**: edizioni, prezzi, early bird, posti, modalità di fruizione e calendario delle sessioni.

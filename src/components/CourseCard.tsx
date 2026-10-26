@@ -9,6 +9,7 @@ import {
 } from "../data";
 import { Btn, EarlyBirdChip, Reveal, SeatsBar, StatusPill, Tag } from "./ui";
 
+import { t } from "../i18n";
 /**
  * CourseCard — sostituisce la riga della vecchia "tabella listino".
  * Gerarchia: formato/stato → titolo → meta scannerizzabili → posti → prezzo → CTA.
@@ -97,21 +98,21 @@ export function CourseCard({ course, index = 0 }: { course: Course; index?: numb
         <div className="mt-auto flex items-end justify-between gap-4 border-t border-ink/8 pt-5 [margin-top:auto]">
           <div className="pt-5">
             {price.original && (
-              <p className="text-[12px] font-medium text-steel line-through" aria-label={`Prezzo di listino ${eur(price.original)}`}>
+              <p className="text-[12px] font-medium text-steel line-through" aria-label={t("Prezzo di listino {price}", { price: eur(price.original) })}>
                 {eur(price.original)}
               </p>
             )}
             <p className="font-display text-[26px] font-bold leading-none tracking-tight text-ink">
               {eur(price.unit)}
-              <span className="ml-1.5 align-middle text-[11px] font-medium tracking-normal text-steel">a persona + IVA</span>
+              <span className="ml-1.5 align-middle text-[11px] font-medium tracking-normal text-steel">{t("a persona + IVA")}</span>
             </p>
           </div>
           <a
             href={waitlist ? `#/corso/${course.slug}` : `#/iscriviti/${course.slug}`}
             aria-label={
               waitlist
-                ? `Entra in lista d'attesa per ${course.short}`
-                : `Iscriviti a ${course.short} del ${fmtRange(course.start, course.end)}`
+                ? t("Entra in lista d'attesa per {name}", { name: course.short })
+                : t("Iscriviti a {name} del {range}", { name: course.short, range: fmtRange(course.start, course.end) })
             }
             className={cn(
               "relative z-10 inline-flex size-12 shrink-0 items-center justify-center rounded-full transition-all duration-300",
@@ -134,7 +135,7 @@ function ConcludedCard({ course }: { course: Course }) {
   const fmt = FORMAT_META[course.format];
   return (
     <article
-      aria-label={`${course.title}, edizione conclusa, ${fmtRange(course.start, course.end)}, ${course.location}`}
+      aria-label={t("{title}, edizione conclusa, {range}, {place}", { title: course.title, range: fmtRange(course.start, course.end), place: course.location })}
       className="relative flex h-full flex-col overflow-hidden rounded-[22px] border border-ink/10 bg-white/70"
     >
       <div className="relative aspect-[16/7] overflow-hidden">
@@ -145,8 +146,7 @@ function ConcludedCard({ course }: { course: Course }) {
         </span>
         <span className="absolute bottom-3 right-4 inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-ink">
           <CheckCircle2 className="size-3.5 text-mint" aria-hidden="true" />
-          Concluso
-        </span>
+          {t("Concluso")}</span>
       </div>
       <div className="flex flex-1 flex-col p-5">
         <h3 className="font-display text-[17px] font-bold leading-snug tracking-tight text-ink/80">{course.title}</h3>
@@ -174,11 +174,11 @@ export function ConcludedSection({ courses, limit = 6 }: { courses: Course[]; li
   return (
     <section className="mt-20" aria-labelledby="concluded-title">
       <Reveal>
-        <Tag>Storico</Tag>
+        <Tag>{t("Storico")}</Tag>
       </Reveal>
       <Reveal delay={80}>
         <h2 id="concluded-title" className="mt-5 font-display text-[clamp(1.6rem,3vw,2.4rem)] font-bold leading-tight tracking-[-0.02em] text-ink">
-          Edizioni <em className="font-serif italic text-flame">concluse.</em>
+          {t("Edizioni")}{" "}<em className="font-serif italic text-flame">{t("concluse.")}</em>
         </h2>
       </Reveal>
       <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">

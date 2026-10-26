@@ -3,6 +3,7 @@ import { Reveal, Tag } from "./ui";
 import { MODALITA, fmtRange, upcomingCourses, type Modalita } from "../data";
 import { useConfig } from "../lib/useConfig";
 
+import { t } from "../i18n";
 const ICONS: Record<Modalita, LucideIcon> = { intensivo: Zap, weekend: CalendarClock, serale: Moon, mezze_giornate: Sun };
 
 /** Le 24 ore del corso, distribuite in modi diversi per chi non può prendere tre giorni di ferie. */
@@ -13,17 +14,16 @@ export function ModalitaSection() {
     <section id="modalita" className="scroll-mt-24 bg-paper py-24 lg:py-28" aria-labelledby="modalita-title">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <Reveal>
-          <Tag>Come seguire il corso</Tag>
+          <Tag>{t("Come seguire il corso")}</Tag>
         </Reveal>
         <Reveal delay={80}>
           <h2 id="modalita-title" className="mt-5 max-w-3xl font-display text-[clamp(2rem,4.2vw,3.4rem)] font-bold leading-[1.04] tracking-[-0.025em] text-ink">
-            Le stesse 24 ore, <em className="font-serif italic text-flame">distribuite come ti conviene.</em>
+            {t("Le stesse 24 ore,")}{" "}<em className="font-serif italic text-flame">{t("distribuite come ti conviene.")}</em>
           </h2>
         </Reveal>
         <Reveal delay={140}>
           <p className="mt-5 max-w-2xl text-[16px] leading-relaxed text-ink/65">
-            Tre giorni pieni non sono per tutti. Stesso programma iSAQB® e stesso docente: cambia solo il calendario.
-          </p>
+            {t("Tre giorni pieni non sono per tutti. Stesso programma iSAQB® e stesso docente: cambia solo il calendario.")}</p>
         </Reveal>
 
         <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
@@ -44,10 +44,10 @@ export function ModalitaSection() {
                   <p className="mt-4 border-t border-ink/8 pt-4 text-[12.5px] text-steel">
                     {next ? (
                       <>
-                        Prossima: <a className="link-sweep font-semibold text-ink" href={`#/corso/${next.slug}`}>{fmtRange(next.start, next.end)}</a>
+                        {t("Prossima:")}{" "}<a className="link-sweep font-semibold text-ink" href={`#/corso/${next.slug}`}>{fmtRange(next.start, next.end)}</a>
                       </>
                     ) : (
-                      <>Date in definizione: <a className="link-sweep font-semibold text-flame" href="mailto:academy@cubeng.eu">scrivici</a></>
+                      <>{t("Date in definizione:")}{" "}<a className="link-sweep font-semibold text-flame" href="mailto:academy@cubeng.eu">{t("scrivici")}</a></>
                     )}
                   </p>
                 </article>
@@ -59,9 +59,8 @@ export function ModalitaSection() {
         {cfg && cfg.privateDiscount > 0 && (
           <Reveal delay={200}>
             <p className="mt-8 rounded-2xl border border-flame/30 bg-flame/[0.06] px-6 py-4 text-[14.5px] leading-relaxed text-ink/80">
-              <strong className="font-semibold text-ink">Per i privati −{cfg.privateDiscount}% sul prezzo di listino.</strong>{" "}
-              Se iscrivi te stesso, senza partita IVA, lo sconto si applica automaticamente in fase d'iscrizione e si somma all'early bird, quando attivo.
-            </p>
+              <strong className="font-semibold text-ink">{t("Per i privati −")}{cfg.privateDiscount}{t("% sul prezzo di listino.")}</strong>{" "}
+              {t("Se iscrivi te stesso, senza partita IVA, lo sconto si applica automaticamente in fase d'iscrizione e si somma all'early bird, quando attivo.")}</p>
           </Reveal>
         )}
       </div>

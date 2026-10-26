@@ -42,6 +42,7 @@ import {
   type MethodId,
 } from "../data";
 
+import { lang, t } from "../i18n";
 /** Limite iSAQB: max 12 partecipanti per corso con un solo docente. */
 const MAX_SEATS = 12;
 
@@ -75,7 +76,7 @@ const emptyBilling = (): Billing => ({
   sdi: "", pec: "", via: "", cap: "", citta: "", paese: "Italia", vatId: "",
 });
 
-const STEPS = ["Corso e posti", "Partecipanti", "Fatturazione", "Pagamento"];
+const STEPS = [t("Corso e posti"), t("Partecipanti"), t("Fatturazione"), t("Pagamento")];
 
 const METHOD_ICONS: Record<MethodId, typeof CreditCard> = {
   stripe: CreditCard,
@@ -138,7 +139,7 @@ function StepConfigure({ course, count, setCount }: { course: Course; count: num
           <img src={course.image} alt="" className="size-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-ink/80 to-ink/10" aria-hidden="true" />
           <p className="absolute bottom-3 left-5 rounded-full bg-ink/70 px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-white">
-            {fmt.label} · Livello {course.level}
+            {fmt.label}{" "}{t("· Livello")}{" "}{course.level}
           </p>
         </div>
         <div className="p-6">
@@ -148,28 +149,26 @@ function StepConfigure({ course, count, setCount }: { course: Course; count: num
           </p>
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <a href="#/corsi" className="link-sweep text-[13px] font-semibold text-flame">
-              Cambia edizione o corso →
-            </a>
+              {t("Cambia edizione o corso →")}</a>
             {course.seatsLeft != null && (
               <span className="inline-flex items-center gap-1.5 rounded-full bg-mint/10 px-3 py-1 text-[12px] font-semibold text-mint">
                 <BadgeCheck className="size-3.5" aria-hidden="true" />
-                {course.seatsLeft} posti disponibili
-              </span>
+                {course.seatsLeft}{" "}{t("posti disponibili")}</span>
             )}
           </div>
         </div>
       </div>
 
       <div className="rounded-3xl border border-ink/10 bg-white p-6 shadow-card sm:p-7">
-        <label className="label" id="count-label">Quante persone iscrivi? <span className="req" aria-hidden="true">*</span></label>
+        <label className="label" id="count-label">{t("Quante persone iscrivi?")}{" "}<span className="req" aria-hidden="true">*</span></label>
         <div className="flex flex-wrap items-center gap-4">
           <div className="inline-flex items-center rounded-full border border-ink/15 bg-paper p-1" role="group" aria-labelledby="count-label">
-            <button onClick={() => setCount(Math.max(1, count - 1))} disabled={count <= 1} aria-label="Riduci partecipanti"
+            <button onClick={() => setCount(Math.max(1, count - 1))} disabled={count <= 1} aria-label={t("Riduci partecipanti")}
               className="grid size-10 place-items-center rounded-full text-ink/70 transition-colors hover:bg-ink hover:text-white disabled:opacity-30">
               <Minus className="size-4" aria-hidden="true" />
             </button>
             <span className="min-w-14 text-center font-display text-2xl font-bold tabular-nums" aria-live="polite">{count}</span>
-            <button onClick={() => setCount(Math.min(MAX_SEATS, count + 1))} disabled={count >= MAX_SEATS} aria-label="Aumenta partecipanti"
+            <button onClick={() => setCount(Math.min(MAX_SEATS, count + 1))} disabled={count >= MAX_SEATS} aria-label={t("Aumenta partecipanti")}
               className="grid size-10 place-items-center rounded-full text-ink/70 transition-colors hover:bg-ink hover:text-white disabled:opacity-30">
               <Plus className="size-4" aria-hidden="true" />
             </button>
@@ -184,14 +183,13 @@ function StepConfigure({ course, count, setCount }: { course: Course; count: num
             ))}
           </div>
         </div>
-        <p className="field-note"><>Massimo {course.seatsLeft != null ? Math.min(MAX_SEATS, course.seatsLeft) : MAX_SEATS} posti per questa edizione · </>Prezzo a persona {eur(price.unit)} + IVA</p>
+        <p className="field-note"><>{t("Massimo")}{" "}{course.seatsLeft != null ? Math.min(MAX_SEATS, course.seatsLeft) : MAX_SEATS}{" "}{t("posti per questa edizione ·")}{" "}</>{t("Prezzo a persona")}{" "}{eur(price.unit)}{" "}{t("+ IVA")}</p>
         {count >= 5 && (
           <div className="mt-4 flex items-start gap-3 rounded-xl border border-gold/30 bg-amber-50 p-4 text-[13px] leading-snug text-ink/75">
             <Users className="mt-0.5 size-4.5 shrink-0 text-gold" aria-hidden="true" />
             <span>
-              <strong className="font-semibold text-ink">Gruppi aziendali:</strong> ogni edizione ha al massimo 12
-              partecipanti. Per più persone o per un'edizione dedicata{" "}
-              <a className="link-sweep font-semibold text-flame" href="mailto:academy@cubeng.eu">scrivici</a>.
+              <strong className="font-semibold text-ink">{t("Gruppi aziendali:")}</strong>{" "}{t("ogni edizione ha al massimo 12 partecipanti. Per più persone o per un'edizione dedicata")}{" "}
+              <a className="link-sweep font-semibold text-flame" href="mailto:academy@cubeng.eu">{t("scrivici")}</a>.
             </span>
           </div>
         )}
@@ -218,8 +216,7 @@ function StepParticipants({
       <div className="flex items-start gap-3 rounded-2xl border border-ink/10 bg-white p-4.5 text-[13.5px] leading-snug text-ink/70">
         <Info className="mt-0.5 size-4.5 shrink-0 text-flame" aria-hidden="true" />
         <p>
-          Servono i dati dei partecipanti per l'iscrizione al corso e l'attestato di partecipazione. <strong className="font-semibold text-ink">L'esame iSAQB non è incluso</strong>: si organizza a parte con gli enti autorizzati (280 € + IVA).
-        </p>
+          {t("Servono i dati dei partecipanti per l'iscrizione al corso e l'attestato di partecipazione.")}{" "}<strong className="font-semibold text-ink">{t("L'esame iSAQB non è incluso")}</strong>{t(": si organizza a parte con gli enti autorizzati (280 € + IVA).")}</p>
       </div>
 
       {participants.map((p, i) => {
@@ -228,7 +225,7 @@ function StepParticipants({
         const k = (f: string) => `p${i}-${f}`;
         return (
           <section key={i} className={cn("overflow-hidden rounded-3xl border bg-white transition-colors", isOpen ? "border-flame/40 shadow-card" : "border-ink/10")}
-            aria-label={`Partecipante ${i + 1}`}>
+            aria-label={t("Partecipante {n}", { n: i + 1 })}>
             <button onClick={() => setOpen(isOpen ? -1 : i)} aria-expanded={isOpen}
               className="flex w-full items-center gap-3.5 px-5 py-4 text-left sm:px-6">
               <span className={cn("grid size-9 shrink-0 place-items-center rounded-full font-mono text-[11.5px] font-bold transition-colors",
@@ -237,45 +234,42 @@ function StepParticipants({
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block truncate font-display text-[15px] font-semibold tracking-tight text-ink">
-                  {p.nome || p.cognome ? `${p.nome} ${p.cognome}`.trim() : `Partecipante ${i + 1}`}
+                  {p.nome || p.cognome ? `${p.nome} ${p.cognome}`.trim() : t("Partecipante {n}", { n: i + 1 })}
                 </span>
-                <span className="block truncate font-mono text-[11px] text-steel">{p.email || "dati da completare"}</span>
+                <span className="block truncate font-mono text-[11px] text-steel">{p.email || t("dati da completare")}</span>
               </span>
-              {done && <span className="hidden rounded-full bg-mint/10 px-2.5 py-1 text-[11px] font-semibold text-mint sm:inline">Completo</span>}
+              {done && <span className="hidden rounded-full bg-mint/10 px-2.5 py-1 text-[11px] font-semibold text-mint sm:inline">{t("Completo")}</span>}
               <ChevronDown className={cn("size-5 shrink-0 text-steel transition-transform duration-300", isOpen && "rotate-180 text-flame")} aria-hidden="true" />
             </button>
 
             <div className={cn("grid transition-all duration-400", isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0")}>
               <div className="overflow-hidden">
                 <div className="grid gap-4 border-t border-ink/8 p-5 sm:grid-cols-2 sm:p-6">
-                  <TextField id={`${k("nome")}`} label="Nome" req placeholder="Giulia" autoComplete="given-name"
+                  <TextField id={`${k("nome")}`} label={t("Nome")} req placeholder={t("Giulia")} autoComplete="given-name"
                     value={p.nome} onChange={(e) => update(i, { nome: e.target.value })}
                     error={attempted ? errors[k("nome")] : undefined} />
-                  <TextField id={`${k("cognome")}`} label="Cognome" req placeholder="Rossi" autoComplete="family-name"
+                  <TextField id={`${k("cognome")}`} label={t("Cognome")} req placeholder={t("Rossi")} autoComplete="family-name"
                     value={p.cognome} onChange={(e) => update(i, { cognome: e.target.value })}
                     error={attempted ? errors[k("cognome")] : undefined} />
-                  <TextField id={`${k("email")}`} label="Email personale" req type="email" placeholder="giulia.rossi@azienda.it" autoComplete="email"
+                  <TextField id={`${k("email")}`} label={t("Email personale")} req type="email" placeholder={t("giulia.rossi@azienda.it")} autoComplete="email"
                     value={p.email} onChange={(e) => update(i, { email: e.target.value })}
                     error={attempted ? errors[k("email")] : undefined}
-                    hint="Qui arrivano convocazione esame e materiali" />
-                  <TextField id={`${k("telefono")}`} label="Telefono" type="tel" placeholder="+39 333 000 0000" autoComplete="tel"
+                    hint={t("Qui arrivano le istruzioni del corso e i materiali")} />
+                  <TextField id={`${k("telefono")}`} label={t("Telefono")} type="tel" placeholder="+39 333 000 0000" autoComplete="tel"
                     value={p.telefono} onChange={(e) => update(i, { telefono: e.target.value })} />
-                  <TextField id={`${k("cf")}`} label="Codice fiscale" placeholder="RSSGLI85M01H501Z" className="sm:col-span-2"
+                  <TextField id={`${k("cf")}`} label={t("Codice fiscale")} placeholder={t("RSSGLI85M01H501Z")} className="sm:col-span-2"
                     value={p.cf} onChange={(e) => update(i, { cf: e.target.value.toUpperCase() })}
                     error={attempted ? errors[k("cf")] : undefined}
-                    hint="Facoltativo, 16 caratteri" />
+                    hint={t("Facoltativo, 16 caratteri")} />
                   <fieldset className="grid gap-2.5 sm:col-span-2">
-                    <legend className="sr-only">Consensi di {p.nome || `partecipante ${i + 1}`}</legend>
+                    <legend className="sr-only">{t("Consensi di")}{" "}{p.nome || t("partecipante {n}", { n: i + 1 })}</legend>
                     <CheckRow id={`${k("privacy")}`} checked={p.cPrivacy} onChange={(v) => update(i, { cPrivacy: v })}
-                      title={<>Consenso privacy <span className="text-flame">*</span> — necessario per iscrizione ed esame</>}
-                      desc="Trattamento dati per gestione corso, certificazione iSAQB e adempimenti fiscali (GDPR 2016/679)."
+                      title={<>{t("Consenso privacy")}{" "}<span className="text-flame">*</span>{" "}{t("— necessario per l'iscrizione")}</>}
+                      desc={t("Trattamento dati per gestione del corso e adempimenti fiscali (GDPR 2016/679).")}
                       error={attempted ? errors[k("privacy")] : undefined} />
-                    <CheckRow id={`${k("av")}`} checked={p.cAV} onChange={(v) => update(i, { cAV: v })}
-                      title="Registrazione audio-video (facoltativo)"
-                      desc="Le sessioni live online possono essere registrate e condivise solo con i partecipanti dell'edizione." />
                     <CheckRow id={`${k("marketing")}`} checked={p.cMarketing} onChange={(v) => update(i, { cMarketing: v })}
-                      title="Novità e offerte (facoltativo)"
-                      desc="Novità su nuove edizioni del corso. Revocabile in qualsiasi momento." />
+                      title={t("Novità e offerte (facoltativo)")}
+                      desc={t("Novità su nuove edizioni del corso. Revocabile in qualsiasi momento.")} />
                   </fieldset>
                 </div>
               </div>
@@ -290,10 +284,10 @@ function StepParticipants({
 /* ========================= step 3 · fatturazione ===================== */
 
 const BILLING_TYPES: { id: BillingType; label: string; desc: string; icon: typeof User }[] = [
-  { id: "privato", label: "Privato", desc: "Persona fisica, senza P.IVA", icon: User },
-  { id: "pro", label: "Libero professionista", desc: "P.IVA individuale", icon: CreditCard },
-  { id: "azienda", label: "Azienda italiana", desc: "Con codice SDI / PEC", icon: Building2 },
-  { id: "estera", label: "Azienda estera", desc: "UE ed extra-UE", icon: Globe },
+  { id: "privato", label: t("Privato"), desc: t("Persona fisica, senza P.IVA"), icon: User },
+  { id: "pro", label: t("Libero professionista"), desc: t("P.IVA individuale"), icon: CreditCard },
+  { id: "azienda", label: t("Azienda italiana"), desc: t("Con codice SDI / PEC"), icon: Building2 },
+  { id: "estera", label: t("Azienda estera"), desc: t("UE ed extra-UE"), icon: Globe },
 ];
 
 function StepBilling({ billing, set, errors, attempted }: {
@@ -302,25 +296,25 @@ function StepBilling({ billing, set, errors, attempted }: {
   errors: Record<string, string>;
   attempted: boolean;
 }) {
-  const t = billing.type;
+  const btype = billing.type;
   const k = (f: string) => `f-${f}`;
   const err = (f: string) => (attempted ? errors[k(f)] : undefined);
-  const isCompany = t === "azienda" || t === "estera";
+  const isCompany = btype === "azienda" || btype === "estera";
 
   return (
     <div className="space-y-5">
       <fieldset>
-        <legend className="label">Chi riceve la fattura? <span className="req" aria-hidden="true">*</span></legend>
-        <div className="grid gap-2.5 sm:grid-cols-2" role="radiogroup" aria-label="Tipo di soggetto fatturante">
+        <legend className="label">{t("Chi riceve la fattura?")}{" "}<span className="req" aria-hidden="true">*</span></legend>
+        <div className="grid gap-2.5 sm:grid-cols-2" role="radiogroup" aria-label={t("Tipo di soggetto fatturante")}>
           {BILLING_TYPES.map((bt) => (
             <label key={bt.id} className={cn(
               "flex cursor-pointer items-center gap-3.5 rounded-2xl border p-4 transition-all",
-              t === bt.id ? "border-flame bg-flame/[0.06] shadow-card" : "border-ink/12 bg-white hover:border-ink/35"
+              btype === bt.id ? "border-flame bg-flame/[0.06] shadow-card" : "border-ink/12 bg-white hover:border-ink/35"
             )}>
-              <input type="radio" name="billing-type" className="sr-only" checked={t === bt.id}
+              <input type="radio" name="billing-type" className="sr-only" checked={btype === bt.id}
                 onChange={() => set({ type: bt.id })} />
               <span className={cn("grid size-10 shrink-0 place-items-center rounded-xl transition-colors",
-                t === bt.id ? "bg-flame text-white" : "bg-ink/6 text-ink/50")}>
+                btype === bt.id ? "bg-flame text-white" : "bg-ink/6 text-ink/50")}>
                 <bt.icon className="size-4.5" aria-hidden="true" />
               </span>
               <span className="min-w-0">
@@ -335,61 +329,59 @@ function StepBilling({ billing, set, errors, attempted }: {
       <div className="rounded-3xl border border-ink/10 bg-white p-6 shadow-card sm:p-7">
         <div className="grid gap-4 sm:grid-cols-2">
           {isCompany ? (
-            <TextField id="f-ragione" label="Ragione sociale" req placeholder="Acme S.r.l." autoComplete="organization"
+            <TextField id="f-ragione" label={t("Ragione sociale")} req placeholder={t("Acme S.r.l.")} autoComplete="organization"
               className="sm:col-span-2" value={billing.ragione} onChange={(e) => set({ ragione: e.target.value })} error={err("ragione")} />
           ) : (
             <>
-              <TextField id="f-nome" label="Nome" req placeholder="Giulia" autoComplete="given-name"
+              <TextField id="f-nome" label={t("Nome")} req placeholder={t("Giulia")} autoComplete="given-name"
                 value={billing.nome} onChange={(e) => set({ nome: e.target.value })} error={err("nome")} />
-              <TextField id="f-cognome" label="Cognome" req placeholder="Rossi" autoComplete="family-name"
+              <TextField id="f-cognome" label={t("Cognome")} req placeholder={t("Rossi")} autoComplete="family-name"
                 value={billing.cognome} onChange={(e) => set({ cognome: e.target.value })} error={err("cognome")} />
             </>
           )}
 
-          {t !== "estera" && (
-            <TextField id="f-cf" label="Codice fiscale" req={!isCompany} placeholder="RSSGLI85M01H501Z"
+          {btype !== "estera" && (
+            <TextField id="f-cf" label={t("Codice fiscale")} req={!isCompany} placeholder={t("RSSGLI85M01H501Z")}
               value={billing.cf} onChange={(e) => set({ cf: e.target.value.toUpperCase() })}
-              error={err("cf")} hint={isCompany ? "Se diverso dalla P.IVA" : undefined} />
+              error={err("cf")} hint={isCompany ? t("Se diverso dalla P.IVA") : undefined} />
           )}
-          {(t === "pro" || t === "azienda") && (
-            <TextField id="f-piva" label="Partita IVA" req inputMode="numeric" placeholder="01234567890" maxLength={11}
+          {(btype === "pro" || btype === "azienda") && (
+            <TextField id="f-piva" label={t("Partita IVA")} req inputMode="numeric" placeholder="01234567890" maxLength={11}
               value={billing.piva} onChange={(e) => set({ piva: e.target.value.replace(/\D/g, "") })}
-              error={err("piva")} hint="11 cifre, fattura elettronica SDI" />
+              error={err("piva")} hint={t("11 cifre, fattura elettronica SDI")} />
           )}
-          {t === "estera" && (
-            <TextField id="f-vatid" label="VAT / Tax ID" req placeholder="DE123456789"
+          {btype === "estera" && (
+            <TextField id="f-vatid" label={t("VAT / Tax ID")} req placeholder={t("DE123456789")}
               value={billing.vatId} onChange={(e) => set({ vatId: e.target.value.toUpperCase() })}
-              error={err("vatId")} hint="Per inversione contabile IVA intra-UE" />
+              error={err("vatId")} hint={t("Per inversione contabile IVA intra-UE")} />
           )}
-          {(t === "pro" || t === "azienda") && (
+          {(btype === "pro" || btype === "azienda") && (
             <>
-              <TextField id="f-sdi" label="Codice SDI" placeholder="A1B2C3D" maxLength={7}
+              <TextField id="f-sdi" label={t("Codice SDI")} placeholder="A1B2C3D" maxLength={7}
                 value={billing.sdi} onChange={(e) => set({ sdi: e.target.value.toUpperCase() })}
                 error={err("sdipec")} />
-              <TextField id="f-pec" label="PEC" type="email" placeholder="fatture@pec.acme.it"
+              <TextField id="f-pec" label={t("PEC")} type="email" placeholder={t("fatture@pec.acme.it")}
                 value={billing.pec} onChange={(e) => set({ pec: e.target.value })}
-                error={err("sdipec")} hint="SDI o PEC: almeno uno dei due" />
+                error={err("sdipec")} hint={t("SDI o PEC: almeno uno dei due")} />
             </>
           )}
-          {t === "estera" && (
-            <TextField id="f-paese" label="Paese" req placeholder="Germania" autoComplete="country-name"
+          {btype === "estera" && (
+            <TextField id="f-paese" label={t("Paese")} req placeholder={t("Germania")} autoComplete="country-name"
               value={billing.paese === "Italia" ? "" : billing.paese} onChange={(e) => set({ paese: e.target.value })} error={err("paese")} />
           )}
 
-          <TextField id="f-via" label="Indirizzo e numero civico" req placeholder="Via Roma 10" autoComplete="street-address"
+          <TextField id="f-via" label={t("Indirizzo e numero civico")} req placeholder={t("Via Roma 10")} autoComplete="street-address"
             className="sm:col-span-2" value={billing.via} onChange={(e) => set({ via: e.target.value })} error={err("via")} />
-          <TextField id="f-cap" label="CAP" req inputMode="numeric" placeholder="40121" autoComplete="postal-code"
+          <TextField id="f-cap" label={t("CAP")} req inputMode="numeric" placeholder="40121" autoComplete="postal-code"
             value={billing.cap} onChange={(e) => set({ cap: e.target.value })} error={err("cap")} />
-          <TextField id="f-citta" label="Città" req placeholder="Roma" autoComplete="address-level2"
+          <TextField id="f-citta" label={t("Città")} req placeholder={t("Roma")} autoComplete="address-level2"
             value={billing.citta} onChange={(e) => set({ citta: e.target.value })} error={err("citta")} />
         </div>
       </div>
 
       <p className="flex items-start gap-2.5 text-[12.5px] leading-snug text-steel">
         <ShieldCheck className="mt-0.5 size-4 shrink-0 text-mint" aria-hidden="true" />
-        Fattura elettronica emessa entro 48 ore dal pagamento. Per ordini d'acquisto (PO) aziendali, indica il
-        riferimento nelle note della mail di conferma.
-      </p>
+        {t("La fattura elettronica è emessa da Cube Engineering ai dati di fatturazione indicati.")}</p>
     </div>
   );
 }
@@ -397,9 +389,9 @@ function StepBilling({ billing, set, errors, attempted }: {
 /* ================= step 4 · pagamento (componente chiave) ============ */
 
 const SPEED_META = {
-  fast: { label: "Conferma immediata", cls: "bg-emerald-50 text-mint ring-mint/25" },
-  mid: { label: "Entro 1 ora lavorativa", cls: "bg-amber-50 text-gold ring-gold/30" },
-  slow: { label: "3–5 giorni lavorativi", cls: "bg-ink/5 text-steel ring-ink/15" },
+  fast: { label: t("Conferma immediata"), cls: "bg-emerald-50 text-mint ring-mint/25" },
+  mid: { label: t("Entro 1 ora lavorativa"), cls: "bg-amber-50 text-gold ring-gold/30" },
+  slow: { label: t("3–5 giorni lavorativi"), cls: "bg-ink/5 text-steel ring-ink/15" },
 } as const;
 
 function StepPayment({
@@ -423,14 +415,13 @@ function StepPayment({
     <div className="space-y-5">
       {/* coupon */}
       <div className="rounded-3xl border border-ink/10 bg-white p-6 shadow-card">
-        <label htmlFor="coupon" className="label">Codice sconto</label>
+        <label htmlFor="coupon" className="label">{t("Codice sconto")}</label>
         {coupon ? (
           <div className="flex items-center justify-between gap-3 rounded-xl border border-mint/35 bg-emerald-50 px-4 py-3">
             <span className="flex items-center gap-2.5 text-[14px] font-semibold text-mint">
               <TicketPercent className="size-4.5" aria-hidden="true" />
-              {coupon.code} — sconto −{Math.round(coupon.pct * 100)}% applicato
-            </span>
-            <button onClick={() => setCoupon(null)} aria-label="Rimuovi codice sconto"
+              {coupon.code}{" "}{t("— sconto −")}{Math.round(coupon.pct * 100)}{t("% applicato")}</span>
+            <button onClick={() => setCoupon(null)} aria-label={t("Rimuovi codice sconto")}
               className="grid size-8 place-items-center rounded-full text-mint transition-colors hover:bg-mint hover:text-white">
               <X className="size-4" aria-hidden="true" />
             </button>
@@ -438,27 +429,26 @@ function StepPayment({
         ) : (
           <>
             <div className="flex gap-2.5">
-              <input id="coupon" className={cn("field uppercase", couponError && "err")} placeholder="Inserisci il codice"
+              <input id="coupon" className={cn("field uppercase", couponError && "err")} placeholder={t("Inserisci il codice")}
                 value={couponInput}
                 onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
                 onKeyDown={(e) => e.key === "Enter" && onApplyCoupon()} />
-              <Btn variant="ink" type="button" onClick={onApplyCoupon} ariaLabel="Applica codice sconto">
-                Applica
-              </Btn>
+              <Btn variant="ink" type="button" onClick={onApplyCoupon} ariaLabel={t("Applica codice sconto")}>
+                {t("Applica")}</Btn>
             </div>
             {couponError && <p className="field-error" role="alert">{couponError}</p>}
-            <p className="field-note">Gli sconti si cumulano con l'early bird.</p>
+            <p className="field-note">{t("Gli sconti si cumulano con l'early bird.")}</p>
           </>
         )}
       </div>
 
       {/* metodi */}
       <fieldset className="rounded-3xl border border-ink/10 bg-white p-6 shadow-card">
-        <legend className="sr-only">Scegli il metodo di pagamento</legend>
-        <p className="label">Come preferisci pagare? <span className="req" aria-hidden="true">*</span></p>
+        <legend className="sr-only">{t("Scegli il metodo di pagamento")}</legend>
+        <p className="label">{t("Come preferisci pagare?")}{" "}<span className="req" aria-hidden="true">*</span></p>
         {errors.method && attempted && <p className="field-error mb-3" role="alert">{errors.method}</p>}
 
-        <div className="grid gap-2.5" role="radiogroup" aria-label="Metodi di pagamento disponibili">
+        <div className="grid gap-2.5" role="radiogroup" aria-label={t("Metodi di pagamento disponibili")}>
           {PAYMENT_METHODS.map((m) => {
             const selected = method === m.id;
             const Icon = METHOD_ICONS[m.id];
@@ -481,7 +471,7 @@ function StepPayment({
                       <span className="font-display text-[15px] font-bold tracking-tight text-ink">{m.label}</span>
                       <span className={cn("inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10.5px] font-bold ring-1", speed.cls)}>
                         <Timer className="size-3" aria-hidden="true" />
-                        {enabled ? speed.label : "Non ancora attivo"}
+                        {enabled ? speed.label : t("Non ancora attivo")}
                       </span>
                     </span>
                     <span className="mt-1 block text-[12.5px] leading-snug text-ink/60">{m.detail}</span>
@@ -501,19 +491,19 @@ function StepPayment({
           <div className="overflow-hidden">
             {active && (
               <div className="rounded-2xl bg-ink p-5 text-white" role="status">
-                <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ember">Come funziona</p>
+                <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ember">{t("Come funziona")}</p>
                 <p className="mt-2 text-[13.5px] leading-relaxed text-white/75">
                   {active.id === "stripe" && (
-                    <>Verrai reindirizzato al checkout sicuro Stripe (3-D Secure). <strong className="text-white">Conferma istantanea.</strong> Non memorizziamo i dati della carta.</>
+                    <>{t("Verrai reindirizzato al checkout sicuro Stripe (3-D Secure).")}{" "}<strong className="text-white">{t("Conferma istantanea.")}</strong>{" "}{t("Non memorizziamo i dati della carta.")}</>
                   )}
                   {active.id === "paypal" && (
-                    <>Accedi al tuo conto PayPal e confermi: <strong className="text-white">conferma istantanea</strong>.</>
+                    <>{t("Accedi al tuo conto PayPal e confermi:")}{" "}<strong className="text-white">{t("conferma istantanea")}</strong>.</>
                   )}
                   {active.id === "sumup" && (
-                    <>Verrai reindirizzato al <strong className="text-white">checkout sicuro SumUp</strong> per pagare con carta. Conferma immediata.</>
+                    <>{t("Verrai reindirizzato al")}{" "}<strong className="text-white">{t("checkout sicuro SumUp")}</strong>{" "}{t("per pagare con carta. Conferma immediata.")}</>
                   )}
                   {active.id === "bonifico" && (
-                    <>Nessun pagamento ora: dopo la conferma ricevi IBAN e causale. <strong className="text-white">I posti restano riservati per alcuni giorni lavorativi</strong>; l'iscrizione è confermata alla ricezione del bonifico.</>
+                    <>{t("Nessun pagamento ora: dopo la conferma ricevi IBAN e causale.")}{" "}<strong className="text-white">{t("I posti restano riservati per alcuni giorni lavorativi")}</strong>{t("; l'iscrizione è confermata alla ricezione del bonifico.")}</>
                   )}
                 </p>
               </div>
@@ -524,14 +514,13 @@ function StepPayment({
 
       {/* condizioni + CTA */}
       <CheckRow id="terms" checked={terms} onChange={setTerms}
-        title={<>Accetto le <a href="#/" className="link-sweep text-flame">Condizioni generali</a> e la <a href="#/" className="link-sweep text-flame">Privacy policy</a> <span className="text-flame">*</span></>}
-        desc="Inclusa la politica di rimborso: se il corso non viene erogato per mancanza del numero minimo di partecipanti, la quota è rimborsata."
+        title={<>{t("Accetto le")}{" "}<a href="#/" className="link-sweep text-flame">{t("Condizioni generali")}</a>{" "}{t("e la")}{" "}<a href="#/" className="link-sweep text-flame">{t("Privacy policy")}</a> <span className="text-flame">*</span></>}
+        desc={t("Inclusa la politica di rimborso: se il corso non viene erogato per mancanza del numero minimo di partecipanti, la quota è rimborsata.")}
         error={attempted ? errors.terms : undefined} />
 
       {config?.testMode && (
         <p className="rounded-xl border border-dashed border-ink/25 bg-white/70 px-4 py-3 text-center font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-steel">
-          Ambiente di prova: pagamenti sandbox, nessun addebito reale
-        </p>
+          {t("Ambiente di prova: pagamenti sandbox, nessun addebito reale")}</p>
       )}
       {payError && <p className="field-error" role="alert">{payError}</p>}
 
@@ -544,12 +533,12 @@ function StepPayment({
             "group flex w-full items-center justify-between gap-4 rounded-2xl p-5 font-display font-bold text-white transition-all duration-300 disabled:cursor-not-allowed",
             method ? "bg-flame shadow-flame hover:bg-ink" : "bg-ink/25"
           )}
-          aria-label={method ? `${active?.cta ?? "Procedi"}, totale ${eur2(total)}` : "Scegli un metodo di pagamento per proseguire"}
+          aria-label={method ? t("{action}, totale {total}", { action: active?.cta ?? t("Procedi"), total: eur2(total) }) : t("Scegli un metodo di pagamento per proseguire")}
           aria-disabled={!method}
         >
           <span className="flex items-center gap-3 text-[15px]">
             <Lock className="size-4.5" aria-hidden="true" />
-            {active ? active.cta : "Scegli un metodo di pagamento"}
+            {active ? active.cta : t("Scegli un metodo di pagamento")}
           </span>
           <span className="flex items-center gap-3">
             <span className="text-lg tabular-nums">{eur2(total)}</span>
@@ -558,8 +547,7 @@ function StepPayment({
         </button>
         <p className="mt-2 flex items-center justify-center gap-2 text-center font-mono text-[10px] uppercase tracking-[0.16em] text-steel">
           <ShieldCheck className="size-3.5 text-mint" aria-hidden="true" />
-          Transazione cifrata TLS · PCI-DSS · nessun dato carta sui nostri server
-        </p>
+          {t("Transazione cifrata TLS · PCI-DSS · nessun dato carta sui nostri server")}</p>
       </div>
     </div>
   );
@@ -583,13 +571,13 @@ function OrderRail({ course, count, coupon, billingType, privatePct, step, goTo,
   course: Course; count: number; coupon: { code: string; pct: number } | null; billingType: string; privatePct: number;
   step: number; goTo: (s: number) => void; maxStep: number;
 }) {
-  const { price, t } = orderTotals(course, count, coupon, billingType, privatePct);
-  const sub = t.subtotal_cents / 100;
+  const { price, t: tot } = orderTotals(course, count, coupon, billingType, privatePct);
+  const sub = tot.subtotal_cents / 100;
   const ebSave = price.active ? (course.price - price.unit) * count : 0;
-  const extraSave = t.discount_cents / 100 - ebSave; // sconto privati o codice
-  const net = (t.subtotal_cents - t.discount_cents) / 100;
-  const vat = t.vat_cents / 100;
-  const total = t.total_cents / 100;
+  const extraSave = tot.discount_cents / 100 - ebSave; // sconto privati o codice
+  const net = (tot.subtotal_cents - tot.discount_cents) / 100;
+  const vat = tot.vat_cents / 100;
+  const total = tot.total_cents / 100;
 
   return (
     <div className="space-y-5">
@@ -597,13 +585,11 @@ function OrderRail({ course, count, coupon, billingType, privatePct, step, goTo,
         <div className="flex items-center justify-between bg-ink px-6 py-4 text-white">
           <p className="flex items-center gap-2 font-mono text-[10.5px] font-semibold uppercase tracking-[0.2em] text-white/70">
             <TicketPercent className="size-3.5 text-ember" aria-hidden="true" />
-            Il tuo ordine
-          </p>
+            {t("Il tuo ordine")}</p>
           {price.active && (
             <span className="inline-flex items-center gap-1.5 rounded-full bg-flame px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-wider text-white">
               <Flame className="size-3" aria-hidden="true" />
-              Early bird
-            </span>
+              {t("Early bird")}</span>
           )}
         </div>
         <div className="p-6">
@@ -612,36 +598,35 @@ function OrderRail({ course, count, coupon, billingType, privatePct, step, goTo,
 
           <dl className="mt-5 space-y-2.5 border-t border-ink/8 pt-5 text-[13.5px]">
             <div className="flex justify-between gap-4">
-              <dt className="text-ink/60">{count} × quota {FORMAT_META[course.format].label}</dt>
+              <dt className="text-ink/60">{count}{" "}{t("× quota")}{" "}{FORMAT_META[course.format].label}</dt>
               <dd className="font-semibold tabular-nums text-ink">{eur(sub)}</dd>
             </div>
             {price.active && (
               <div className="flex justify-between gap-4 text-mint">
                 <dt className="flex items-center gap-1.5 font-medium">
                   <Flame className="size-3.5" aria-hidden="true" />
-                  Early bird −{Math.round(course.earlyBirdPct * 100)}% (già applicato)
-                </dt>
+                  {t("Early bird −")}{Math.round(course.earlyBirdPct * 100)}{t("% (già applicato)")}</dt>
                 <dd className="font-semibold tabular-nums">−{eur(ebSave)}</dd>
               </div>
             )}
-            {t.applied && extraSave > 0 && (
+            {tot.applied && extraSave > 0 && (
               <div className="flex justify-between gap-4 text-mint">
-                <dt className="font-medium">{t.applied === "PRIVATO" ? `Sconto privati −${privatePct}% sul listino` : `Codice ${t.applied}`}</dt>
+                <dt className="font-medium">{tot.applied === "PRIVATO" ? t("Sconto privati −{pct}% sul listino", { pct: privatePct }) : t("Codice {code}", { code: tot.applied })}</dt>
                 <dd className="font-semibold tabular-nums">−{eur(extraSave)}</dd>
               </div>
             )}
             <div className="flex justify-between gap-4">
-              <dt className="text-ink/60">Imponibile</dt>
+              <dt className="text-ink/60">{t("Imponibile")}</dt>
               <dd className="tabular-nums text-ink">{eur2(net)}</dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-ink/60">IVA 22%</dt>
+              <dt className="text-ink/60">{t("IVA 22%")}</dt>
               <dd className="tabular-nums text-ink">{eur2(vat)}</dd>
             </div>
           </dl>
 
           <div className="mt-4 flex items-end justify-between border-t-2 border-ink/80 pt-4">
-            <p className="text-[13px] font-semibold text-ink">Totale ordine</p>
+            <p className="text-[13px] font-semibold text-ink">{t("Totale ordine")}</p>
             <p className="font-display text-[30px] font-bold leading-none tracking-tight text-ink" aria-live="polite">
               {eur2(total)}
             </p>
@@ -649,14 +634,14 @@ function OrderRail({ course, count, coupon, billingType, privatePct, step, goTo,
           {price.active && (
             <p className="mt-3 flex items-center gap-1.5 rounded-lg bg-flame/8 px-3 py-2 text-[11.5px] font-medium text-flame">
               <Timer className="size-3.5" aria-hidden="true" />
-              Prezzo bloccato fino al {fmtFull(price.until)}
+              {t("Prezzo bloccato fino al")}{" "}{fmtFull(price.until)}
             </p>
           )}
         </div>
       </div>
 
       {/* stepper verticale */}
-      <nav aria-label="Avanzamento iscrizione" className="rounded-3xl border border-ink/10 bg-white p-5 shadow-card">
+      <nav aria-label={t("Avanzamento iscrizione")} className="rounded-3xl border border-ink/10 bg-white p-5 shadow-card">
         <ol className="space-y-1">
           {STEPS.map((s, i) => {
             const state = i < step ? "done" : i === step ? "current" : "todo";
@@ -687,7 +672,7 @@ function OrderRail({ course, count, coupon, billingType, privatePct, step, goTo,
                   )}>
                     {s}
                   </span>
-                  {state === "done" && <span className="ml-auto font-mono text-[10px] uppercase tracking-widest text-mint">ok</span>}
+                  {state === "done" && <span className="ml-auto font-mono text-[10px] uppercase tracking-widest text-mint">{t("ok")}</span>}
                 </button>
               </li>
             );
@@ -697,9 +682,9 @@ function OrderRail({ course, count, coupon, billingType, privatePct, step, goTo,
 
       <ul className="space-y-2 px-1 text-[12px] leading-snug text-steel">
         {[
-          { icon: RotateCcw, t: "Rimborso se il corso non parte" },
-          { icon: Landmark, t: "Bonifico bancario" },
-          { icon: Lock, t: "Torna indietro quando vuoi: non perdi i dati" },
+          { icon: RotateCcw, t: t("Rimborso se il corso non parte") },
+          { icon: Landmark, t: t("Bonifico bancario") },
+          { icon: Lock, t: t("Torna indietro quando vuoi: non perdi i dati") },
         ].map((r) => (
           <li key={r.t} className="flex items-start gap-2">
             <r.icon className="mt-0.5 size-3.5 shrink-0 text-mint" aria-hidden="true" />
@@ -751,32 +736,32 @@ export function Enroll({ course }: { course: Course }) {
     const errs: Record<string, string> = {};
     if (s === 1) {
       participants.forEach((p, i) => {
-        if (!p.nome.trim()) errs[`p${i}-nome`] = "Obbligatorio";
-        if (!p.cognome.trim()) errs[`p${i}-cognome`] = "Obbligatorio";
-        if (!/.+@.+\..+/.test(p.email)) errs[`p${i}-email`] = "Email valida richiesta";
-        if (p.cf && p.cf.replace(/\s/g, "").length !== 16) errs[`p${i}-cf`] = "Il codice fiscale ha 16 caratteri";
-        if (!p.cPrivacy) errs[`p${i}-privacy`] = "Consenso necessario per procedere";
+        if (!p.nome.trim()) errs[`p${i}-nome`] = t("Obbligatorio");
+        if (!p.cognome.trim()) errs[`p${i}-cognome`] = t("Obbligatorio");
+        if (!/.+@.+\..+/.test(p.email)) errs[`p${i}-email`] = t("Email valida richiesta");
+        if (p.cf && p.cf.replace(/\s/g, "").length !== 16) errs[`p${i}-cf`] = t("Il codice fiscale ha 16 caratteri");
+        if (!p.cPrivacy) errs[`p${i}-privacy`] = t("Consenso necessario per procedere");
       });
     }
     if (s === 2) {
-      const t = billing.type;
-      const isCompany = t === "azienda" || t === "estera";
-      if (isCompany && !billing.ragione.trim()) errs["f-ragione"] = "Obbligatorio";
-      if (!isCompany && !billing.nome.trim()) errs["f-nome"] = "Obbligatorio";
-      if (!isCompany && !billing.cognome.trim()) errs["f-cognome"] = "Obbligatorio";
-      if (!isCompany && billing.cf.replace(/\s/g, "").length !== 16) errs["f-cf"] = "16 caratteri richiesti";
-      if ((t === "pro" || t === "azienda") && !/^\d{11}$/.test(billing.piva)) errs["f-piva"] = "11 cifre numeriche";
-      if ((t === "pro" || t === "azienda") && !billing.sdi.trim() && !billing.pec.trim())
-        errs["f-sdipec"] = "Inserisci codice SDI o PEC";
-      if (t === "estera" && !billing.vatId.trim()) errs["f-vatId"] = "Obbligatorio";
-      if (t === "estera" && (!billing.paese.trim() || billing.paese === "Italia")) errs["f-paese"] = "Indica il paese";
-      if (!billing.via.trim()) errs["f-via"] = "Obbligatorio";
-      if (!billing.cap.trim()) errs["f-cap"] = "Obbligatorio";
-      if (!billing.citta.trim()) errs["f-citta"] = "Obbligatorio";
+      const bt = billing.type;
+      const isCompany = bt === "azienda" || bt === "estera";
+      if (isCompany && !billing.ragione.trim()) errs["f-ragione"] = t("Obbligatorio");
+      if (!isCompany && !billing.nome.trim()) errs["f-nome"] = t("Obbligatorio");
+      if (!isCompany && !billing.cognome.trim()) errs["f-cognome"] = t("Obbligatorio");
+      if (!isCompany && billing.cf.replace(/\s/g, "").length !== 16) errs["f-cf"] = t("16 caratteri richiesti");
+      if ((bt === "pro" || bt === "azienda") && !/^\d{11}$/.test(billing.piva)) errs["f-piva"] = t("11 cifre numeriche");
+      if ((bt === "pro" || bt === "azienda") && !billing.sdi.trim() && !billing.pec.trim())
+        errs["f-sdipec"] = t("Inserisci codice SDI o PEC");
+      if (bt === "estera" && !billing.vatId.trim()) errs["f-vatId"] = t("Obbligatorio");
+      if (bt === "estera" && (!billing.paese.trim() || billing.paese === "Italia")) errs["f-paese"] = t("Indica il paese");
+      if (!billing.via.trim()) errs["f-via"] = t("Obbligatorio");
+      if (!billing.cap.trim()) errs["f-cap"] = t("Obbligatorio");
+      if (!billing.citta.trim()) errs["f-citta"] = t("Obbligatorio");
     }
     if (s === 3) {
-      if (!method) errs.method = "Scegli uno dei 4 metodi di pagamento";
-      if (!terms) errs.terms = "Devi accettare le condizioni per procedere";
+      if (!method) errs.method = t("Scegli uno dei 4 metodi di pagamento");
+      if (!terms) errs.terms = t("Devi accettare le condizioni per procedere");
     }
     return errs;
   };
@@ -823,7 +808,7 @@ export function Enroll({ course }: { course: Course }) {
     setBusy(true);
     setPayError("");
     try {
-      const res = await createOrder({ courseId: Number(course.slug), seats: count, method, coupon: coupon?.code ?? null, participants, billing });
+      const res = await createOrder({ lang, courseId: Number(course.slug), seats: count, method, coupon: coupon?.code ?? null, participants, billing });
       if (res.url) window.location.href = res.url; // checkout del provider
       else window.location.hash = `#/esito/${encodeURIComponent(res.ref)}/pending`; // bonifico
     } catch (e) {
@@ -844,10 +829,9 @@ export function Enroll({ course }: { course: Course }) {
         <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
           <p className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/5 px-3.5 py-1.5 font-mono text-[10.5px] font-semibold uppercase tracking-[0.2em] text-white/76">
             <CheckCircle2 className="size-3.5 text-mint" aria-hidden="true" />
-            Iscrizione guidata · 4 passi · circa 4 minuti
-          </p>
+            {t("Iscrizione guidata · 4 passi · circa 4 minuti")}</p>
           <h1 className="mt-5 max-w-2xl font-display text-[clamp(1.9rem,4.5vw,3.2rem)] font-bold leading-[1.05] tracking-[-0.025em]">
-            Iscriviti a <em className="font-serif italic text-flame">{course.short}.</em>
+            {t("Iscriviti a")}{" "}<em className="font-serif italic text-flame">{course.short}.</em>
           </h1>
           <p className="mt-3 text-[14.5px] text-white/68">
             {fmtRange(course.start, course.end)} · {course.effort} · {course.location}
@@ -859,7 +843,7 @@ export function Enroll({ course }: { course: Course }) {
       <div className="sticky top-[68px] z-30 border-b border-ink/10 bg-paper/92 lg:hidden">
         <div className="flex items-center justify-between gap-3 px-5 py-3">
           <p className="font-mono text-[11px] font-semibold uppercase tracking-widest text-ink/70">
-            Passo {step + 1}<span className="text-ink/35">/4</span> — {STEPS[step]}
+            {t("Passo")}{" "}{step + 1}<span className="text-ink/35">/4</span> — {STEPS[step]}
           </p>
           <button onClick={() => setMobileSummary((v) => !v)} aria-expanded={mobileSummary}
             className="flex items-center gap-1.5 rounded-full bg-ink px-3.5 py-1.5 font-mono text-[11.5px] font-bold text-white">
@@ -867,7 +851,7 @@ export function Enroll({ course }: { course: Course }) {
             <ChevronDown className={cn("size-3.5 transition-transform", mobileSummary && "rotate-180")} aria-hidden="true" />
           </button>
         </div>
-        <div className="h-[3px] bg-ink/8" role="progressbar" aria-valuenow={step + 1} aria-valuemin={1} aria-valuemax={4} aria-label={`Passo ${step + 1} di 4: ${STEPS[step]}`}>
+        <div className="h-[3px] bg-ink/8" role="progressbar" aria-valuenow={step + 1} aria-valuemin={1} aria-valuemax={4} aria-label={t("Passo {n} di 4: {name}", { n: step + 1, name: STEPS[step] })}>
           <div className="h-full bg-flame transition-all duration-700" style={{ width: `${((step + 1) / 4) * 100}%` }} />
         </div>
         {mobileSummary && (
@@ -883,14 +867,12 @@ export function Enroll({ course }: { course: Course }) {
           {/* header step (desktop) */}
           <div className="mb-8 hidden lg:block">
             <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.24em] text-flame">
-              Passo {step + 1} di 4
-            </p>
+              {t("Passo")}{" "}{step + 1}{" "}{t("di 4")}</p>
             <h2 className="mt-2 font-display text-3xl font-bold tracking-tight text-ink">{STEPS[step]}</h2>
             {attempted[step] && Object.keys(currentErrors).length > 0 && (
               <p className="mt-3 flex items-center gap-2 rounded-xl border border-err/30 bg-red-50 px-4 py-3 text-[13px] font-semibold text-err" role="alert">
                 <AlertTriangle className="size-4" aria-hidden="true" />
-                Controlla i campi evidenziati: manca qualcosa per proseguire.
-              </p>
+                {t("Controlla i campi evidenziati: manca qualcosa per proseguire.")}</p>
             )}
           </div>
 
@@ -919,19 +901,16 @@ export function Enroll({ course }: { course: Course }) {
               <button onClick={() => goTo(step - 1)}
                 className="inline-flex items-center gap-2 rounded-full border border-ink/15 px-5 py-3 text-[13.5px] font-semibold text-ink/70 transition-colors hover:border-ink hover:text-ink">
                 <ArrowLeft className="size-4" aria-hidden="true" />
-                Indietro
-              </button>
+                {t("Indietro")}</button>
             ) : (
               <a href={`#/corso/${course.slug}`} className="inline-flex items-center gap-2 text-[13px] font-semibold text-steel transition-colors hover:text-ink">
                 <ArrowLeft className="size-4" aria-hidden="true" />
-                Torna alla scheda corso
-              </a>
+                {t("Torna alla scheda corso")}</a>
             )}
             {step < 3 && (
               <button onClick={goNext}
                 className="group inline-flex items-center gap-2.5 rounded-full bg-ink px-7 py-3.5 font-display text-sm font-semibold text-white transition-all duration-300 hover:bg-flame hover:shadow-flame">
-                Continua
-                <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true" />
+                {t("Continua")}<ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true" />
               </button>
             )}
           </div>

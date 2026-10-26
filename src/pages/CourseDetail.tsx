@@ -31,6 +31,7 @@ import {
   type Course,
 } from "../data";
 
+import { t } from "../i18n";
 /* ------------------------- rail prezzo sticky ------------------------ */
 
 function PriceRail({ course }: { course: Course }) {
@@ -42,7 +43,7 @@ function PriceRail({ course }: { course: Course }) {
   const privateUnit = privateTotals ? (privateTotals.subtotal_cents - privateTotals.discount_cents) / 100 : null;
   const waitlist = course.status === "waitlist";
   return (
-    <aside className="lg:sticky lg:top-24" aria-label="Riepilogo iscrizione">
+    <aside className="lg:sticky lg:top-24" aria-label={t("Riepilogo iscrizione")}>
       <div className="overflow-hidden rounded-[24px] border border-ink/10 bg-white shadow-lift">
         <div className="bg-ink p-6 text-white">
           <div className="flex items-center justify-between">
@@ -57,16 +58,15 @@ function PriceRail({ course }: { course: Course }) {
             {price.original && <p className="pb-1 text-lg text-white/52 line-through">{eur(price.original)}</p>}
           </div>
           <p className="mt-1.5 text-[12.5px] text-white/64">
-            a persona + IVA 22%{waitlist ? " · prezzo indicativo per la prossima data" : ""}
+            {t("a persona + IVA 22%")}{waitlist ? t(" · prezzo indicativo per la prossima data") : ""}
           </p>
           {privateUnit != null && (
             <p className="mt-3 rounded-lg bg-white/10 px-3 py-2 text-[12.5px] font-medium text-white">
-              Privati (senza P.IVA): {eur(privateUnit)} + IVA, sconto −{cfg!.privateDiscount}% sul listino
-            </p>
+              {t("Privati (senza P.IVA):")}{" "}{eur(privateUnit)}{" "}{t("+ IVA, sconto −")}{cfg!.privateDiscount}{t("% sul listino")}</p>
           )}
           {price.active && (
             <p className="mt-3 rounded-lg bg-flame/15 px-3 py-2 text-[12.5px] font-medium text-ember">
-              Early bird −{Math.round(course.earlyBirdPct * 100)}% fino al {fmtFull(course.earlyBirdUntil)}
+              {t("Early bird −")}{Math.round(course.earlyBirdPct * 100)}{t("% fino al")}{" "}{fmtFull(course.earlyBirdUntil)}
             </p>
           )}
         </div>
@@ -79,7 +79,7 @@ function PriceRail({ course }: { course: Course }) {
               { icon: Clock, text: course.effort },
               { icon: CalendarDays, text: course.orario },
               { icon: MapPin, text: course.location },
-              { icon: Globe, text: course.language === "IT" ? "Docenza in italiano" : "Taught in English" },
+              { icon: Globe, text: course.language === "IT" ? t("Docenza in italiano") : t("Taught in English") },
             ].map((r) => (
               <li key={r.text} className="flex items-center gap-2.5">
                 <r.icon className="size-4 shrink-0 text-flame" aria-hidden="true" />
@@ -90,29 +90,26 @@ function PriceRail({ course }: { course: Course }) {
 
           {waitlist ? (
             <Btn href={`mailto:academy@cubeng.eu?subject=Lista%20d'attesa%20${encodeURIComponent(course.short)}`} variant="ink" size="lg" className="mt-7 w-full" withArrow>
-              Entra in lista d'attesa
-            </Btn>
+              {t("Entra in lista d'attesa")}</Btn>
           ) : (
-            <Btn href={`#/iscriviti/${course.slug}`} size="lg" className="mt-7 w-full" withArrow ariaLabel={`Iscriviti a ${course.title} del ${fmtRange(course.start, course.end)}`}>
-              Iscriviti ora
-            </Btn>
+            <Btn href={`#/iscriviti/${course.slug}`} size="lg" className="mt-7 w-full" withArrow ariaLabel={t("Iscriviti a {name} del {range}", { name: course.title, range: fmtRange(course.start, course.end) })}>
+              {t("Iscriviti ora")}</Btn>
           )}
 
           <button
             type="button"
             className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full border border-ink/15 px-6 py-3 text-sm font-semibold text-ink/75 transition-colors hover:border-ink hover:text-ink"
-            aria-label="Scarica il syllabus ufficiale iSAQB in PDF"
+            aria-label={t("Scarica il syllabus ufficiale iSAQB in PDF")}
           >
             <Download className="size-4" aria-hidden="true" />
-            Syllabus ufficiale (PDF)
-          </button>
+            {t("Syllabus ufficiale (PDF)")}</button>
 
           <ul className="mt-6 space-y-2.5 border-t border-ink/8 pt-5 text-[12.5px] text-ink/60">
             {[
-              { icon: RotateCcw, text: "Rimborso se il corso non parte" },
-              { icon: Landmark, text: "Bonifico bancario" },
-              { icon: Lock, text: "Pagamenti cifrati · Stripe, PayPal, SumUp" },
-              { icon: FileCheck, text: "Fattura elettronica SDI per aziende" },
+              { icon: RotateCcw, text: t("Rimborso se il corso non parte") },
+              { icon: Landmark, text: t("Bonifico bancario") },
+              { icon: Lock, text: t("Pagamenti cifrati · Stripe, PayPal, SumUp") },
+              { icon: FileCheck, text: t("Fattura elettronica SDI per aziende") },
             ].map((r) => (
               <li key={r.text} className="flex items-start gap-2.5">
                 <r.icon className="mt-0.5 size-3.5 shrink-0 text-mint" aria-hidden="true" />
@@ -125,8 +122,7 @@ function PriceRail({ course }: { course: Course }) {
 
       <p className="mt-4 flex items-center justify-center gap-2 text-center font-mono text-[10.5px] uppercase tracking-[0.18em] text-steel">
         <ShieldCheck className="size-3.5 text-mint" aria-hidden="true" />
-        Training Provider accreditato iSAQB®
-      </p>
+        {t("Training Provider accreditato iSAQB®")}</p>
     </aside>
   );
 }
@@ -167,10 +163,10 @@ export function CourseDetail({ course }: { course: Course }) {
         <img src={course.image} alt="" className="absolute inset-0 size-full object-cover opacity-20" />
         <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/75 to-ink/40" aria-hidden="true" />
         <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
-          <nav aria-label="Breadcrumb" className="flex items-center gap-2 font-mono text-[11.5px] uppercase tracking-widest text-white/60">
-            <a href="#/" className="transition-colors hover:text-white">Home</a>
+          <nav aria-label={t("Breadcrumb")} className="flex items-center gap-2 font-mono text-[11.5px] uppercase tracking-widest text-white/60">
+            <a href="#/" className="transition-colors hover:text-white">{t("Home")}</a>
             <ChevronRight className="size-3.5" aria-hidden="true" />
-            <a href="#/corsi" className="transition-colors hover:text-white">Catalogo</a>
+            <a href="#/corsi" className="transition-colors hover:text-white">{t("Catalogo")}</a>
             <ChevronRight className="size-3.5" aria-hidden="true" />
             <span className="text-ember" aria-current="page">{course.short}</span>
           </nav>
@@ -180,16 +176,15 @@ export function CourseDetail({ course }: { course: Course }) {
               {fmt.label}
             </span>
             <span className="rounded-full border border-white/20 px-3.5 py-1.5 font-mono text-[10.5px] font-semibold uppercase tracking-[0.16em] text-white/75">
-              Livello {course.level}
+              {t("Livello")}{" "}{course.level}
             </span>
             <span className="rounded-full border border-white/20 px-3.5 py-1.5 font-mono text-[10.5px] font-semibold uppercase tracking-[0.16em] text-white/75">
-              {course.language === "IT" ? "Italiano" : "English"}
+              {course.language === "IT" ? t("Italiano") : t("English")}
             </span>
             {!course.examIncluded && (
               <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-300/30 bg-amber-400/10 px-3.5 py-1.5 font-mono text-[10.5px] font-semibold uppercase tracking-[0.16em] text-amber-300">
                 <BadgeCheck className="size-3.5" aria-hidden="true" />
-                Esame non incluso · 280 € + IVA
-              </span>
+                {t("Esame non incluso · 280 € + IVA")}</span>
             )}
           </div>
 
@@ -203,15 +198,15 @@ export function CourseDetail({ course }: { course: Course }) {
       {/* body */}
       <main className="mx-auto grid max-w-7xl gap-12 px-5 py-16 lg:grid-cols-[1fr_380px] lg:px-8 lg:py-20">
         <div>
-          <Block id="overview" n="01" title="Panoramica">
+          <Block id="overview" n="01" title={t("Panoramica")}>
             <p className="max-w-2xl text-[16px] leading-[1.75] text-ink/70">{course.description}</p>
             <div className="mt-8 grid gap-4 sm:grid-cols-3">
               {[
                 course.seatsTotal != null
-                  ? { v: `${course.seatsTotal}`, l: "posti per edizione" }
-                  : { v: course.location, l: "sede" },
-                { v: `${course.effort.split(" ")[0]} gg`, l: "di formazione live" },
-                { v: price.active ? `−${Math.round(course.earlyBirdPct * 100)}%` : eur(price.unit), l: price.active ? "early bird attivo ora" : "prezzo a persona + IVA" },
+                  ? { v: `${course.seatsTotal}`, l: t("posti per edizione") }
+                  : { v: course.location, l: t("sede") },
+                { v: t("24 ore"), l: t("di formazione live") },
+                { v: price.active ? `−${Math.round(course.earlyBirdPct * 100)}%` : eur(price.unit), l: price.active ? t("early bird attivo ora") : t("prezzo a persona + IVA") },
               ].map((s) => (
                 <div key={s.l} className="rounded-2xl border border-ink/10 bg-white p-5">
                   <p className="font-display text-2xl font-bold tracking-tight text-flame">{s.v}</p>
@@ -221,7 +216,7 @@ export function CourseDetail({ course }: { course: Course }) {
             </div>
           </Block>
 
-          <Block id="obiettivi" n="02" title="Cosa saprai fare">
+          <Block id="obiettivi" n="02" title={t("Cosa saprai fare")}>
             <ul className="grid gap-3 sm:grid-cols-2">
               {course.objectives.map((o) => (
                 <li key={o} className="flex items-start gap-3 rounded-2xl border border-ink/8 bg-white p-4 text-[14.5px] leading-snug text-ink/75">
@@ -234,7 +229,7 @@ export function CourseDetail({ course }: { course: Course }) {
             </ul>
           </Block>
 
-          <Block id="destinatari" n="03" title="Per chi è pensato">
+          <Block id="destinatari" n="03" title={t("Per chi è pensato")}>
             <div className="flex flex-wrap gap-2.5">
               {course.audience.map((a) => (
                 <span key={a} className="rounded-full border border-ink/12 bg-white px-4.5 py-2.5 text-[14px] font-medium text-ink/75">
@@ -244,7 +239,7 @@ export function CourseDetail({ course }: { course: Course }) {
             </div>
           </Block>
 
-          <Block id="programma" n="04" title="Programma giorno per giorno">
+          <Block id="programma" n="04" title={t("Programma del corso")}>
             <div className="space-y-3">
               {course.modules.map((m, i) => {
                 const isOpen = openModule === i;
@@ -257,11 +252,11 @@ export function CourseDetail({ course }: { course: Course }) {
                       className="flex w-full items-center gap-4 px-6 py-5 text-left"
                     >
                       <span className={cn("grid size-10 shrink-0 place-items-center rounded-xl font-mono text-[12px] font-bold transition-colors", isOpen ? "bg-flame text-white" : "bg-ink/6 text-ink/60")}>
-                        G{i + 1}
+                        {i + 1}
                       </span>
                       <span className="min-w-0 flex-1">
                         <span className="block truncate font-display text-[15.5px] font-semibold tracking-tight text-ink">{m.title}</span>
-                        <span className="mt-0.5 block font-mono text-[11px] uppercase tracking-widest text-steel">{m.hours} ore · {m.topics.length} moduli</span>
+                        <span className="mt-0.5 block font-mono text-[11px] uppercase tracking-widest text-steel">{m.topics.length}{" "}{t("argomenti")}</span>
                       </span>
                       <ChevronDown className={cn("size-5 shrink-0 text-steel transition-transform duration-300", isOpen && "rotate-180 text-flame")} aria-hidden="true" />
                     </button>
@@ -283,7 +278,7 @@ export function CourseDetail({ course }: { course: Course }) {
             </div>
           </Block>
 
-          <Block id="prerequisiti" n="05" title="Prerequisiti">
+          <Block id="prerequisiti" n="05" title={t("Prerequisiti")}>
             <ul className="space-y-3">
               {course.prerequisites.map((p) => (
                 <li key={p} className="flex items-start gap-3 text-[15px] leading-relaxed text-ink/70">
@@ -294,9 +289,9 @@ export function CourseDetail({ course }: { course: Course }) {
             </ul>
           </Block>
 
-          <Block id="docente" n="06" title="Il docente">
+          <Block id="docente" n="06" title={t("Il docente")}>
             <article className="flex flex-col gap-6 rounded-[24px] border border-ink/10 bg-white p-7 shadow-card sm:flex-row sm:items-start">
-              <img src={TRAINER.img} alt={`Ritratto di ${TRAINER.name}`} loading="lazy" className="size-24 shrink-0 rounded-2xl object-cover ring-2 ring-flame/25" />
+              <img src={TRAINER.img} alt={t("Ritratto di {name}", { name: TRAINER.name })} loading="lazy" className="size-24 shrink-0 rounded-2xl object-cover ring-2 ring-flame/25" />
               <div>
                 <h3 className="font-display text-lg font-bold tracking-tight text-ink">{TRAINER.name}</h3>
                 <p className="mt-0.5 text-[13px] font-medium text-flame">{TRAINER.role}</p>
@@ -305,13 +300,12 @@ export function CourseDetail({ course }: { course: Course }) {
             </article>
           </Block>
 
-          <Block id="costi" n="07" title="Costi, inclusi e rimborso">
+          <Block id="costi" n="07" title={t("Costi, inclusi e rimborso")}>
             <div className="grid gap-4 lg:grid-cols-2">
               <div className="rounded-[24px] border border-ink/10 bg-white p-7">
                 <h3 className="flex items-center gap-2 font-display text-[15.5px] font-bold tracking-tight text-ink">
                   <BadgeCheck className="size-4.5 text-mint" aria-hidden="true" />
-                  Tutto questo è incluso
-                </h3>
+                  {t("Tutto questo è incluso")}</h3>
                 <ul className="mt-4 space-y-2.5">
                   {course.includes.map((inc) => (
                     <li key={inc} className="flex items-start gap-2.5 text-[13.5px] leading-snug text-ink/70">
@@ -324,12 +318,11 @@ export function CourseDetail({ course }: { course: Course }) {
               <div className="rounded-[24px] border border-gold/30 bg-amber-50/60 p-7">
                 <h3 className="flex items-center gap-2 font-display text-[15.5px] font-bold tracking-tight text-ink">
                   <RotateCcw className="size-4.5 text-gold" aria-hidden="true" />
-                  Politica di rimborso
-                </h3>
+                  {t("Politica di rimborso")}</h3>
                 <ul className="mt-4 space-y-2.5 text-[13.5px] leading-relaxed text-ink/70">
-                  <li><strong className="text-ink">Numero minimo non raggiunto:</strong> se il corso non viene erogato per mancanza del numero minimo di partecipanti, la quota versata è rimborsata.</li>
-                  <li><strong className="text-ink">Alternativa:</strong> puoi scegliere, in alternativa al rimborso, un'altra data.</li>
-                  <li><strong className="text-ink">Altre richieste:</strong> scrivi a academy@cubeng.eu.</li>
+                  <li><strong className="text-ink">{t("Numero minimo non raggiunto:")}</strong>{" "}{t("se il corso non viene erogato per mancanza del numero minimo di partecipanti, la quota versata è rimborsata.")}</li>
+                  <li><strong className="text-ink">{t("Alternativa:")}</strong>{" "}{t("puoi scegliere, in alternativa al rimborso, un'altra data.")}</li>
+                  <li><strong className="text-ink">{t("Altre richieste:")}</strong>{" "}{t("scrivi a academy@cubeng.eu.")}</li>
                 </ul>
               </div>
             </div>
@@ -343,16 +336,15 @@ export function CourseDetail({ course }: { course: Course }) {
       <section className="border-t border-ink/8 bg-sand/35 py-20" aria-labelledby="related-h">
         <div className="mx-auto max-w-7xl px-5 lg:px-8">
           <Reveal>
-            <Tag>Continua a esplorare</Tag>
+            <Tag>{t("Continua a esplorare")}</Tag>
           </Reveal>
           <div className="mt-5 flex flex-wrap items-end justify-between gap-6">
             <Reveal delay={70}>
               <h2 id="related-h" className="font-display text-[clamp(1.8rem,3.4vw,2.6rem)] font-bold tracking-tight text-ink">
-                Altre edizioni in calendario
-              </h2>
+                {t("Altre edizioni in calendario")}</h2>
             </Reveal>
             <Reveal delay={120}>
-              <Btn href="#/corsi" variant="ghost" withArrow>Catalogo completo</Btn>
+              <Btn href="#/corsi" variant="ghost" withArrow>{t("Catalogo completo")}</Btn>
             </Reveal>
           </div>
           <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3 lg:pb-10">
@@ -372,12 +364,11 @@ export function CourseDetail({ course }: { course: Course }) {
             <div className="min-w-0 flex-1">
               <p className="truncate font-display text-sm font-bold text-ink">{fmtRange(course.start, course.end)}</p>
               <p className="font-mono text-[11px] text-steel">
-                {eur(getLivePrice(course).unit)} + IVA{course.seatsLeft != null && <> · <span className="text-flame">{course.seatsLeft} posti</span></>}
+                {eur(getLivePrice(course).unit)}{" "}{t("+ IVA")}{course.seatsLeft != null && <> · <span className="text-flame">{course.seatsLeft}{" "}{t("posti")}</span></>}
               </p>
             </div>
-            <Btn href={`#/iscriviti/${course.slug}`} ariaLabel={`Iscriviti a ${course.short}`}>
-              Iscriviti
-            </Btn>
+            <Btn href={`#/iscriviti/${course.slug}`} ariaLabel={t("Iscriviti a {name}", { name: course.short })}>
+              {t("Iscriviti")}</Btn>
           </div>
         </div>
       )}

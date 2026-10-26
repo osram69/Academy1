@@ -16,27 +16,28 @@ import { Hero } from "../components/Hero";
 import { ConcludedSection, CourseCard } from "../components/CourseCard";
 import { Btn, IsoCube, Reveal, Tag } from "../components/ui";
 import { ModalitaSection } from "../components/ModalitaSection";
-import { FAQS, TRAINER, concludedCourses, fmtRange, nextCourse, upcomingCourses } from "../data";
+import { FAQS, TRAINER, concludedCourses, eur, fmtRange, nextCourse, upcomingCourses } from "../data";
 
+import { t } from "../i18n";
 /* ============================ cos'è CPSA-F ============================ */
 
 const WHY = [
   {
     n: "01",
-    title: "Uno standard, non un'opinione",
-    text: "Il curriculum iSAQB® è mantenuto da una community internazionale di architetti: ciò che studi è ciò che il mercato riconosce, identico in 40+ paesi.",
+    title: t("Uno standard, non un'opinione"),
+    text: t("Il curriculum iSAQB® è mantenuto da una community internazionale di architetti: ciò che studi è ciò che il mercato riconosce."),
     icon: BadgeCheck,
   },
   {
     n: "02",
-    title: "Competenze verificabili",
-    text: "L'esame CPSA-F non premia la memoria: valida la capacità di prendere decisioni architetturali motivate. È il segnale che manager e clienti sanno leggere.",
+    title: t("Competenze verificabili"),
+    text: t("L'esame CPSA-F non premia la memoria: valida la capacità di prendere decisioni architetturali motivate. È il segnale che manager e clienti sanno leggere."),
     icon: GraduationCap,
   },
   {
     n: "03",
-    title: "Una lingua comune",
-    text: "Dopo il corso, il tuo team discute di qualità, trade-off e viste con lo stesso vocabolario. Le riunioni di design diventano più corte e più utili.",
+    title: t("Una lingua comune"),
+    text: t("Dopo il corso, il tuo team discute di qualità, trade-off e viste con lo stesso vocabolario. Le riunioni di design diventano più corte e più utili."),
     icon: FileCheck,
   },
 ];
@@ -48,36 +49,30 @@ function CertificationSection() {
       <div className="relative mx-auto grid max-w-7xl gap-14 px-5 lg:grid-cols-[1fr_1.1fr] lg:gap-20 lg:px-8">
         <div className="lg:sticky lg:top-28 lg:self-start">
           <Reveal>
-            <Tag>La certificazione</Tag>
+            <Tag>{t("La certificazione")}</Tag>
           </Reveal>
           <Reveal delay={80}>
             <h2 id="cert-title" className="mt-5 font-display text-[clamp(2rem,4.2vw,3.4rem)] font-bold leading-[1.04] tracking-[-0.025em] text-ink">
-              CPSA-F: il titolo che parla <em className="font-serif italic text-flame">chiaro</em> al mercato.
-            </h2>
+              {t("CPSA-F: il titolo che parla")}{" "}<em className="font-serif italic text-flame">{t("chiaro")}</em>{" "}{t("al mercato.")}</h2>
           </Reveal>
           <Reveal delay={160}>
             <p className="mt-6 max-w-md text-[16.5px] leading-relaxed text-ink/65">
-              <strong className="font-semibold text-ink">iSAQB® CPSA-Foundation</strong> è la certificazione di
-              architettura software più riconosciuta in Europa. Non un badge da LinkedIn: un percorso strutturato che
-              cambia come progetti, documenti e difendi le tue decisioni.
-            </p>
+              <strong className="font-semibold text-ink">{t("iSAQB® CPSA-Foundation")}</strong>{" "}{t("è la certificazione di architettura software più riconosciuta in Europa. Non un badge da LinkedIn: un percorso strutturato che cambia come progetti, documenti e difendi le tue decisioni.")}</p>
           </Reveal>
           <Reveal delay={240} className="mt-8">
             <Btn href="#/corsi" variant="ink" withArrow>
-              Scegli la tua edizione
-            </Btn>
+              {t("Scegli la tua edizione")}</Btn>
           </Reveal>
           <Reveal delay={300} className="mt-12 hidden lg:block">
             <figure className="ticks relative max-w-sm p-2.5">
               <img
                 src="https://images.pexels.com/photos/18999483/pexels-photo-18999483.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200"
-                alt="Professionisti durante un workshop Cube Academy su casi architetturali reali"
+                alt={t("Professionisti durante un workshop di architettura software")}
                 loading="lazy"
                 className="aspect-[4/3] w-full rounded-lg object-cover"
               />
               <figcaption className="absolute -bottom-5 right-6 rounded-lg bg-ink px-4 py-2.5 font-mono text-[10.5px] uppercase tracking-[0.2em] text-white/80 shadow-lift">
-                Workshop, non slide
-              </figcaption>
+                {t("Workshop, non slide")}</figcaption>
             </figure>
           </Reveal>
         </div>
@@ -108,7 +103,7 @@ function CertificationSection() {
             <aside className="flex flex-col gap-4 rounded-[22px] bg-ink p-7 text-white sm:flex-row sm:items-center lg:p-8">
               <img
                 src={TRAINER.img}
-                alt={`Ritratto di ${TRAINER.name}`}
+                alt={t("Ritratto di {name}", { name: TRAINER.name })}
                 loading="lazy"
                 className="size-14 shrink-0 rounded-full border-2 border-flame object-cover"
               />
@@ -120,8 +115,7 @@ function CertificationSection() {
                 href="#/corso/cpsa-f-online"
                 className="link-sweep ml-auto shrink-0 text-[13px] font-medium text-ember"
               >
-                Conosci i docenti →
-              </a>
+                {t("Conosci i docenti →")}</a>
             </aside>
           </Reveal>
         </div>
@@ -136,30 +130,30 @@ const FORMATS = [
   {
     id: "online",
     icon: MonitorPlay,
-    title: "Live Online",
-    claim: "L'aula viene da te.",
-    text: "Aula virtuale su Zoom con docente accreditato iSAQB®, esercitazioni ed esame simulato nell'ultima giornata.",
-    points: ["24 ore su 3 giornate", "Max 12 partecipanti", "Zero trasferte"],
+    title: t("Live Online"),
+    claim: t("L'aula viene da te."),
+    text: t("Aula virtuale su Zoom con docente accreditato iSAQB®, esercitazioni ed esame simulato nell'ultima giornata."),
+    points: [t("24 ore su 3 giornate"), t("Max 12 partecipanti"), t("Zero trasferte")],
     dark: false,
     img: null as string | null,
   },
   {
     id: "aula",
     icon: Building2,
-    title: "In Aula",
-    claim: "Full immersion, networking vero.",
-    text: "Corso in presenza a Roma, con docente accreditato iSAQB® e gruppi di massimo 12 partecipanti.",
-    points: ["Sede a Roma", "Max 12 partecipanti", "Docente accreditato iSAQB®"],
+    title: t("In Aula"),
+    claim: t("Full immersion, networking vero."),
+    text: t("Corso in presenza a Roma, con docente accreditato iSAQB® e gruppi di massimo 12 partecipanti."),
+    points: [t("Sede a Roma"), t("Max 12 partecipanti"), t("Docente accreditato iSAQB®")],
     dark: false,
     img: null as string | null,
   },
   {
     id: "prestige",
     icon: BedDouble,
-    title: "Prestige Residenziale",
-    claim: "Certificarsi è un'esperienza.",
-    text: "Corsi residenziali di 4 giorni nelle più belle città italiane, con albergo e mezza pensione. Presto maggiori informazioni.",
-    points: ["4 giorni in residenza", "Albergo e mezza pensione", "Presto informazioni"],
+    title: t("Prestige Residenziale"),
+    claim: t("Certificarsi è un'esperienza."),
+    text: t("Corsi residenziali di 4 giorni nelle più belle città italiane, con albergo e mezza pensione. Presto maggiori informazioni."),
+    points: [t("4 giorni in residenza"), t("Albergo e mezza pensione"), t("Presto informazioni")],
     dark: true,
     img: "https://images.pexels.com/photos/38115059/pexels-photo-38115059.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
   },
@@ -172,19 +166,16 @@ function FormatsSection() {
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div>
             <Reveal>
-              <Tag dark>I formati</Tag>
+              <Tag dark>{t("I formati")}</Tag>
             </Reveal>
             <Reveal delay={80}>
               <h2 id="formats-title" className="mt-5 max-w-2xl font-display text-[clamp(2rem,4.2vw,3.4rem)] font-bold leading-[1.04] tracking-[-0.025em]">
-                Stesso curriculum. <em className="font-serif italic text-flame">Tre modi</em> di viverlo.
-              </h2>
+                {t("Stesso curriculum.")}{" "}<em className="font-serif italic text-flame">{t("Tre modi")}</em>{" "}{t("di viverlo.")}</h2>
             </Reveal>
           </div>
           <Reveal delay={160}>
             <p className="max-w-sm text-[15px] leading-relaxed text-white/64">
-              Scegli in base ad agenda e budget: il docente accreditato iSAQB® e il programma sono identici in ogni
-              formato.
-            </p>
+              {t("Scegli in base ad agenda e budget: il docente accreditato iSAQB® e il programma sono identici in ogni formato.")}</p>
           </Reveal>
         </div>
 
@@ -238,10 +229,9 @@ function FormatsSection() {
                   <a
                     href="#/corsi"
                     className="mt-7 inline-flex items-center gap-2 text-[13.5px] font-semibold text-white transition-colors hover:text-ember"
-                    aria-label={`Vedi le edizioni in formato ${f.title}`}
+                    aria-label={t("Vedi le edizioni in formato {format}", { format: f.title })}
                   >
-                    Vedi le edizioni
-                    <ArrowUpRight className="size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden="true" />
+                    {t("Vedi le edizioni")}<ArrowUpRight className="size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden="true" />
                   </a>
                 </div>
               </article>
@@ -265,18 +255,17 @@ function EditionsSection() {
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div>
             <Reveal>
-              <Tag>Calendario</Tag>
+              <Tag>{t("Calendario")}</Tag>
             </Reveal>
             <Reveal delay={80}>
               <h2 id="editions-title" className="mt-5 font-display text-[clamp(2rem,4.2vw,3.4rem)] font-bold leading-[1.04] tracking-[-0.025em] text-ink">
-                Le prossime <em className="font-serif italic text-flame">edizioni.</em>
+                {t("Le prossime")}{" "}<em className="font-serif italic text-flame">{t("edizioni.")}</em>
               </h2>
             </Reveal>
           </div>
           <Reveal delay={160}>
             <Btn href="#/corsi" variant="ghost" withArrow>
-              Tutto il catalogo
-            </Btn>
+              {t("Tutto il catalogo")}</Btn>
           </Reveal>
         </div>
         <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3 lg:pb-10">
@@ -301,31 +290,26 @@ function FaqSection() {
       <div className="mx-auto grid max-w-7xl gap-14 px-5 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
         <div className="lg:sticky lg:top-28 lg:self-start">
           <Reveal>
-            <Tag>Domande frequenti</Tag>
+            <Tag>{t("Domande frequenti")}</Tag>
           </Reveal>
           <Reveal delay={80}>
             <h2 id="faq-title" className="mt-5 font-display text-[clamp(2rem,4.2vw,3.2rem)] font-bold leading-[1.04] tracking-[-0.025em] text-ink">
-              Prima di investire <em className="font-serif italic text-flame">€1.800</em>, giusto chiedere.
-            </h2>
+              {t("Prima di investire")}{" "}<em className="font-serif italic text-flame">{eur(nextCourse().price)}</em>{t(", giusto chiedere.")}</h2>
           </Reveal>
           <Reveal delay={160}>
             <p className="mt-6 max-w-md text-[15.5px] leading-relaxed text-ink/60">
-              Non trovi la risposta? Scrivici a{" "}
+              {t("Non trovi la risposta? Scrivici a")}{" "}
               <a href="mailto:academy@cubeng.eu" className="link-sweep font-semibold text-flame">
-                academy@cubeng.eu
-              </a>{" "}
-              — rispondiamo entro 4 ore lavorative, o prenota una call di orientamento gratuita.
-            </p>
+                {t("academy@cubeng.eu")}</a>{" "}
+              {t("— ti rispondiamo il prima possibile.")}</p>
           </Reveal>
           <Reveal delay={240} className="mt-9 flex flex-wrap gap-3">
             <span className="inline-flex items-center gap-2 rounded-full border border-ink/12 bg-white px-4 py-2 text-[13px] font-medium text-ink/75">
               <RotateCcw className="size-4 text-flame" aria-hidden="true" />
-              Rimborso se il corso non parte
-            </span>
+              {t("Rimborso se il corso non parte")}</span>
             <span className="inline-flex items-center gap-2 rounded-full border border-ink/12 bg-white px-4 py-2 text-[13px] font-medium text-ink/75">
               <BadgeCheck className="size-4 text-flame" aria-hidden="true" />
-              Esame iSAQB® a parte
-            </span>
+              {t("Esame iSAQB® a parte")}</span>
           </Reveal>
         </div>
 
@@ -392,27 +376,23 @@ function CtaSection() {
       <div className="absolute inset-0 bg-gradient-to-r from-ink via-ink/70 to-ink/30" aria-hidden="true" />
       <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
         <Reveal>
-          <Tag dark>Il prossimo passo</Tag>
+          <Tag dark>{t("Il prossimo passo")}</Tag>
         </Reveal>
         <Reveal delay={90}>
           <h2 id="cta-title" className="mt-6 max-w-3xl font-display text-[clamp(2.4rem,5.5vw,4.4rem)] font-bold leading-[1.0] tracking-[-0.03em]">
-            Tra {Math.max(1, Math.round((next.start.getTime() - Date.now()) / 86400000))} giorni potresti essere{" "}
-            <em className="font-serif italic text-flame">in aula.</em>
+            {t("Tra")}{" "}{Math.max(1, Math.round((next.start.getTime() - Date.now()) / 86400000))}{" "}{t("giorni potresti essere")}{" "}
+            <em className="font-serif italic text-flame">{t("in aula.")}</em>
           </h2>
         </Reveal>
         <Reveal delay={180}>
           <p className="mt-6 max-w-xl text-[16.5px] leading-relaxed text-white/72">
-            {next.short} · {fmtRange(next.start, next.end)} · {next.location}. Early bird attivo: blocchi il prezzo ora,
-            il materiale del corso è incluso nel prezzo.
-          </p>
+            {next.short} · {fmtRange(next.start, next.end)} · {next.location}{t(". Early bird attivo: blocchi il prezzo ora, il materiale del corso è incluso nel prezzo.")}</p>
         </Reveal>
         <Reveal delay={260} className="mt-10 flex flex-wrap gap-4">
-          <Btn href={`#/iscriviti/${next.slug}`} size="lg" withArrow ariaLabel="Iscriviti ora alla prossima edizione">
-            Iscriviti ora
-          </Btn>
+          <Btn href={`#/iscriviti/${next.slug}`} size="lg" withArrow ariaLabel={t("Iscriviti ora alla prossima edizione")}>
+            {t("Iscriviti ora")}</Btn>
           <Btn href="#/corsi" variant="line-dark" size="lg">
-            Confronta le date
-          </Btn>
+            {t("Confronta le date")}</Btn>
         </Reveal>
       </div>
     </section>

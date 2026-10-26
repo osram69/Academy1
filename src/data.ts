@@ -6,6 +6,7 @@
 
 import { supabase, supabaseConfigured } from "./lib/supabase";
 
+import { lang, locale, t } from "./i18n";
 const DAY = 86400000;
 
 export type CourseFormat = "online" | "aula" | "prestige";
@@ -14,32 +15,32 @@ export type Modalita = "intensivo" | "weekend" | "serale" | "mezze_giornate";
 
 export const MODALITA: Record<Modalita, { label: string; short: string; effort: string; schedule: string; forWho: string }> = {
   intensivo: {
-    label: "Intensivo · 3 giorni",
-    short: "3 giorni",
-    effort: "3 giornate · 24 ore",
-    schedule: "3 giornate consecutive, 9:00–17:30",
-    forWho: "Chi può liberarsi per tre giorni e vuole finire subito.",
+    label: t("Intensivo · 3 giorni"),
+    short: t("3 giorni"),
+    effort: t("3 giornate · 24 ore"),
+    schedule: t("3 giornate consecutive, 9:00–17:30"),
+    forWho: t("Chi può liberarsi per tre giorni e vuole finire subito."),
   },
   weekend: {
-    label: "Weekend · 4 giornate",
-    short: "Weekend",
-    effort: "4 giornate · 24 ore",
-    schedule: "Sabato e domenica per due weekend, 9:00–16:00",
-    forWho: "Lavoratori dipendenti: nessun giorno di ferie e nessun permesso.",
+    label: t("Weekend · 4 giornate"),
+    short: t("Weekend"),
+    effort: t("4 giornate · 24 ore"),
+    schedule: t("Sabato e domenica per due weekend, 9:00–16:00"),
+    forWho: t("Lavoratori dipendenti: nessun giorno di ferie e nessun permesso."),
   },
   serale: {
-    label: "Serale · 8 serate",
-    short: "Serale",
-    effort: "8 serate · 24 ore",
-    schedule: "Due sere a settimana per 4 settimane, 18:00–21:00",
-    forWho: "Chi lavora di giorno: si segue dopo l'orario d'ufficio, senza ferie.",
+    label: t("Serale · 8 serate"),
+    short: t("Serale"),
+    effort: t("8 serate · 24 ore"),
+    schedule: t("Due sere a settimana per 4 settimane, 18:00–21:00"),
+    forWho: t("Chi lavora di giorno: si segue dopo l'orario d'ufficio, senza ferie."),
   },
   mezze_giornate: {
-    label: "Mezze giornate · 6 mattine",
-    short: "Mezze giornate",
-    effort: "6 mezze giornate · 24 ore",
-    schedule: "Due mattine a settimana per 3 settimane, 9:00–13:00",
-    forWho: "Chi ottiene dall'azienda permessi di formazione di mezza giornata.",
+    label: t("Mezze giornate · 6 mattine"),
+    short: t("Mezze giornate"),
+    effort: t("6 mezze giornate · 24 ore"),
+    schedule: t("Due mattine a settimana per 3 settimane, 9:00–13:00"),
+    forWho: t("Chi ottiene dall'azienda permessi di formazione di mezza giornata."),
   },
 };
 export type CourseLevel = "Foundation" | "Advanced" | "Workshop";
@@ -89,29 +90,27 @@ export interface Course {
 /* ----------------------------- formati ---------------------------- */
 
 export const FORMAT_META: Record<CourseFormat, { label: string; blurb: string }> = {
-  online: { label: "Live Online", blurb: "Aula virtuale interattiva, stessi docenti, zero trasferte." },
-  aula: { label: "In Aula", blurb: "Corso in presenza a Roma." },
-  prestige: { label: "Prestige Residenziale", blurb: "Corso residenziale di 4 giorni con albergo e mezza pensione. Presto informazioni." },
+  online: { label: t("Live Online"), blurb: t("Aula virtuale interattiva, stessi docenti, zero trasferte.") },
+  aula: { label: t("In Aula"), blurb: t("Corso in presenza a Roma.") },
+  prestige: { label: t("Prestige Residenziale"), blurb: t("Corso residenziale di 4 giorni con albergo e mezza pensione. Presto informazioni.") },
 };
 
 export const STATUS_META: Record<CourseStatus, { label: string }> = {
-  available: { label: "Posti disponibili" },
-  few: { label: "Ultimi posti" },
-  waitlist: { label: "Lista d'attesa" },
-  concluded: { label: "Edizione conclusa" },
+  available: { label: t("Posti disponibili") },
+  few: { label: t("Ultimi posti") },
+  waitlist: { label: t("Lista d'attesa") },
+  concluded: { label: t("Edizione conclusa") },
 };
 
 /* --------------------------- formattatori ------------------------- */
 
 export const eur = (n: number) =>
-  n.toLocaleString("it-IT", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
+  n.toLocaleString(locale, { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
 
 export const eur2 = (n: number) =>
-  n.toLocaleString("it-IT", { style: "currency", currency: "EUR", minimumFractionDigits: 2 });
+  n.toLocaleString(locale, { style: "currency", currency: "EUR", minimumFractionDigits: 2 });
 
-const MONTHS = ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"];
-
-export const fmtDate = (dt: Date) => `${dt.getDate()} ${MONTHS[dt.getMonth()]}`;
+export const fmtDate = (dt: Date) => dt.toLocaleDateString(locale, { day: "numeric", month: "short" });
 
 export const fmtRange = (a: Date, b: Date) => {
   const sameMonth = a.getMonth() === b.getMonth() && a.getFullYear() === b.getFullYear();
@@ -120,7 +119,7 @@ export const fmtRange = (a: Date, b: Date) => {
 };
 
 export const fmtFull = (dt: Date) =>
-  dt.toLocaleDateString("it-IT", { weekday: "short", day: "numeric", month: "long", year: "numeric" });
+  dt.toLocaleDateString(locale, { weekday: "short", day: "numeric", month: "long", year: "numeric" });
 
 /* ------------------------------ pricing --------------------------- */
 
@@ -149,35 +148,35 @@ export const VAT = 0.22;
 export const PAYMENT_METHODS = [
   {
     id: "stripe",
-    label: "Carta di credito / debito",
-    detail: "Visa, Mastercard, Amex. Checkout sicuro Stripe con 3-D Secure.",
-    timing: "Conferma immediata",
+    label: t("Carta di credito / debito"),
+    detail: t("Visa, Mastercard, Amex. Checkout sicuro Stripe con 3-D Secure."),
+    timing: t("Conferma immediata"),
     speed: "fast" as const,
-    cta: "Paga ora con carta",
+    cta: t("Paga ora con carta"),
   },
   {
     id: "paypal",
-    label: "PayPal",
-    detail: "Usa il saldo o la carta collegata al tuo conto PayPal.",
-    timing: "Conferma immediata",
+    label: t("PayPal"),
+    detail: t("Usa il saldo o la carta collegata al tuo conto PayPal."),
+    timing: t("Conferma immediata"),
     speed: "fast" as const,
-    cta: "Vai al checkout PayPal",
+    cta: t("Vai al checkout PayPal"),
   },
   {
     id: "sumup",
-    label: "Carta con SumUp",
-    detail: "Pagamento con carta sul checkout sicuro SumUp.",
-    timing: "Conferma immediata",
+    label: t("Carta con SumUp"),
+    detail: t("Pagamento con carta sul checkout sicuro SumUp."),
+    timing: t("Conferma immediata"),
     speed: "fast" as const,
-    cta: "Vai al checkout SumUp",
+    cta: t("Vai al checkout SumUp"),
   },
   {
     id: "bonifico",
-    label: "Bonifico bancario",
-    detail: "Ideale per aziende con procedura d'acquisto. L'iscrizione è confermata alla ricezione del pagamento.",
-    timing: "Conferma in 3–5 giorni",
+    label: t("Bonifico bancario"),
+    detail: t("Ideale per aziende con procedura d'acquisto. L'iscrizione è confermata alla ricezione del pagamento."),
+    timing: t("Conferma in 3–5 giorni"),
     speed: "slow" as const,
-    cta: "Conferma e ricevi le coordinate",
+    cta: t("Conferma e ricevi le coordinate"),
   },
 ];
 export type MethodId = (typeof PAYMENT_METHODS)[number]["id"];
@@ -185,86 +184,73 @@ export type MethodId = (typeof PAYMENT_METHODS)[number]["id"];
 /* ------------------------------ docente --------------------------- */
 
 export const TRAINER = {
-  name: "Docente accreditato iSAQB®",
-  role: "iSAQB® Accredited Trainer",
+  name: t("Docente accreditato iSAQB®"),
+  role: t("iSAQB® Accredited Trainer"),
   img: "/img/isaqb-accredited-trainer.jpg",
-  bio: "I corsi CPSA-F sono tenuti da un docente accreditato iSAQB®, come richiesto dal programma di accreditamento: Cube Engineering organizza e conduce i corsi solo con trainer accreditati e materiale didattico accreditato iSAQB®. Ogni edizione ha un unico docente, per questo i partecipanti sono al massimo 12.",
+  bio: t("I corsi CPSA-F sono tenuti da un docente accreditato iSAQB®, come richiesto dal programma di accreditamento: Cube Engineering organizza e conduce i corsi solo con trainer accreditati e materiale didattico accreditato iSAQB®. Ogni edizione ha un unico docente, per questo i partecipanti sono al massimo 12."),
 };
 
 /* --------------------------- contenuti base ----------------------- */
 
 const F_OBJECTIVES = [
-  "Progettare architetture software a partire da requisiti e vincoli, non per abitudine",
-  "Padroneggiare principi di design, pattern architetturali e trade-off documentati",
-  "Documentare l'architettura in modo comunicabile (arc42, C4, ADR)",
-  "Valutare la qualità di un'architettura con scenari e metriche oggettive",
-  "Comunicare decisioni tecniche a stakeholder tecnici e di business",
-  "Presentarti all'esame CPSA-F con simulazioni reali e feedback del trainer",
+  t("Comprendere i concetti fondamentali e la terminologia dell'architettura software"),
+  t("Analizzare e definire i requisiti architetturali, inclusi i requisiti di qualità"),
+  t("Applicare metodologie e strumenti per la progettazione e documentazione dell'architettura software"),
+  t("Valutare diverse soluzioni architetturali rispetto ai requisiti e ai vincoli aziendali e tecnici"),
+  t("Collaborare efficacemente con team multidisciplinari e stakeholder"),
 ];
 
 const F_AUDIENCE = [
-  "Software architect e aspiranti tali",
-  "Sviluppatrici e sviluppatori senior (3+ anni)",
-  "Technical lead e engineering manager",
-  "IT consultant che progettano soluzioni per clienti",
-  "Project manager tecnici che devono dialogare con gli architect",
+  t("Software Architect"),
+  t("Sviluppatori senior e Lead Developer"),
+  t("Project Manager con focus tecnico"),
+  t("IT Consultant e Technical Leader"),
+  t("Esperti di requisiti e ingegneri del software"),
 ];
 
 const F_PREREQUISITES = [
-  "Almeno 18 mesi di esperienza nello sviluppo software (consigliati 3+ anni)",
-  "Conoscenza pratica di almeno un linguaggio ad oggetti o funzionale",
-  "Utili ma non obbligatorie: nozioni di UML e di sviluppo a componenti",
-  "Nessuna certificazione precedente richiesta",
+  t("Almeno 18 mesi di esperienza pratica nello sviluppo di software, acquisita programmando vari progetti o sistemi al di fuori dell'istruzione"),
+  t("Conoscenza ed esperienza pratica in almeno un linguaggio di programmazione, preferibilmente ad oggetti"),
+  t("Nozioni di base di UML (diagrammi di classe, di pacchetto, di componente e di sequenza) e loro relazione con il codice sorgente"),
+  t("Esperienza pratica nella documentazione tecnica"),
 ];
 
 const F_MODULES: CourseModule[] = [
   {
-    title: "Giorno 1 — Fondamenti e ruolo dell'architetto",
-    hours: 8,
+    title: t("Introduzione all'architettura software"),
+    hours: 0,
+    topics: [t("Concetti base e terminologia"), t("Ruolo e responsabilità dell'architetto software")],
+  },
+  {
+    title: t("Requisiti e qualità del software"),
+    hours: 0,
+    topics: [t("Raccolta e gestione dei requisiti architetturali"), t("Requisiti di qualità e scenari di qualità")],
+  },
+  {
+    title: t("Progettazione dell'architettura software"),
+    hours: 0,
     topics: [
-      "Che cos'è (e non è) l'architettura software: definizioni iSAQB",
-      "Il ruolo dell'architetto nel ciclo di vita e nei team agili",
-      "Obiettivi di qualità ISO 25010 e alberi di qualità",
-      "Vincoli tecnici, organizzativi e legge di Conway",
+      t("Modelli architetturali e stili (ad esempio Layered Architecture, Microservices, Event-Driven Architecture)"),
+      t("Decisioni architetturali e trade-off"),
     ],
   },
   {
-    title: "Giorno 2 — Progettazione: principi e pattern",
-    hours: 8,
-    topics: [
-      "Principi: modularità, accoppiamento, coesione, SOLID applicato all'architettura",
-      "Pattern architetturali: layer, hexagonal, microservizi, event-driven",
-      "Gestione delle dipendenze e interfacce tra componenti",
-      "Workshop: da requisiti a struttura, in gruppi",
-    ],
+    title: t("Documentazione e comunicazione"),
+    hours: 0,
+    topics: [t("Tecniche di documentazione dell'architettura"), t("Comunicazione con stakeholder tecnici e non tecnici")],
   },
   {
-    title: "Giorno 3 — Documentare e comunicare",
-    hours: 8,
-    topics: [
-      "arc42 e C4 model: documentare ciò che serve, niente di più",
-      "Architecture Decision Records (ADR) e decision log",
-      "Viste architetturali: contesto, building block, runtime, deployment",
-      "Workshop: documentare il caso del Giorno 2 e presentarlo",
-    ],
-  },
-  {
-    title: "Giorno 4 — Qualità, evoluzione ed esame",
-    hours: 8,
-    topics: [
-      "Valutazione architetturale: scenari, ATAM semplificato, metriche",
-      "Evoluzione, debito tecnico e modernizzazione dei legacy system",
-      "Simulazione completa d'esame CPSA-F con correzione guidata",
-      "Q&A finale, piano di studio personalizzato e tips per l'esame",
-    ],
+    title: t("Valutazione delle architetture software"),
+    hours: 0,
+    topics: [t("Strumenti e tecniche per valutare la qualità dell'architettura"), t("Analisi dei rischi e mitigazione")],
   },
 ];
 
 const F_INCLUDES = [
-  "Corso sincrono con docente accreditato iSAQB® (max 12 partecipanti)",
-  "Materiale Cube Academy / iSAQB®",
-  "Simulazione d'esame con discussione e correzione (ultima giornata)",
-  "Attestato di partecipazione Cube Academy, su richiesta",
+  t("Corso sincrono con docente accreditato iSAQB® (max 12 partecipanti)"),
+  t("Materiale Cube Academy / iSAQB®"),
+  t("Simulazione d'esame con discussione e correzione (ultima giornata)"),
+  t("Attestato di partecipazione Cube Academy, su richiesta"),
 ];
 
 /* ------------------------------ corsi ----------------------------- */
@@ -297,21 +283,21 @@ export interface ApiCourse {
 const FORMAT_COPY: Record<CourseFormat, { image: string; tagline: string; description: string }> = {
   online: {
     image: "https://images.pexels.com/photos/18999565/pexels-photo-18999565.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
-    tagline: "Aula virtuale live su Zoom con docente accreditato e simulazione d'esame nell'ultima giornata.",
+    tagline: t("Aula virtuale live su Zoom con docente accreditato e simulazione d'esame nell'ultima giornata."),
     description:
-      "Il percorso Foundation copre l'intero curriculum iSAQB: dai fondamenti del ruolo alla progettazione, dalla documentazione alla valutazione della qualità. Le lezioni alternano teoria, casi reali dai progetti del docente e workshop di gruppo con revisione in plenaria.",
+      t("Il corso iSAQB® CPSA Foundation Level fornisce una solida base per apprendere i principi fondamentali della progettazione e gestione dell'architettura software, con l'obiettivo di creare sistemi robusti, scalabili e facilmente manutenibili."),
   },
   aula: {
     image: "https://images.pexels.com/photos/3184328/pexels-photo-3184328.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
-    tagline: "Full immersion in presenza: lavagne, post-it e networking con professionisti di tutta Italia.",
+    tagline: t("In presenza a Roma, con docente accreditato iSAQB® e gruppi fino a 12 partecipanti."),
     description:
-      "Stessa qualità del curriculum iSAQB, con l'energia dell'aula fisica: esercitazioni al flipchart, design review a coppie e conversazioni che continuano durante le pause.",
+      t("Lo stesso programma iSAQB® CPSA Foundation Level, seguito in aula a Roma."),
   },
   prestige: {
     image: "https://images.pexels.com/photos/38120266/pexels-photo-38120266.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
-    tagline: "Corso e soggiorno in una location d'eccezione: formazione intensiva senza distrazioni.",
+    tagline: t("Corso e soggiorno in una location d'eccezione: formazione intensiva senza distrazioni."),
     description:
-      "Il percorso Foundation in formato residenziale di 4 giorni, con albergo e mezza pensione nelle più belle città italiane. Presto maggiori informazioni.",
+      t("Il percorso Foundation in formato residenziale di 4 giorni, con albergo e mezza pensione nelle più belle città italiane. Presto maggiori informazioni."),
   },
 };
 
@@ -337,9 +323,9 @@ function toCourse(a: ApiCourse): Course {
   const copy = FORMAT_COPY[format];
   // se ci sono entrambi i prezzi, lo sconto mostrato è quello reale tra i due
   const pct = a.earlyBirdPrice && price ? 1 - a.earlyBirdPrice / price : a.earlyBirdPct;
-  const loc = a.location.IT || "";
+  const loc = a.location[lang.toUpperCase()] || a.location.IT || "";
   const mod = MODALITA[a.modalita];
-  const short = `CPSA-F ${a.modalita !== "intensivo" ? mod.short : online ? "Online" : loc} · ${fmtDate(start)}`;
+  const short = `CPSA-F ${a.modalita !== "intensivo" ? mod.short : online ? t("Online") : loc} · ${fmtDate(start)}`;
   return {
     slug: String(a.id),
     short,
@@ -350,10 +336,10 @@ function toCourse(a: ApiCourse): Course {
     concluded,
     start,
     end,
-    effort: a.modalita !== "intensivo" ? mod.effort : days === 3 ? mod.effort : `${days} giornate · ${days * 8} ore`,
+    effort: a.modalita !== "intensivo" ? mod.effort : days === 3 ? mod.effort : t("{d} giornate · {h} ore", { d: days, h: days * 8 }),
     modalita: a.modalita,
     orario: a.orario || mod.schedule,
-    location: online ? "Aula virtuale live" : loc,
+    location: online ? t("Aula virtuale live") : loc,
     language: /^ital/i.test(a.language.IT || "") ? "IT" : "EN",
     seatsTotal: a.seatsTotal,
     seatsLeft,
@@ -394,6 +380,9 @@ interface PublicRow {
   posti_totali: number | null;
   posti_disponibili: number | null;
   luogo_it: string | null;
+  luogo_en?: string | null;
+  luogo_fr?: string | null;
+  luogo_de?: string | null;
   modalita: string | null;
   orario_it: string | null;
   lingua_it: string | null;
@@ -426,7 +415,7 @@ const fromRow = (r: PublicRow): ApiCourse => ({
   earlyBirdEnd: r.early_bird_end,
   start: r.data_inizio,
   end: r.data_fine ?? r.data_inizio,
-  location: { IT: r.luogo_it ?? "" },
+  location: { IT: r.luogo_it ?? "", EN: r.luogo_en ?? "", FR: r.luogo_fr ?? "", DE: r.luogo_de ?? "" },
   language: { IT: r.lingua_it ?? "" },
   bookingUrl: { IT: r.link_booking_it ?? "" },
   seatsTotal: r.posti_totali,
@@ -457,7 +446,7 @@ export const bySlug = (slug: string) => COURSES.find((c) => c.slug === slug);
 
 const EMPTY_COURSE: Course = {
   ...toCourse({
-    id: 0, title: "CPSA-Foundation®", weekend: false, modalita: "intensivo", orario: "", residential: false, level: "Foundation", stato: 0, open: false,
+    id: 0, title: t("CPSA-Foundation®"), weekend: false, modalita: "intensivo", orario: "", residential: false, level: "Foundation", stato: 0, open: false,
     price: 0, earlyBirdPrice: null, earlyBirdPct: 0, earlyBirdStart: null, earlyBirdEnd: null,
     start: new Date().toISOString(), end: new Date().toISOString(), location: {}, language: {}, bookingUrl: {},
     seatsTotal: null, seatsLeft: null,
@@ -468,10 +457,10 @@ const EMPTY_COURSE: Course = {
 /* ------------------------------ numeri ---------------------------- */
 
 export const STATS = [
-  { value: "iSAQB®", label: "Training Provider accreditato" },
-  { value: "3 giorni", label: "24 ore di formazione live" },
-  { value: "Max 12", label: "partecipanti per edizione" },
-  { value: "2024", label: "accreditamento iSAQB®" },
+  { value: "iSAQB®", label: t("Training Provider accreditato") },
+  { value: t("3 giorni"), label: t("24 ore di formazione live") },
+  { value: t("Max 12"), label: t("partecipanti per edizione") },
+  { value: "2024", label: t("accreditamento iSAQB®") },
 ];
 
 /* --------------------------- testimonianze ------------------------ */
@@ -480,36 +469,36 @@ export const STATS = [
 
 export const FAQS = [
   {
-    q: "L'esame di certificazione è incluso nel prezzo?",
-    a: "No. La tassa d'esame CPSA-F (280 € + IVA) non è inclusa nel prezzo del corso e si paga separatamente all'ente di certificazione autorizzato iSAQB®, con cui organizzi l'esame in autonomia al termine del corso. Durante l'ultima giornata svolgiamo una simulazione d'esame con discussione e correzione.",
+    q: t("L'esame di certificazione è incluso nel prezzo?"),
+    a: t("No. La tassa d'esame CPSA-F (280 € + IVA) non è inclusa nel prezzo del corso e si paga separatamente all'ente di certificazione autorizzato iSAQB®, con cui organizzi l'esame in autonomia al termine del corso. Durante l'ultima giornata svolgiamo una simulazione d'esame con discussione e correzione."),
   },
   {
-    q: "Posso pagare con bonifico e fattura alla mia azienda?",
-    a: "Certo. Durante l'iscrizione scegli il soggetto fatturante (privato, libero professionista, azienda italiana o estera) e inserisci P.IVA, codice SDI e PEC. ",
+    q: t("Posso pagare con bonifico e fattura alla mia azienda?"),
+    a: t("Certo. Durante l'iscrizione scegli il soggetto fatturante (privato, libero professionista, azienda italiana o estera) e inserisci P.IVA, codice SDI e PEC. "),
   },
   {
-    q: "Come funziona la politica di rimborso?",
-    a: "Se il corso non viene erogato per mancato raggiungimento del numero minimo di partecipanti, la quota versata è rimborsata (in alternativa puoi scegliere un'altra data). Per altre esigenze, come la sostituzione di un partecipante, scrivi a academy@cubeng.eu.",
+    q: t("Come funziona la politica di rimborso?"),
+    a: t("Se il corso non viene erogato per mancato raggiungimento del numero minimo di partecipanti, la quota versata è rimborsata (in alternativa puoi scegliere un'altra data). Per altre esigenze, come la sostituzione di un partecipante, scrivi a academy@cubeng.eu."),
   },
   {
-    q: "Cosa sono i corsi Prestige residenziali?",
-    a: "I corsi residenziali durano 4 giorni e comprendono albergo e mezza pensione, nelle più belle città italiane. Le informazioni arriveranno presto: scrivi a academy@cubeng.eu per essere avvisato.",
+    q: t("Cosa sono i corsi Prestige residenziali?"),
+    a: t("I corsi residenziali durano 4 giorni e comprendono albergo e mezza pensione, nelle più belle città italiane. Le informazioni arriveranno presto: scrivi a academy@cubeng.eu per essere avvisato."),
   },
   {
-    q: "Serve esperienza da architetto per iscriversi?",
-    a: "No: servono almeno 18 mesi di esperienza in sviluppo software. Il corso Foundation è pensato per costruire il metodo, parte dalle basi del ruolo. Se hai dubbi sul livello, scrivici: ti facciamo una call di orientamento gratuita di 15 minuti.",
+    q: t("Serve esperienza da architetto per iscriversi?"),
+    a: t("No: servono almeno 18 mesi di esperienza in sviluppo software. Il corso Foundation è pensato per costruire il metodo, parte dalle basi del ruolo. Se hai dubbi sul livello, scrivici a academy@cubeng.eu."),
   },
   {
-    q: "Organizzate edizioni dedicate per il nostro team?",
-    a: "Per gruppi aziendali puoi contattarci per valutare edizioni dedicate. Scrivi a academy@cubeng.eu.",
+    q: t("Organizzate edizioni dedicate per il nostro team?"),
+    a: t("Per gruppi aziendali puoi contattarci per valutare edizioni dedicate. Scrivi a academy@cubeng.eu."),
   },
 ];
 
 export const ORG = {
-  name: "Cube Academy",
+  name: t("Cube Academy"),
   company: "Cube Engineering S.r.l.",
   vat: "",
   email: "academy@cubeng.eu",
   phone: "+39 06 92.92.87.80",
-  address: "Via Venti Settembre, 118 - 00187 Roma",
+  address: t("Via Venti Settembre, 118 - 00187 Roma"),
 };

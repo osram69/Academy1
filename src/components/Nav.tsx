@@ -3,19 +3,18 @@ import { ChevronDown, Menu, X } from "lucide-react";
 import { cn } from "../utils/cn";
 import { nextCourse, fmtRange } from "../data";
 
+import { LANGS, lang, setLang, t } from "../i18n";
 const LINKS = [
-  { label: "Home", href: "#/" },
-  { label: "Catalogo corsi", href: "#/corsi" },
-  { label: "Certificazione", href: "#/", section: "certificazione" },
-  { label: "Prestige", href: "#/", section: "formati" },
-  { label: "FAQ", href: "#/", section: "faq" },
+  { label: t("Home"), href: "#/" },
+  { label: t("Catalogo corsi"), href: "#/corsi" },
+  { label: t("Certificazione"), href: "#/", section: "certificazione" },
+  { label: t("Prestige"), href: "#/", section: "formati" },
+  { label: t("FAQ"), href: "#/", section: "faq" },
 ];
 
-const LANGS = ["IT", "EN", "FR", "DE"];
 
 export function Nav({ route }: { route: string }) {
   const [open, setOpen] = useState(false);
-  const [lang, setLang] = useState("IT");
   const [langOpen, setLangOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const next = nextCourse();
@@ -50,10 +49,10 @@ export function Nav({ route }: { route: string }) {
       >
         <div className="mx-auto flex h-[68px] max-w-7xl items-center justify-between gap-4 px-5 lg:px-8">
           {/* logo */}
-          <a href="#/" className="group flex items-center gap-3" aria-label="Cube Academy — Home">
+          <a href="#/" className="group flex items-center gap-3" aria-label={t("Cube Academy — Home")}>
             <img
               src="/img/logo-cube-academy.png"
-              alt="Cube Academy"
+              alt={t("Cube Academy")}
               width={1000}
               height={173}
               className="h-8 w-auto sm:h-11"
@@ -61,7 +60,7 @@ export function Nav({ route }: { route: string }) {
           </a>
 
           {/* desktop links */}
-          <nav className="hidden items-center gap-7 lg:flex" aria-label="Navigazione principale">
+          <nav className="hidden items-center gap-7 lg:flex" aria-label={t("Navigazione principale")}>
             {LINKS.map((l) => (
               <a
                 key={l.label}
@@ -85,32 +84,32 @@ export function Nav({ route }: { route: string }) {
                 className="flex items-center gap-1.5 rounded-full border border-white/15 px-3 py-1.5 font-mono text-[11px] font-medium tracking-widest text-white/70 transition-colors hover:border-white/40 hover:text-white"
                 aria-haspopup="listbox"
                 aria-expanded={langOpen}
-                aria-label="Seleziona lingua"
+                aria-label={t("Seleziona lingua")}
               >
-                {lang}
+                {lang.toUpperCase()}
                 <ChevronDown className={cn("size-3 transition-transform", langOpen && "rotate-180")} aria-hidden="true" />
               </button>
               {langOpen && (
                 <ul
                   className="absolute right-0 top-full mt-2 w-28 overflow-hidden rounded-xl border border-white/10 bg-ink2 py-1 shadow-lift"
                   role="listbox"
-                  aria-label="Lingue disponibili"
+                  aria-label={t("Lingue disponibili")}
                 >
                   {LANGS.map((l) => (
-                    <li key={l}>
+                    <li key={l.code}>
                       <button
                         role="option"
-                        aria-selected={l === lang}
+                        aria-selected={l.code === lang}
                         onClick={() => {
-                          setLang(l);
+                          setLang(l.code);
                           setLangOpen(false);
                         }}
                         className={cn(
                           "w-full px-4 py-2 text-left font-mono text-[11px] tracking-widest transition-colors",
-                          l === lang ? "bg-flame/15 text-flame" : "text-white/72 hover:bg-white/5 hover:text-white"
+                          l.code === lang ? "bg-flame/15 text-flame" : "text-white/72 hover:bg-white/5 hover:text-white"
                         )}
                       >
-                        {l}
+                        {l.label}
                       </button>
                     </li>
                   ))}
@@ -122,8 +121,7 @@ export function Nav({ route }: { route: string }) {
               href={`#/iscriviti/${next.slug}`}
               className="group hidden items-center gap-2.5 rounded-full bg-flame py-2 pl-4 pr-5 font-display text-[13px] font-semibold text-white shadow-flame transition-all duration-300 hover:bg-white hover:text-ink md:inline-flex"
             >
-              Iscriviti
-              <span className="font-mono text-[10px] font-medium tracking-wider opacity-75">
+              {t("Iscriviti")}<span className="font-mono text-[10px] font-medium tracking-wider opacity-75">
                 {fmtRange(next.start, next.end)}
               </span>
             </a>
@@ -132,7 +130,7 @@ export function Nav({ route }: { route: string }) {
               className="grid size-10 place-items-center rounded-full border border-white/15 text-white lg:hidden"
               onClick={() => setOpen((v) => !v)}
               aria-expanded={open}
-              aria-label={open ? "Chiudi menu" : "Apri menu"}
+              aria-label={open ? t("Chiudi menu") : t("Apri menu")}
             >
               {open ? <X className="size-5" aria-hidden="true" /> : <Menu className="size-5" aria-hidden="true" />}
             </button>
@@ -148,7 +146,7 @@ export function Nav({ route }: { route: string }) {
         )}
         aria-hidden={!open}
       >
-        <nav className="flex flex-col divide-y divide-white/8" aria-label="Menu mobile">
+        <nav className="flex flex-col divide-y divide-white/8" aria-label={t("Menu mobile")}>
           {LINKS.map((l, i) => (
             <a
               key={l.label}
@@ -166,19 +164,19 @@ export function Nav({ route }: { route: string }) {
           href={`#/iscriviti/${next.slug}`}
           className="mt-auto inline-flex items-center justify-center rounded-full bg-flame py-4 font-display font-semibold text-white"
         >
-          Iscriviti alla prossima edizione
-        </a>
+          {t("Iscriviti alla prossima edizione")}</a>
         <div className="mt-4 flex justify-center gap-2">
           {LANGS.map((l) => (
             <button
-              key={l}
-              onClick={() => setLang(l)}
+              key={l.code}
+              onClick={() => setLang(l.code)}
+              aria-label={l.name}
               className={cn(
                 "rounded-full border px-3 py-1.5 font-mono text-[11px] tracking-widest",
-                l === lang ? "border-flame bg-flame/15 text-flame" : "border-white/15 text-white/64"
+                l.code === lang ? "border-flame bg-flame/15 text-flame" : "border-white/15 text-white/64"
               )}
             >
-              {l}
+              {l.label}
             </button>
           ))}
         </div>
