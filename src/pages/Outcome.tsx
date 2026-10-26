@@ -9,15 +9,15 @@ import {
   Landmark,
   Mail,
   RotateCcw,
-  Send,
   XCircle,
   CalendarDays,
   ReceiptText,
 } from "lucide-react";
 import { cn } from "../utils/cn";
-import { BANK, eur2, fmtFull, fmtRange, PAYMENT_METHODS, type Course, type MethodId } from "../data";
+import { eur2, fmtRange, PAYMENT_METHODS, type Course, type MethodId } from "../data";
+import type { BankDetails } from "../lib/api";
 
-export type OutcomeVariant = "success" | "sumup" | "bank" | "cancelled" | "error";
+export type OutcomeVariant = "success" | "pending" | "bank" | "cancelled" | "error";
 
 export interface OrderInfo {
   course: Course;
@@ -25,15 +25,9 @@ export interface OrderInfo {
   total: number;
   method: MethodId;
   orderRef: string;
+  bank?: BankDetails;
+  testMode?: boolean;
 }
-
-const VARIANT_META: Record<OutcomeVariant, { label: string }> = {
-  success: { label: "Successo" },
-  sumup: { label: "Link SumUp" },
-  bank: { label: "Bonifico" },
-  cancelled: { label: "Annullato" },
-  error: { label: "Errore" },
-};
 
 function CopyRow({ label, value }: { label: string; value: string }) {
   const [copied, setCopied] = useState(false);
@@ -97,13 +91,8 @@ function RecapCard({ order }: { order: OrderInfo }) {
   );
 }
 
-export function Outcome({ variant, onVariant, order, onRestart }: {
-  variant: OutcomeVariant;
-  onVariant: (v: OutcomeVariant) => void;
-  order: OrderInfo;
-  onRestart: () => void;
-}) {
-  const holdUntil = new Date(Date.now() + 8 * 86400000);
+export function Outcome({ variant, order }: { variant: OutcomeVariant; order: OrderInfo }) {
+  const onRestart = () => { window.location.hash = `#/iscriviti/${order.course.slug}`; };
   const causale = `Iscrizione ${order.course.short} ${fmtRange(order.course.start, order.course.end)} rif. ${order.orderRef}`;
 
   const head: Record<OutcomeVariant, { icon: React.ReactNode; kicker: string; title: string; sub: string; tone: string }> = {
@@ -111,21 +100,21 @@ export function Outcome({ variant, onVariant, order, onRestart }: {
       icon: <CheckCircle2 className="size-16 text-mint" strokeWidth={1.4} aria-hidden="true" />,
       kicker: "Pagamento riuscito",
       title: "Sei dei nostri. Aula confermata.",
-      sub: "Riceverai entro pochi minuti la mail di conferma con ricevuta, dettagli logistici e accesso all'area partecipanti.",
+      sub: "Abbiamo registrato il pagamento. Ti scriviamo all'indirizzo indicato con le istruzioni per partecipare al corso. Conserva il riferimento dell'ordine.",
       tone: "border-mint/40 bg-emerald-50",
     },
-    sumup: {
-      icon: <Send className="size-16 text-flame" strokeWidth={1.4} aria-hidden="true" />,
-      kicker: "Prenotazione registrata",
-      title: "Il link di pagamento è in arrivo.",
-      sub: "Controlla la casella email del referente: il link SumUp arriva entro 1 ora lavorativa ed è valido 48 ore. Al pagamento, i posti sono confermati.",
+    pending: {
+      icon: <Clock className="size-16 text-flame" strokeWidth={1.4} aria-hidden="true" />,
+      kicker: "Pagamento in verifica",
+      title: "Stiamo aspettando la conferma del circuito.",
+      sub: "Il pagamento non risulta ancora confermato. Se hai completato l'operazione, ricarica questa pagina tra qualche minuto; in caso di dubbi scrivi a academy@cubeng.eu indicando il riferimento dell'ordine.",
       tone: "border-flame/40 bg-flame/5",
     },
     bank: {
       icon: <Clock className="size-16 text-gold" strokeWidth={1.4} aria-hidden="true" />,
-      kicker: "Posti bloccati per te",
+      kicker: "Iscrizione registrata",
       title: "Manca solo il bonifico.",
-      sub: "I posti restano riservati fino al termine indicato. Se la contabilità aziendale richiede più tempo, scrivici: estendiamo il blocco.",
+      sub: "I posti restano riservati per alcuni giorni lavorativi. L'iscrizione è confermata alla ricezione del pagamento: se serve più tempo, scrivici.",
       tone: "border-gold/40 bg-amber-50",
     },
     cancelled: {
@@ -139,7 +128,7 @@ export function Outcome({ variant, onVariant, order, onRestart }: {
       icon: <AlertTriangle className="size-16 text-err" strokeWidth={1.4} aria-hidden="true" />,
       kicker: "Qualcosa non ha funzionato",
       title: "Il pagamento non è andato a buon fine.",
-      sub: "Nessun importo è stato addebitato (eventuali pre-autorizzazioni rientrano in 24–48h). Riprova o scegli un altro metodo: il bonifico funziona sempre.",
+      sub: "Riprova o scegli un altro metodo. Per assistenza scrivi a academy@cubeng.eu.",
       tone: "border-err/30 bg-red-50/60",
     },
   };
@@ -147,27 +136,11 @@ export function Outcome({ variant, onVariant, order, onRestart }: {
 
   return (
     <div className="mx-auto max-w-3xl">
-      {/* switcher stati — strumento di anteprima per il cliente */}
-      <div className="mb-10 rounded-2xl border border-dashed border-ink/25 bg-white/70 p-4">
-        <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-steel">
-          Anteprima stati della pagina di esito (demo)
+      {order.testMode && (
+        <p className="mb-6 rounded-xl border border-dashed border-ink/25 bg-white/70 px-4 py-3 text-center font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-steel">
+          Ambiente di prova: nessun addebito reale
         </p>
-        <div className="mt-2.5 flex flex-wrap gap-1.5" role="group" aria-label="Anteprima varianti di esito">
-          {(Object.keys(VARIANT_META) as OutcomeVariant[]).map((v) => (
-            <button
-              key={v}
-              onClick={() => onVariant(v)}
-              aria-pressed={variant === v}
-              className={cn(
-                "rounded-full px-3.5 py-1.5 text-[12px] font-semibold transition-colors",
-                variant === v ? "bg-ink text-white" : "border border-ink/15 text-ink/55 hover:border-ink hover:text-ink"
-              )}
-            >
-              {VARIANT_META[v].label}
-            </button>
-          ))}
-        </div>
-      </div>
+      )}
 
       <div className={cn("overflow-hidden rounded-[28px] border shadow-card", h.tone)}>
         <div className="p-8 text-center sm:p-12">
@@ -182,25 +155,25 @@ export function Outcome({ variant, onVariant, order, onRestart }: {
         <div className="border-t border-ink/8 bg-paper/70 p-6 sm:p-8">
           <RecapCard order={order} />
 
-          {variant === "bank" && (
+          {variant === "bank" && order.bank && (
             <div className="mt-5 space-y-2.5" aria-label="Coordinate bancarie per il bonifico">
               <p className="flex items-center gap-2 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-steel">
                 <Landmark className="size-4 text-gold" aria-hidden="true" />
                 Coordinate per il bonifico
               </p>
-              <CopyRow label="Intestatario" value={BANK.holder} />
-              <CopyRow label="IBAN" value={BANK.iban} />
-              <CopyRow label="Banca" value={BANK.bank} />
+              <CopyRow label="Intestatario" value={order.bank.holder} />
+              <CopyRow label="IBAN" value={order.bank.iban} />
+              {order.bank.bank && <CopyRow label="Banca" value={order.bank.bank} />}
               <CopyRow label="Causale" value={causale} />
               <div className="flex items-start gap-2.5 rounded-xl border border-gold/30 bg-amber-50 px-4 py-3 text-[13px] leading-snug text-ink/75">
                 <Clock className="mt-0.5 size-4 shrink-0 text-gold" aria-hidden="true" />
                 <span>
-                  <strong className="font-semibold text-ink">Posti riservati fino al {fmtFull(holdUntil)}.</strong>{" "}
+                  <strong className="font-semibold text-ink">Posti riservati per alcuni giorni lavorativi.</strong>{" "}
                   Invia la distinta a{" "}
                   <a className="link-sweep font-semibold text-flame" href="mailto:academy@cubeng.eu">
                     academy@cubeng.eu
                   </a>{" "}
-                  per accelerare la conferma (3–5 giorni con riconciliazione automatica).
+                  per accelerare la conferma.
                 </span>
               </div>
             </div>
@@ -209,9 +182,9 @@ export function Outcome({ variant, onVariant, order, onRestart }: {
           {variant === "success" && (
             <ol className="mt-5 space-y-3" aria-label="Prossimi passi">
               {[
-                { t: "Entro pochi minuti", d: "mail di conferma con ricevuta e istruzioni per l'aula (o il link Zoom)." },
-                { t: "Entro 48 ore", d: "fattura elettronica al soggetto fatturante indicato in fase d'ordine." },
-                { t: "7 giorni prima del corso", d: "mail logistica con agenda, materiali pre-corso e test dei prerequisiti." },
+                { t: "Conferma", d: "ti scriviamo all'email del partecipante con le istruzioni per collegarti al corso (Zoom)." },
+                { t: "Fattura", d: "Cube Engineering emette la fattura elettronica ai dati di fatturazione indicati." },
+                { t: "Esame iSAQB®", d: "non è incluso: si organizza a parte con gli enti autorizzati (280 € + IVA)." },
               ].map((s, i) => (
                 <li key={s.t} className="flex gap-4 rounded-xl border border-ink/10 bg-white px-4 py-3.5">
                   <span className="grid size-7 shrink-0 place-items-center rounded-full bg-mint/12 font-mono text-[11px] font-bold text-mint">
@@ -226,7 +199,7 @@ export function Outcome({ variant, onVariant, order, onRestart }: {
           )}
 
           <div className="mt-6 flex flex-wrap justify-center gap-3">
-            {variant === "success" || variant === "sumup" || variant === "bank" ? (
+            {variant === "success" || variant === "pending" || variant === "bank" ? (
               <>
                 <a href="#/" className="inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 font-display text-sm font-semibold text-white transition-colors hover:bg-flame">
                   Torna alla home

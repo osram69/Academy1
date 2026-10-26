@@ -52,11 +52,6 @@ export function CourseCard({ course, index = 0 }: { course: Course; index?: numb
         <div className="absolute bottom-4 right-4">
           <EarlyBirdChip course={course} dark />
         </div>
-        {course.format === "prestige" && (
-          <span className="absolute bottom-4 left-4 rounded-full bg-flame px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white">
-            Hotel 4★ incluso
-          </span>
-        )}
       </div>
 
       {/* body */}

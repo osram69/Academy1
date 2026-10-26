@@ -5,10 +5,11 @@ import { Home } from "./pages/Home";
 import { Catalog } from "./pages/Catalog";
 import { CourseDetail } from "./pages/CourseDetail";
 import { Enroll } from "./pages/Enroll";
+import { Esito } from "./pages/Esito";
 import { Admin } from "./admin/Admin";
 import { bySlug } from "./data";
 
-type Route = { page: "home" } | { page: "admin" } | { page: "catalog" } | { page: "course"; slug: string } | { page: "enroll"; slug: string };
+type Route = { page: "home" } | { page: "admin" } | { page: "catalog" } | { page: "course"; slug: string } | { page: "enroll"; slug: string } | { page: "esito"; ref: string; status: string };
 
 function parseRoute(hash: string): Route {
   const parts = hash.replace(/^#\/?/, "").split("/").filter(Boolean);
@@ -16,6 +17,7 @@ function parseRoute(hash: string): Route {
   if (parts[0] === "corsi") return { page: "catalog" };
   if (parts[0] === "corso" && parts[1]) return { page: "course", slug: parts[1] };
   if (parts[0] === "iscriviti" && parts[1]) return { page: "enroll", slug: parts[1] };
+  if (parts[0] === "esito" && parts[1]) return { page: "esito", ref: decodeURIComponent(parts[1]), status: parts[2] || "pending" };
   return { page: "home" };
 }
 
@@ -49,6 +51,9 @@ export default function App() {
       page = course && !course.concluded ? <Enroll key={course.slug} course={course} /> : <Catalog />;
       break;
     }
+    case "esito":
+      page = <Esito refCode={route.ref} status={route.status} />;
+      break;
     default:
       page = <Home />;
   }

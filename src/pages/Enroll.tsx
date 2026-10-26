@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   AlertTriangle,
   ArrowLeft,
@@ -28,9 +28,8 @@ import {
 } from "lucide-react";
 import { cn } from "../utils/cn";
 import { Btn } from "../components/ui";
-import { Outcome, type OutcomeVariant, type OrderInfo } from "./Outcome";
+import { checkCoupon, createOrder, getConfig, type ApiConfig } from "../lib/api";
 import {
-  COUPONS,
   FORMAT_META,
   PAYMENT_METHODS,
   VAT,
@@ -42,6 +41,9 @@ import {
   type Course,
   type MethodId,
 } from "../data";
+
+/** Limite iSAQB: max 12 partecipanti per corso con un solo docente. */
+const MAX_SEATS = 12;
 
 /* ================================ tipi =============================== */
 
@@ -167,13 +169,13 @@ function StepConfigure({ course, count, setCount }: { course: Course; count: num
               <Minus className="size-4" aria-hidden="true" />
             </button>
             <span className="min-w-14 text-center font-display text-2xl font-bold tabular-nums" aria-live="polite">{count}</span>
-            <button onClick={() => setCount(Math.min(50, count + 1))} disabled={count >= 50} aria-label="Aumenta partecipanti"
+            <button onClick={() => setCount(Math.min(MAX_SEATS, count + 1))} disabled={count >= MAX_SEATS} aria-label="Aumenta partecipanti"
               className="grid size-10 place-items-center rounded-full text-ink/70 transition-colors hover:bg-ink hover:text-white disabled:opacity-30">
               <Plus className="size-4" aria-hidden="true" />
             </button>
           </div>
           <div className="flex flex-wrap gap-1.5">
-            {[1, 2, 3, 5, 10].map((n) => (
+            {[1, 2, 3, 5, 12].map((n) => (
               <button key={n} onClick={() => setCount(n)} aria-pressed={count === n}
                 className={cn("rounded-full px-3.5 py-2 font-mono text-[12px] font-semibold transition-colors",
                   count === n ? "bg-ink text-white" : "border border-ink/15 text-ink/55 hover:border-ink hover:text-ink")}>
@@ -182,15 +184,14 @@ function StepConfigure({ course, count, setCount }: { course: Course; count: num
             ))}
           </div>
         </div>
-        <p className="field-note">{course.seatsLeft != null && <>Massimo {course.seatsLeft} posti per questa edizione · </>}Prezzo a persona {eur(price.unit)} + IVA</p>
-        {count >= 8 && (
+        <p className="field-note"><>Massimo {course.seatsLeft != null ? Math.min(MAX_SEATS, course.seatsLeft) : MAX_SEATS} posti per questa edizione · </>Prezzo a persona {eur(price.unit)} + IVA</p>
+        {count >= 5 && (
           <div className="mt-4 flex items-start gap-3 rounded-xl border border-gold/30 bg-amber-50 p-4 text-[13px] leading-snug text-ink/75">
             <Users className="mt-0.5 size-4.5 shrink-0 text-gold" aria-hidden="true" />
             <span>
-              <strong className="font-semibold text-ink">Da 8 persone conviene un'edizione dedicata:</strong> stesso
-              prezzo a persona, ma date e casi di studio su misura.{" "}
-              <a className="link-sweep font-semibold text-flame" href="mailto:academy@cubeng.eu">Richiedi un preventivo</a>{" "}
-              — puoi comunque proseguire qui.
+              <strong className="font-semibold text-ink">Gruppi aziendali:</strong> ogni edizione ha al massimo 12
+              partecipanti. Per più persone o per un'edizione dedicata{" "}
+              <a className="link-sweep font-semibold text-flame" href="mailto:academy@cubeng.eu">scrivici</a>.
             </span>
           </div>
         )}
@@ -217,9 +218,7 @@ function StepParticipants({
       <div className="flex items-start gap-3 rounded-2xl border border-ink/10 bg-white p-4.5 text-[13.5px] leading-snug text-ink/70">
         <Info className="mt-0.5 size-4.5 shrink-0 text-flame" aria-hidden="true" />
         <p>
-          Servono i dati anagrafici per la <strong className="font-semibold text-ink">registrazione all'esame
-          iSAQB</strong> e i consensi per ciascun partecipante. Puoi proseguire e completare i profili entro 5 giorni
-          dalla mail di conferma.
+          Servono i dati dei partecipanti per l'iscrizione al corso e l'attestato di partecipazione. <strong className="font-semibold text-ink">L'esame iSAQB non è incluso</strong>: si organizza a parte con gli enti autorizzati (280 € + IVA).
         </p>
       </div>
 
@@ -264,7 +263,7 @@ function StepParticipants({
                   <TextField id={`${k("cf")}`} label="Codice fiscale" placeholder="RSSGLI85M01H501Z" className="sm:col-span-2"
                     value={p.cf} onChange={(e) => update(i, { cf: e.target.value.toUpperCase() })}
                     error={attempted ? errors[k("cf")] : undefined}
-                    hint="Richiesto dall'ente certificatore per il referto d'esame nominativo" />
+                    hint="Facoltativo, 16 caratteri" />
                   <fieldset className="grid gap-2.5 sm:col-span-2">
                     <legend className="sr-only">Consensi di {p.nome || `partecipante ${i + 1}`}</legend>
                     <CheckRow id={`${k("privacy")}`} checked={p.cPrivacy} onChange={(v) => update(i, { cPrivacy: v })}
@@ -276,7 +275,7 @@ function StepParticipants({
                       desc="Le sessioni live online possono essere registrate e condivise solo con i partecipanti dell'edizione." />
                     <CheckRow id={`${k("marketing")}`} checked={p.cMarketing} onChange={(v) => update(i, { cMarketing: v })}
                       title="Novità e offerte (facoltativo)"
-                      desc="Max 1 mail al mese su nuove edizioni e sconti alumni. Revocabile con un click." />
+                      desc="Novità su nuove edizioni del corso. Revocabile in qualsiasi momento." />
                   </fieldset>
                 </div>
               </div>
@@ -381,7 +380,7 @@ function StepBilling({ billing, set, errors, attempted }: {
             className="sm:col-span-2" value={billing.via} onChange={(e) => set({ via: e.target.value })} error={err("via")} />
           <TextField id="f-cap" label="CAP" req inputMode="numeric" placeholder="40121" autoComplete="postal-code"
             value={billing.cap} onChange={(e) => set({ cap: e.target.value })} error={err("cap")} />
-          <TextField id="f-citta" label="Città" req placeholder="Bologna" autoComplete="address-level2"
+          <TextField id="f-citta" label="Città" req placeholder="Roma" autoComplete="address-level2"
             value={billing.citta} onChange={(e) => set({ citta: e.target.value })} error={err("citta")} />
         </div>
       </div>
@@ -405,7 +404,7 @@ const SPEED_META = {
 
 function StepPayment({
   method, setMethod, coupon, setCoupon, couponInput, setCouponInput, couponError, onApplyCoupon,
-  terms, setTerms, errors, attempted, total, onPay,
+  terms, setTerms, errors, attempted, total, onPay, config, payError, busy,
 }: {
   method: MethodId | null;
   setMethod: (m: MethodId) => void;
@@ -417,6 +416,7 @@ function StepPayment({
   errors: Record<string, string>; attempted: boolean;
   total: number;
   onPay: () => void;
+  config: ApiConfig | null; payError: string; busy: boolean;
 }) {
   const active = PAYMENT_METHODS.find((m) => m.id === method);
   return (
@@ -428,7 +428,7 @@ function StepPayment({
           <div className="flex items-center justify-between gap-3 rounded-xl border border-mint/35 bg-emerald-50 px-4 py-3">
             <span className="flex items-center gap-2.5 text-[14px] font-semibold text-mint">
               <TicketPercent className="size-4.5" aria-hidden="true" />
-              {coupon.code} — {COUPONS[coupon.code]?.label ?? `−${coupon.pct * 100}%`} applicato
+              {coupon.code} — sconto −{Math.round(coupon.pct * 100)}% applicato
             </span>
             <button onClick={() => setCoupon(null)} aria-label="Rimuovi codice sconto"
               className="grid size-8 place-items-center rounded-full text-mint transition-colors hover:bg-mint hover:text-white">
@@ -438,7 +438,7 @@ function StepPayment({
         ) : (
           <>
             <div className="flex gap-2.5">
-              <input id="coupon" className={cn("field uppercase", couponError && "err")} placeholder="Es. ARCHI10"
+              <input id="coupon" className={cn("field uppercase", couponError && "err")} placeholder="Inserisci il codice"
                 value={couponInput}
                 onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
                 onKeyDown={(e) => e.key === "Enter" && onApplyCoupon()} />
@@ -447,7 +447,7 @@ function StepPayment({
               </Btn>
             </div>
             {couponError && <p className="field-error" role="alert">{couponError}</p>}
-            <p className="field-note">Gli sconti si cumulano con l'early bird. Sconto aziende: scrivici per gruppi 5+.</p>
+            <p className="field-note">Gli sconti si cumulano con l'early bird.</p>
           </>
         )}
       </div>
@@ -463,12 +463,14 @@ function StepPayment({
             const selected = method === m.id;
             const Icon = METHOD_ICONS[m.id];
             const speed = SPEED_META[m.speed];
+            const enabled = !config || config.methods[m.id as keyof ApiConfig["methods"]];
             return (
               <label key={m.id} className={cn(
-                "group relative block cursor-pointer rounded-2xl border p-4.5 transition-all duration-300",
+                "group relative block rounded-2xl border p-4.5 transition-all duration-300",
+                enabled ? "cursor-pointer" : "cursor-not-allowed opacity-50",
                 selected ? "border-flame bg-flame/[0.05] shadow-card" : "border-ink/12 hover:border-ink/35"
               )}>
-                <input type="radio" name="pay-method" className="sr-only" checked={selected} onChange={() => setMethod(m.id)} />
+                <input type="radio" name="pay-method" className="sr-only" checked={selected} disabled={!enabled} onChange={() => setMethod(m.id)} />
                 <span className="flex items-start gap-4">
                   <span className={cn("grid size-11 shrink-0 place-items-center rounded-xl transition-colors",
                     selected ? "bg-flame text-white" : "bg-ink/6 text-ink/55 group-hover:bg-ink/10")}>
@@ -479,7 +481,7 @@ function StepPayment({
                       <span className="font-display text-[15px] font-bold tracking-tight text-ink">{m.label}</span>
                       <span className={cn("inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10.5px] font-bold ring-1", speed.cls)}>
                         <Timer className="size-3" aria-hidden="true" />
-                        {speed.label}
+                        {enabled ? speed.label : "Non ancora attivo"}
                       </span>
                     </span>
                     <span className="mt-1 block text-[12.5px] leading-snug text-ink/60">{m.detail}</span>
@@ -502,16 +504,16 @@ function StepPayment({
                 <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ember">Come funziona</p>
                 <p className="mt-2 text-[13.5px] leading-relaxed text-white/75">
                   {active.id === "stripe" && (
-                    <>Verrai reindirizzato al checkout sicuro Stripe (3-D Secure). <strong className="text-white">Conferma istantanea:</strong> ricevi subito ricevuta e convocazione. Non memorizziamo i dati della carta.</>
+                    <>Verrai reindirizzato al checkout sicuro Stripe (3-D Secure). <strong className="text-white">Conferma istantanea.</strong> Non memorizziamo i dati della carta.</>
                   )}
                   {active.id === "paypal" && (
-                    <>Accedi al tuo conto PayPal e confermi: <strong className="text-white">conferma istantanea</strong>. Su importi idonei, PayPal propone il pagamento in 3 rate senza interessi.</>
+                    <>Accedi al tuo conto PayPal e confermi: <strong className="text-white">conferma istantanea</strong>.</>
                   )}
                   {active.id === "sumup" && (
-                    <>Nessun pagamento ora: entro 1 ora lavorativa inviamo un <strong className="text-white">link SumUp all'email del referente</strong>, valido 48h. I posti sono confermati al saldo.</>
+                    <>Verrai reindirizzato al <strong className="text-white">checkout sicuro SumUp</strong> per pagare con carta. Conferma immediata.</>
                   )}
                   {active.id === "bonifico" && (
-                    <>Nessun pagamento ora: alla conferma ricevi IBAN e causale strutturata. <strong className="text-white">I posti restano bloccati 7 giorni lavorativi</strong> — tempo più che sufficiente per la procedura d'acquisto interna.</>
+                    <>Nessun pagamento ora: dopo la conferma ricevi IBAN e causale. <strong className="text-white">I posti restano riservati per alcuni giorni lavorativi</strong>; l'iscrizione è confermata alla ricezione del bonifico.</>
                   )}
                 </p>
               </div>
@@ -523,14 +525,21 @@ function StepPayment({
       {/* condizioni + CTA */}
       <CheckRow id="terms" checked={terms} onChange={setTerms}
         title={<>Accetto le <a href="#/" className="link-sweep text-flame">Condizioni generali</a> e la <a href="#/" className="link-sweep text-flame">Privacy policy</a> <span className="text-flame">*</span></>}
-        desc="Inclusa la politica di rimborso: 100% fino a 14 giorni prima dell'inizio del corso."
+        desc="Inclusa la politica di rimborso: se il corso non viene erogato per mancanza del numero minimo di partecipanti, la quota è rimborsata."
         error={attempted ? errors.terms : undefined} />
+
+      {config?.testMode && (
+        <p className="rounded-xl border border-dashed border-ink/25 bg-white/70 px-4 py-3 text-center font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-steel">
+          Ambiente di prova: pagamenti sandbox, nessun addebito reale
+        </p>
+      )}
+      {payError && <p className="field-error" role="alert">{payError}</p>}
 
       <div className="sticky bottom-3 z-20">
         <button
           type="button"
           onClick={onPay}
-          disabled={!method}
+          disabled={!method || busy}
           className={cn(
             "group flex w-full items-center justify-between gap-4 rounded-2xl p-5 font-display font-bold text-white transition-all duration-300 disabled:cursor-not-allowed",
             method ? "bg-flame shadow-flame hover:bg-ink" : "bg-ink/25"
@@ -676,8 +685,8 @@ function OrderRail({ course, count, coupon, step, goTo, maxStep }: {
 
       <ul className="space-y-2 px-1 text-[12px] leading-snug text-steel">
         {[
-          { icon: RotateCcw, t: "Rimborso 100% fino a 14 giorni prima" },
-          { icon: Landmark, t: "Bonifico: posti bloccati 7 gg lavorativi" },
+          { icon: RotateCcw, t: "Rimborso se il corso non parte" },
+          { icon: Landmark, t: "Bonifico bancario" },
           { icon: Lock, t: "Torna indietro quando vuoi: non perdi i dati" },
         ].map((r) => (
           <li key={r.t} className="flex items-start gap-2">
@@ -704,17 +713,18 @@ export function Enroll({ course }: { course: Course }) {
   const [couponInput, setCouponInput] = useState("");
   const [couponError, setCouponError] = useState<string | null>(null);
   const [terms, setTerms] = useState(false);
-  const [outcome, setOutcome] = useState<OutcomeVariant | null>(null);
+  const [config, setConfig] = useState<ApiConfig | null>(null);
+  const [payError, setPayError] = useState("");
+  const [busy, setBusy] = useState(false);
   const [mobileSummary, setMobileSummary] = useState(false);
 
   const price = getLivePrice(course);
-  const orderRef = useMemo(
-    () => `CUBE-${new Date().getFullYear()}-${String(Math.floor(10000 + Math.random() * 89999))}`,
-    []
-  );
+  useEffect(() => {
+    getConfig().then(setConfig).catch(() => setConfig(null));
+  }, []);
 
   const setCount = (n: number) => {
-    const clamped = Math.max(1, Math.min(50, n));
+    const clamped = Math.max(1, Math.min(MAX_SEATS, n));
     setCountRaw(clamped);
     setParticipants((ps) => {
       if (clamped > ps.length) return [...ps, ...Array.from({ length: clamped - ps.length }, emptyParticipant)];
@@ -782,42 +792,39 @@ export function Enroll({ course }: { course: Course }) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const applyCoupon = () => {
+  const applyCoupon = async () => {
     const code = couponInput.trim();
-    const found = COUPONS[code];
-    setCoupon(found ? { code, pct: found.pct } : null);
-    setCouponError(code && !found ? "Codice non valido o scaduto" : null);
+    if (!code) return;
+    try {
+      setCoupon(await checkCoupon(Number(course.slug), code));
+      setCouponError(null);
+    } catch (e) {
+      setCoupon(null);
+      setCouponError((e as Error).message);
+    }
   };
 
-  const pay = () => {
+  const pay = async () => {
     const errs = validate(3);
     setCurrentErrors(errs);
     setAttempted((a) => ({ ...a, 3: true }));
-    if (Object.keys(errs).length > 0) return;
-    setOutcome(method === "bonifico" ? "bank" : method === "sumup" ? "sumup" : "success");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (Object.keys(errs).length > 0 || !method) return;
+    setBusy(true);
+    setPayError("");
+    try {
+      const res = await createOrder({ courseId: Number(course.slug), seats: count, method, coupon: coupon?.code ?? null, participants, billing });
+      if (res.url) window.location.href = res.url; // checkout del provider
+      else window.location.hash = `#/esito/${encodeURIComponent(res.ref)}/pending`; // bonifico
+    } catch (e) {
+      setPayError((e as Error).message);
+      setBusy(false);
+    }
   };
 
   /* ------------------------------ prezzo ----------------------------- */
   const sub = price.unit * count;
   const couponAmt = coupon ? sub * coupon.pct : 0;
   const total = (sub - couponAmt) * (1 + VAT);
-
-  const order: OrderInfo = { course, count, total, method: method ?? "stripe", orderRef };
-
-  /* ------------------------------ esito ------------------------------ */
-  if (outcome) {
-    return (
-      <div className="bg-paper bg-blueprint px-5 pb-24 pt-36 lg:px-8">
-        <Outcome
-          variant={outcome}
-          onVariant={setOutcome}
-          order={order}
-          onRestart={() => setOutcome(null)}
-        />
-      </div>
-    );
-  }
 
   /* ------------------------------ wizard ----------------------------- */
   return (
@@ -893,7 +900,7 @@ export function Enroll({ course }: { course: Course }) {
               onApplyCoupon={applyCoupon}
               terms={terms} setTerms={setTerms}
               errors={currentErrors} attempted={!!attempted[3]}
-              total={total} onPay={pay}
+              total={total} onPay={pay} config={config} payError={payError} busy={busy}
             />
           )}
 

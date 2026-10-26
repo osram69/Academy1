@@ -9,15 +9,13 @@ import {
   FileCheck,
   GraduationCap,
   MonitorPlay,
-  Quote,
   RotateCcw,
-  Star,
 } from "lucide-react";
 import { cn } from "../utils/cn";
 import { Hero } from "../components/Hero";
 import { ConcludedSection, CourseCard } from "../components/CourseCard";
 import { Btn, IsoCube, Reveal, Tag } from "../components/ui";
-import { FAQS, TESTIMONIALS, TRAINER, concludedCourses, fmtRange, nextCourse, upcomingCourses } from "../data";
+import { FAQS, TRAINER, concludedCourses, fmtRange, nextCourse, upcomingCourses } from "../data";
 
 /* ============================ cos'è CPSA-F ============================ */
 
@@ -139,7 +137,7 @@ const FORMATS = [
     icon: MonitorPlay,
     title: "Live Online",
     claim: "L'aula viene da te.",
-    text: "Zoom con docente live, breakout room per i workshop, lavagna condivisa Miro. Registrazioni disponibili 30 giorni.",
+    text: "Aula virtuale su Zoom con docente accreditato iSAQB®, esercitazioni ed esame simulato nell'ultima giornata.",
     points: ["24 ore su 3 giornate", "Max 12 partecipanti", "Zero trasferte"],
     dark: false,
     img: null as string | null,
@@ -149,8 +147,8 @@ const FORMATS = [
     icon: Building2,
     title: "In Aula",
     claim: "Full immersion, networking vero.",
-    text: "Milano e Bologna. Lavagne, post-it e pranzi inclusi: le conversazioni fuori dalle sessioni valgono quanto il corso.",
-    points: ["Sedi centrali, raggiungibili in metro", "Pranzi e coffee break inclusi", "Max 12 partecipanti"],
+    text: "Corso in presenza a Roma, con docente accreditato iSAQB® e gruppi di massimo 12 partecipanti.",
+    points: ["Sede a Roma", "Max 12 partecipanti", "Docente accreditato iSAQB®"],
     dark: false,
     img: null as string | null,
   },
@@ -159,8 +157,8 @@ const FORMATS = [
     icon: BedDouble,
     title: "Prestige Residenziale",
     claim: "Certificarsi è un'esperienza.",
-    text: "Cinque giorni in ville italiane d'eccezione: corso, hotel 4★, pasti e cena conviviale inclusi. Gruppi di massimo 12, ritmo residenziale.",
-    points: ["Hotel 4★ + tutti i pasti inclusi", "Masterclass serale con il docente", "Transfer dalla stazione"],
+    text: "Corsi residenziali di 4 giorni nelle più belle città italiane, con albergo e mezza pensione. Presto maggiori informazioni.",
+    points: ["4 giorni in residenza", "Albergo e mezza pensione", "Presto informazioni"],
     dark: true,
     img: "https://images.pexels.com/photos/38115059/pexels-photo-38115059.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
   },
@@ -293,49 +291,6 @@ function EditionsSection() {
   );
 }
 
-/* ============================ testimonianze ========================== */
-
-function VoicesSection() {
-  return (
-    <section id="voci" className="scroll-mt-24 bg-sand/40 py-24 lg:py-32" aria-labelledby="voices-title">
-      <div className="mx-auto max-w-7xl px-5 lg:px-8">
-        <div className="max-w-2xl">
-          <Reveal>
-            <Tag>Le voci degli alumni</Tag>
-          </Reveal>
-          <Reveal delay={80}>
-            <h2 id="voices-title" className="mt-5 font-display text-[clamp(2rem,4.2vw,3.4rem)] font-bold leading-[1.04] tracking-[-0.025em] text-ink">
-              740 professionisti hanno già <em className="font-serif italic text-flame">alzato l'asticella.</em>
-            </h2>
-          </Reveal>
-        </div>
-        <div className="mt-14 grid gap-5 lg:grid-cols-3">
-          {TESTIMONIALS.map((t, i) => (
-            <Reveal key={t.name} delay={i * 120} className={cn(i === 1 && "lg:translate-y-8")}>
-              <figure className="flex h-full flex-col rounded-[24px] border border-ink/10 bg-white p-8 shadow-card">
-                <Quote className="size-7 rotate-180 text-flame" aria-hidden="true" />
-                <div className="mt-4 flex gap-1" aria-label="Valutazione 5 su 5">
-                  {Array.from({ length: 5 }).map((_, s) => (
-                    <Star key={s} className="size-3.5 fill-amber-400 text-amber-400" aria-hidden="true" />
-                  ))}
-                </div>
-                <blockquote className="mt-4 flex-1 text-[15.5px] leading-relaxed text-ink/80">“{t.quote}”</blockquote>
-                <figcaption className="mt-7 flex items-center gap-3.5 border-t border-ink/8 pt-5">
-                  <img src={t.img} alt="" loading="lazy" className="size-12 rounded-full object-cover ring-2 ring-flame/30" />
-                  <div>
-                    <p className="font-display text-[14.5px] font-semibold text-ink">{t.name}</p>
-                    <p className="text-[12.5px] text-steel">{t.role}</p>
-                  </div>
-                </figcaption>
-              </figure>
-            </Reveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
 /* -------------------------------- FAQ ------------------------------- */
 
 function FaqSection() {
@@ -364,7 +319,7 @@ function FaqSection() {
           <Reveal delay={240} className="mt-9 flex flex-wrap gap-3">
             <span className="inline-flex items-center gap-2 rounded-full border border-ink/12 bg-white px-4 py-2 text-[13px] font-medium text-ink/75">
               <RotateCcw className="size-4 text-flame" aria-hidden="true" />
-              Rimborso 100% fino a 14 gg prima
+              Rimborso se il corso non parte
             </span>
             <span className="inline-flex items-center gap-2 rounded-full border border-ink/12 bg-white px-4 py-2 text-[13px] font-medium text-ink/75">
               <BadgeCheck className="size-4 text-flame" aria-hidden="true" />
@@ -472,7 +427,6 @@ export function Home() {
       <CertificationSection />
       <FormatsSection />
       <EditionsSection />
-      <VoicesSection />
       <FaqSection />
       <CtaSection />
     </>

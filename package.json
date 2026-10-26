@@ -1,19 +1,23 @@
 {
-  "name": "react-vite-tailwind",
+  "name": "cube-academy",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "start": "node server/index.mjs",
+    "server": "node server/index.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",
     "clsx": "2.1.1",
+    "express": "^4.22.3",
     "lucide-react": "^1.48.0",
     "react": "19.2.6",
     "react-dom": "19.2.6",
+    "stripe": "^23.0.1",
     "tailwind-merge": "3.4.0"
   },
   "devDependencies": {
@@ -26,5 +30,8 @@
     "typescript": "5.9.3",
     "vite": "7.3.2",
     "vite-plugin-singlefile": "2.3.0"
+  },
+  "engines": {
+    "node": ">=20.12"
   }
 }

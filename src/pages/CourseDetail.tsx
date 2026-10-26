@@ -96,8 +96,8 @@ function PriceRail({ course }: { course: Course }) {
 
           <ul className="mt-6 space-y-2.5 border-t border-ink/8 pt-5 text-[12.5px] text-ink/60">
             {[
-              { icon: RotateCcw, text: "Rimborso 100% fino a 14 giorni prima" },
-              { icon: Landmark, text: "Bonifico: posti bloccati 7 gg lavorativi" },
+              { icon: RotateCcw, text: "Rimborso se il corso non parte" },
+              { icon: Landmark, text: "Bonifico bancario" },
               { icon: Lock, text: "Pagamenti cifrati · Stripe, PayPal, SumUp" },
               { icon: FileCheck, text: "Fattura elettronica SDI per aziende" },
             ].map((r) => (
@@ -314,10 +314,9 @@ export function CourseDetail({ course }: { course: Course }) {
                   Politica di rimborso
                 </h3>
                 <ul className="mt-4 space-y-2.5 text-[13.5px] leading-relaxed text-ink/70">
-                  <li><strong className="text-ink">Fino a 14 giorni prima:</strong> rimborso del 100%, senza domande.</li>
-                  <li><strong className="text-ink">Fino a 7 giorni prima:</strong> rimborso del 50% o spostamento gratuito.</li>
-                  <li><strong className="text-ink">Oltre:</strong> sostituzione del partecipante gratuita, sempre.</li>
-                  <li><strong className="text-ink">Se annulliamo noi:</strong> rimborso integrale entro 5 giorni lavorativi.</li>
+                  <li><strong className="text-ink">Numero minimo non raggiunto:</strong> se il corso non viene erogato per mancanza del numero minimo di partecipanti, la quota versata è rimborsata.</li>
+                  <li><strong className="text-ink">Alternativa:</strong> puoi scegliere, in alternativa al rimborso, un'altra data.</li>
+                  <li><strong className="text-ink">Altre richieste:</strong> scrivi a academy@cubeng.eu.</li>
                 </ul>
               </div>
             </div>

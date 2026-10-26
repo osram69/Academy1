@@ -12,8 +12,8 @@ export function Footer() {
               <img src="/img/logo-cube-academy.png" alt="Cube Academy" width={1000} height={173} className="h-10 w-auto" />
             </a>
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-white/68">
-              Training Provider accreditato iSAQB® dal 2024. Formiamo gli architetti del software italiani — online, in
-              aula e nelle residenze Prestige.
+              Training Provider accreditato iSAQB® dal 2024. Formiamo gli architetti del software italiani — online e
+              in aula a Roma.
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
               {[

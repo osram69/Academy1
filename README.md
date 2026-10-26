@@ -1,8 +1,28 @@
 # Cube Academy — sito + gestione corsi
 
-Sito React/Vite **statico**. I corsi vivono in un database **Supabase** (Postgres) e il sito li legge
-direttamente dal browser: nessun backend da mantenere. Il pannello `#/admin` sostituisce il plugin
-WordPress "Cube Academy - Gestione Corsi".
+Sito React/Vite servito da un piccolo **server Node.js** (`server/`), come romaofficesharing.it. I corsi
+vivono in un database **Supabase** (Postgres) e il sito li legge dal browser; iscrizioni e pagamenti
+(Stripe, PayPal, SumUp, bonifico) passano dal server, che custodisce le chiavi segrete. Il pannello
+`#/admin` sostituisce il plugin WordPress "Cube Academy - Gestione Corsi".
+
+## Deploy su Hostinger (app Node.js)
+
+1. hPanel → **Siti web → Aggiungi sito → App Node.js**, collega il repository GitHub (branch `main`).
+2. Build command `npm ci && npm run build`, start command `npm start`, Node 20+.
+3. **Environment variables**: copia i nomi da `.env.example` (stessi nomi di romaofficesharing:
+   `STRIPE_SECRET_TEST`, `PAYPAL_CLIENT_ID_TEST`, `SUMUP_API_KEY_TEST`, `BANK_IBAN`, ...) più
+   `SITE_URL`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `PAYMENTS_TEST_MODE=true` e le due `VITE_*`
+   (servono al momento della build).
+4. Supabase → SQL Editor: esegui `supabase/orders.sql` (tabella `iscrizioni`, accessibile solo al server).
+5. Webhook: Stripe → `https://<dominio>/api/webhook/stripe`, PayPal → `https://<dominio>/api/webhook/paypal`.
+   (SumUp non ha webhook firmati: il pagamento è verificato dal server al ritorno dal checkout.)
+6. Per passare in produzione: valorizza le chiavi live e imposta `PAYMENTS_TEST_MODE=false`.
+
+Il server calcola prezzo, sconti e IVA da solo (il browser non decide l'importo), accetta al massimo
+12 partecipanti per edizione (limite iSAQB con un solo docente) e verifica ogni pagamento direttamente
+sul provider prima di segnare l'ordine come pagato. Un metodo senza chiavi configurate resta disattivato.
+
+Sviluppo locale: `npm run server` (porta 3000) e, in un altro terminale, `npm run dev`.
 
 ## Setup Supabase (una tantum)
 

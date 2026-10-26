@@ -157,8 +157,8 @@ export function Hero() {
                   "iSAQB® Accredited Training Provider",
                   "CPSA-Foundation Level",
                   "Esame iSAQB® a parte (280 € + IVA)",
-                  "Corsi in IT · EN · FR · DE",
-                  "Rimborso 100% fino a 14 giorni prima",
+                  "Corsi in IT · EN · FR",
+                  "Rimborso se il corso non parte",
                   "Fatturazione elettronica SDI",
                 ].map((t) => (
                   <span key={t} className="flex items-center gap-10 font-mono text-[11.5px] uppercase tracking-[0.24em] text-white/60">

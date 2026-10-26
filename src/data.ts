@@ -55,8 +55,8 @@ export interface Course {
 
 export const FORMAT_META: Record<CourseFormat, { label: string; blurb: string }> = {
   online: { label: "Live Online", blurb: "Aula virtuale interattiva, stessi docenti, zero trasferte." },
-  aula: { label: "In Aula", blurb: "Full immersion nelle nostre sedi di Milano e Bologna." },
-  prestige: { label: "Prestige Residenziale", blurb: "Corso + hotel 4★ in location italiane d'eccezione." },
+  aula: { label: "In Aula", blurb: "Corso in presenza a Roma." },
+  prestige: { label: "Prestige Residenziale", blurb: "Corso residenziale di 4 giorni con albergo e mezza pensione. Presto informazioni." },
 };
 
 export const STATUS_META: Record<CourseStatus, { label: string }> = {
@@ -107,11 +107,6 @@ export const getLivePrice = (c: Course): LivePrice => {
   };
 };
 
-export const COUPONS: Record<string, { pct: number; label: string }> = {
-  ARCHI10: { pct: 0.1, label: "Sconto community −10%" },
-  TEAM5: { pct: 0.05, label: "Sconto team −5%" },
-};
-
 export const VAT = 0.22;
 
 /* -------------------------- metodi pagamento ---------------------- */
@@ -128,23 +123,23 @@ export const PAYMENT_METHODS = [
   {
     id: "paypal",
     label: "PayPal",
-    detail: "Usa il saldo o la carta collegata. Anche in 3 rate, se eleggibile.",
+    detail: "Usa il saldo o la carta collegata al tuo conto PayPal.",
     timing: "Conferma immediata",
     speed: "fast" as const,
     cta: "Vai al checkout PayPal",
   },
   {
     id: "sumup",
-    label: "Link di pagamento SumUp",
-    detail: "Ricevi via email un link per pagare con carta quando preferisci, entro 48h.",
-    timing: "Link entro 1 ora lavorativa",
-    speed: "mid" as const,
-    cta: "Inviami il link di pagamento",
+    label: "Carta con SumUp",
+    detail: "Pagamento con carta sul checkout sicuro SumUp.",
+    timing: "Conferma immediata",
+    speed: "fast" as const,
+    cta: "Vai al checkout SumUp",
   },
   {
     id: "bonifico",
     label: "Bonifico bancario",
-    detail: "Ideale per aziende con procedura d'acquisto. I posti restano bloccati 7 giorni lavorativi.",
+    detail: "Ideale per aziende con procedura d'acquisto. L'iscrizione è confermata alla ricezione del pagamento.",
     timing: "Conferma in 3–5 giorni",
     speed: "slow" as const,
     cta: "Conferma e ricevi le coordinate",
@@ -152,20 +147,13 @@ export const PAYMENT_METHODS = [
 ];
 export type MethodId = (typeof PAYMENT_METHODS)[number]["id"];
 
-export const BANK = {
-  holder: "Cube Engineering S.r.l.",
-  iban: "IT60 X054 2811 1010 0000 0123 456",
-  bank: "Banca di Credito Cooperativo — Sede di Bologna",
-  bic: "ICRAITRRXXX",
-};
-
 /* ------------------------------ docente --------------------------- */
 
 export const TRAINER = {
-  name: "Ing. Luca Ferrandi",
-  role: "iSAQB® Accredited Trainer · Software Architect",
-  img: "https://images.pexels.com/photos/28442318/pexels-photo-28442318.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-  bio: "Da oltre vent'anni progetta sistemi distribuiti mission-critical per banche, telco e pubblica amministrazione. Trainer accreditato iSAQB dal 2015, ha certificato più di 700 professionisti in 4 lingue. Membro attivo dei working group iSAQB sul curriculum Foundation.",
+  name: "Docente accreditato iSAQB®",
+  role: "iSAQB® Accredited Trainer",
+  img: "/img/isaqb-accredited-trainer.jpg",
+  bio: "I corsi CPSA-F sono tenuti da un docente accreditato iSAQB®, come richiesto dal programma di accreditamento: Cube Engineering organizza e conduce i corsi solo con trainer accreditati e materiale didattico accreditato iSAQB®. Ogni edizione ha un unico docente, per questo i partecipanti sono al massimo 12.",
 };
 
 /* --------------------------- contenuti base ----------------------- */
@@ -239,11 +227,9 @@ const F_MODULES: CourseModule[] = [
 
 const F_INCLUDES = [
   "Corso sincrono con docente accreditato iSAQB® (max 12 partecipanti)",
-  "Slide, workbook e repository di esercizi in PDF",
-  "Registrazioni delle sessioni disponibili per 30 giorni",
-  "Attestato di partecipazione Cube Academy",
-  "Accesso alla community alumni (2.400+ iscritti)",
-  "Supporto del trainer via email fino all'esame",
+  "Materiale Cube Academy / iSAQB®",
+  "Simulazione d'esame con discussione e correzione (ultima giornata)",
+  "Attestato di partecipazione Cube Academy, su richiesta",
 ];
 
 /* ------------------------------ corsi ----------------------------- */
@@ -274,7 +260,7 @@ export interface ApiCourse {
 const FORMAT_COPY: Record<CourseFormat, { image: string; tagline: string; description: string }> = {
   online: {
     image: "https://images.pexels.com/photos/18999565/pexels-photo-18999565.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
-    tagline: "Aula virtuale live: esercitazioni in breakout room e simulazione d'esame con il trainer.",
+    tagline: "Aula virtuale live su Zoom con docente accreditato e simulazione d'esame nell'ultima giornata.",
     description:
       "Il percorso Foundation copre l'intero curriculum iSAQB: dai fondamenti del ruolo alla progettazione, dalla documentazione alla valutazione della qualità. Le lezioni alternano teoria, casi reali dai progetti del docente e workshop di gruppo con revisione in plenaria.",
   },
@@ -288,7 +274,7 @@ const FORMAT_COPY: Record<CourseFormat, { image: string; tagline: string; descri
     image: "https://images.pexels.com/photos/38120266/pexels-photo-38120266.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
     tagline: "Corso e soggiorno in una location d'eccezione: formazione intensiva senza distrazioni.",
     description:
-      "Il percorso Foundation in formato residenziale: l'intero curriculum iSAQB, esercitazioni di gruppo e simulazione d'esame, con soggiorno in una location selezionata.",
+      "Il percorso Foundation in formato residenziale di 4 giorni, con albergo e mezza pensione nelle più belle città italiane. Presto maggiori informazioni.",
   },
 };
 
@@ -438,37 +424,13 @@ const EMPTY_COURSE: Course = {
 /* ------------------------------ numeri ---------------------------- */
 
 export const STATS = [
-  { value: "740+", label: "professionisti certificati" },
-  { value: "98,4%", label: "esame superato al primo tentativo" },
-  { value: "4,9/5", label: "valutazione media · 212 recensioni" },
-  { value: "2", label: "anni di corsi, dal 2024" },
+  { value: "iSAQB®", label: "Training Provider accreditato" },
+  { value: "3 giorni", label: "24 ore di formazione live" },
+  { value: "Max 12", label: "partecipanti per edizione" },
+  { value: "2024", label: "accreditamento iSAQB®" },
 ];
 
 /* --------------------------- testimonianze ------------------------ */
-
-export const TESTIMONIALS = [
-  {
-    quote:
-      "Avevo letto il curriculum da solo e mi sembrava arido. In aula tutto è diventato concreto: i workshop sui casi reali valgono da soli il prezzo del corso. Esame superato con 82%.",
-    name: "Giulia Moretti",
-    role: "Lead Software Engineer · Gruppo bancario, Milano",
-    img: "https://images.pexels.com/photos/8312669/pexels-photo-8312669.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-  },
-  {
-    quote:
-      "L'azienda ha iscritto quattro di noi con fattura e bonifico: processo impeccabile, fatturazione elettronica arrivata in giornata. Il formato Prestige in Toscana? Il miglior corso della mia carriera.",
-    name: "Marco Santini",
-    role: "Solution Architect · System integrator, Roma",
-    img: "https://images.pexels.com/photos/7752846/pexels-photo-7752846.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-  },
-  {
-    quote:
-      "Docente di livello raro: ha risposto a ogni domanda con un esempio da un progetto vero, mai con la slide. Il voucher d'esame incluso e la simulazione finale tolgono ogni incertezza.",
-    name: "Elena Pagano",
-    role: "Engineering Manager · Scale-up fintech, Torino",
-    img: "https://images.pexels.com/photos/33680700/pexels-photo-33680700.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-  },
-];
 
 /* -------------------------------- FAQ ----------------------------- */
 
@@ -479,15 +441,15 @@ export const FAQS = [
   },
   {
     q: "Posso pagare con bonifico e fattura alla mia azienda?",
-    a: "Certo: circa il 60% delle iscrizioni è aziendale. Durante l'iscrizione scegli il soggetto fatturante (privato, libero professionista, azienda italiana o estera) e inserisci P.IVA, codice SDI e PEC. Fattura elettronica emessa entro 48h dal pagamento. Con il bonifico i posti restano bloccati 7 giorni lavorativi.",
+    a: "Certo. Durante l'iscrizione scegli il soggetto fatturante (privato, libero professionista, azienda italiana o estera) e inserisci P.IVA, codice SDI e PEC. ",
   },
   {
     q: "Come funziona la politica di rimborso?",
-    a: "Rimborso del 100% fino a 14 giorni prima dell'inizio, 50% fino a 7 giorni prima. Oltre quel termine puoi sempre sostituire il partecipante gratuitamente o spostare l'iscrizione a una data futura (una volta). Se annulliamo noi l'edizione, rimborso integrale garantito.",
+    a: "Se il corso non viene erogato per mancato raggiungimento del numero minimo di partecipanti, la quota versata è rimborsata (in alternativa puoi scegliere un'altra data). Per altre esigenze, come la sostituzione di un partecipante, scrivi a academy@cubeng.eu.",
   },
   {
-    q: "Cosa comprende il formato Prestige residenziale?",
-    a: "Corso completo, 4 notti in hotel 4★ in camera singola, tutti i pasti, la cena conviviale con degustazione e il transfer da Firenze o Como. Porta solo il laptop: gruppi da massimo 12 persone.",
+    q: "Cosa sono i corsi Prestige residenziali?",
+    a: "I corsi residenziali durano 4 giorni e comprendono albergo e mezza pensione, nelle più belle città italiane. Le informazioni arriveranno presto: scrivi a academy@cubeng.eu per essere avvisato.",
   },
   {
     q: "Serve esperienza da architetto per iscriversi?",
@@ -495,7 +457,7 @@ export const FAQS = [
   },
   {
     q: "Organizzate edizioni dedicate per il nostro team?",
-    a: "Sì: per gruppi da 8+ persone attiviamo edizioni private (online, nella vostra sede o in formato Prestige) con casi di studio costruiti sul vostro dominio. Scrivi a academy@cubeng.eu per un preventivo in 48 ore.",
+    a: "Per gruppi aziendali puoi contattarci per valutare edizioni dedicate. Scrivi a academy@cubeng.eu.",
   },
 ];
 
