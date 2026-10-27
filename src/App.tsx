@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { Nav } from "./components/Nav";
 import { Footer } from "./components/Footer";
-import { Home } from "./pages/Home";
-import { Catalog } from "./pages/Catalog";
-import { CourseDetail } from "./pages/CourseDetail";
-import { Enroll } from "./pages/Enroll";
-import { Esito } from "./pages/Esito";
+import { Home } from "./views/Home";
+import { Catalog } from "./views/Catalog";
+import { CourseDetail } from "./views/CourseDetail";
+import { Enroll } from "./views/Enroll";
+import { Esito } from "./views/Esito";
 import { Admin } from "./admin/Admin";
 import { bySlug } from "./data";
 
