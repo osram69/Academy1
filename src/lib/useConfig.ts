@@ -17,7 +17,7 @@ export function useConfig(): ApiConfig | null {
 
 /** Prezzo a persona (IVA esclusa) per un privato: sconto sul listino più early bird. Null se lo sconto non è attivo. */
 export function privatePrice(course: Course, cfg: ApiConfig | null): { pct: number; unit: number } | null {
-  if (!cfg || cfg.privateDiscount <= 0 || course.concluded) return null;
+  if (!cfg || cfg.privateDiscount <= 0 || course.concluded || !course.privateDiscount) return null;
   const live = getLivePrice(course);
   const t = computeTotals({
     listEuro: course.price, earlyEuro: live.active ? live.unit : null, seats: 1, billingType: "privato", privatePct: cfg.privateDiscount / 100,

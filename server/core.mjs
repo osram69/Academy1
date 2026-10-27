@@ -71,6 +71,9 @@ function resolveCoupon(course, settings, code, billingType) {
     const to = course[`codice_sconto_${n}_data_fine`];
     const now = new Date();
     if ((from && now < new Date(from)) || (to && now > new Date(to))) continue;
+    // ambito: tipologie di fatturazione ammesse (vuoto = tutte)
+    const scopes = String(course[`codice_sconto_${n}_ambiti`] || "").split(",").map((x) => x.trim()).filter(Boolean);
+    if (scopes.length && !scopes.includes(billingType)) continue;
     const pct = Number(course[`codice_sconto_${n}_percentuale`]);
     if (pct > 0 && pct <= 100) return { code: cd.toUpperCase(), pct: pct / 100 };
   }
@@ -187,7 +190,7 @@ export async function apiCreateOrder(b, { origin, ip }) {
     if (b.coupon && !coupon) return fail(400, "Codice sconto non valido o scaduto.");
     const t = computeTotals({
       listEuro: course.standard_price ?? 0, earlyEuro: earlyPriceEuro(course), seats, billingType: billing.type,
-      privatePct: settings.private.enabled ? settings.private.percent / 100 : 0, couponPct: coupon?.pct ?? 0, couponCode: coupon?.code ?? null,
+      privatePct: settings.private.enabled && course.sconto_privati !== false ? settings.private.percent / 100 : 0, couponPct: coupon?.pct ?? 0, couponCode: coupon?.code ?? null,
     });
     const { applied, early_active: _early, ...totals } = t;
     void _early;

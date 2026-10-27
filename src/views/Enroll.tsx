@@ -855,7 +855,7 @@ export function Enroll({ course }: { course: Course }) {
   };
 
   /* ------------------------------ prezzo ----------------------------- */
-  const total = orderTotals(course, count, coupon, billing.type, config?.privateDiscount ?? 0).t.total_cents / 100;
+  const total = orderTotals(course, count, coupon, billing.type, course.privateDiscount ? config?.privateDiscount ?? 0 : 0).t.total_cents / 100;
 
   /* ------------------------------ wizard ----------------------------- */
   return (
@@ -894,7 +894,7 @@ export function Enroll({ course }: { course: Course }) {
         </div>
         {mobileSummary && (
           <div className="border-t border-ink/8 px-5 pb-5 pt-4">
-            <OrderRail course={course} count={count} coupon={coupon} billingType={billing.type} privatePct={config?.privateDiscount ?? 0} step={step} goTo={goTo} maxStep={maxStep} />
+            <OrderRail course={course} count={count} coupon={coupon} billingType={billing.type} privatePct={course.privateDiscount ? config?.privateDiscount ?? 0 : 0} step={step} goTo={goTo} maxStep={maxStep} />
           </div>
         )}
       </div>
@@ -919,7 +919,7 @@ export function Enroll({ course }: { course: Course }) {
             <StepParticipants participants={participants} update={updateParticipant} errors={visibleErrors(1)} attempted />
           )}
           {step === 2 && (
-            <StepBilling billing={billing} set={setBilling} errors={visibleErrors(2)} attempted privatePct={config?.privateDiscount ?? 0} />
+            <StepBilling billing={billing} set={setBilling} errors={visibleErrors(2)} attempted privatePct={course.privateDiscount ? config?.privateDiscount ?? 0 : 0} />
           )}
           {step === 3 && (
             <StepPayment
@@ -957,7 +957,7 @@ export function Enroll({ course }: { course: Course }) {
         {/* rail desktop */}
         <div className="hidden lg:block">
           <div className="sticky top-24">
-            <OrderRail course={course} count={count} coupon={coupon} billingType={billing.type} privatePct={config?.privateDiscount ?? 0} step={step} goTo={goTo} maxStep={maxStep} />
+            <OrderRail course={course} count={count} coupon={coupon} billingType={billing.type} privatePct={course.privateDiscount ? config?.privateDiscount ?? 0 : 0} step={step} goTo={goTo} maxStep={maxStep} />
           </div>
         </div>
       </main>

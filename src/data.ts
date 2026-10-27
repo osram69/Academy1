@@ -66,6 +66,7 @@ export interface Course {
   effort: string;
   modalita: Modalita;
   orario: string;
+  privateDiscount: boolean; // sconto privati attivo per questa edizione
   location: string;
   language: Lang;
   seatsTotal: number | null; // null = non gestito in DB
@@ -262,6 +263,7 @@ export interface ApiCourse {
   weekend: boolean;
   modalita: Modalita;
   orario: string;
+  privateDiscount: boolean;
   residential: boolean;
   level: string;
   stato: number;
@@ -339,6 +341,7 @@ function toCourse(a: ApiCourse): Course {
     effort: a.modalita !== "intensivo" ? mod.effort : days === 3 ? mod.effort : t("{d} giornate · {h} ore", { d: days, h: days * 8 }),
     modalita: a.modalita,
     orario: a.orario || mod.schedule,
+    privateDiscount: a.privateDiscount,
     location: online ? t("Aula virtuale live") : loc,
     language: /^ital/i.test(a.language.IT || "") ? "IT" : "EN",
     seatsTotal: a.seatsTotal,
@@ -385,6 +388,7 @@ interface PublicRow {
   luogo_de?: string | null;
   modalita: string | null;
   orario_it: string | null;
+  sconto_privati?: boolean | null;
   lingua_it: string | null;
   link_booking_it: string | null;
 }
@@ -404,6 +408,7 @@ const fromRow = (r: PublicRow): ApiCourse => ({
   weekend: /weekend/i.test(r.titolo),
   modalita: (r.modalita && r.modalita in MODALITA ? r.modalita : /weekend/i.test(r.titolo) ? "weekend" : "intensivo") as Modalita,
   orario: r.orario_it ?? "",
+  privateDiscount: r.sconto_privati !== false,
   residential: /residential/i.test(r.titolo),
   level: r.livello,
   stato: r.stato,
@@ -446,7 +451,7 @@ export const bySlug = (slug: string) => COURSES.find((c) => c.slug === slug);
 
 const EMPTY_COURSE: Course = {
   ...toCourse({
-    id: 0, title: t("CPSA-Foundation®"), weekend: false, modalita: "intensivo", orario: "", residential: false, level: "Foundation", stato: 0, open: false,
+    id: 0, title: t("CPSA-Foundation®"), weekend: false, modalita: "intensivo", orario: "", privateDiscount: true, residential: false, level: "Foundation", stato: 0, open: false,
     price: 0, earlyBirdPrice: null, earlyBirdPct: 0, earlyBirdStart: null, earlyBirdEnd: null,
     start: new Date().toISOString(), end: new Date().toISOString(), location: {}, language: {}, bookingUrl: {},
     seatsTotal: null, seatsLeft: null,

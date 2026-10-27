@@ -18,7 +18,8 @@ hash (`#/corsi`, `#/admin`, ...) e le API di iscrizione e pagamento sono Route H
    `NEXT_PUBLIC_SUPABASE_ANON_KEY` (queste ultime servono **al momento della build**; vanno bene anche i
    vecchi nomi `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY`).
 4. Supabase → SQL Editor: esegui `supabase/orders.sql` (tabella `iscrizioni`, accessibile solo al server) e poi
-   `supabase/migrazione-2.sql` (modalità di fruizione dei corsi e tabella `impostazioni`).
+   `supabase/migrazione-2.sql` (modalità di fruizione dei corsi e tabella `impostazioni`) e
+   `supabase/migrazione-3.sql` (sconto privati per corso e ambito dei codici sconto).
 5. Webhook: Stripe → `https://<dominio>/api/webhook/stripe`, PayPal → `https://<dominio>/api/webhook/paypal`.
    (SumUp non ha webhook firmati: il pagamento è verificato dal server al ritorno dal checkout.)
 6. Per passare in produzione: valorizza le chiavi live e, da `#/admin/impostazioni`, porta il metodo da Sandbox a Live.

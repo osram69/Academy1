@@ -33,11 +33,14 @@ const INTS = ["standard_price", "early_bird_price", "posti_totali", "posti_dispo
 const DECS = ["early_bird_percentuale", ...[1, 2, 3].map((i) => `codice_sconto_${i}_percentuale`)];
 const DTS = ["early_bird_start", "early_bird_end", ...[1, 2, 3].flatMap((i) => [`codice_sconto_${i}_data_inizio`, `codice_sconto_${i}_data_fine`])];
 const DATES = ["data_inizio", "data_fine"];
-const BOOLS = ["in_evidenza", "iscrizioni_aperte"];
+const BOOLS = ["in_evidenza", "iscrizioni_aperte", "sconto_privati"];
 // testo NOT NULL nel DB: vuoto = stringa vuota (gli altri testi vuoti diventano NULL)
 const TEXT_REQUIRED = ["titolo", "livello", ...LANGS.flatMap(([l]) => [`link_readmore_${l}`, `link_booking_${l}`, `home_subtitle_${l}`])];
 const URLS = LANGS.flatMap(([l]) => [`link_readmore_${l}`, `link_booking_${l}`]);
 const LIMITS: Record<string, number> = { livello: 10, titolo: 255 };
+
+const SCOPES: [string, string][] = [["privato", "Privati"], ["pro", "Liberi professionisti"], ["azienda", "Aziende italiane"], ["estera", "Aziende estere"]];
+const round2 = (n: number) => Math.round(n * 100) / 100;
 
 const pad = (n: number) => String(n).padStart(2, "0");
 /** timestamptz ISO (UTC) -> valore per <input type="datetime-local"> nel fuso del browser */
@@ -298,7 +301,7 @@ function List() {
 
 /* --------------------------------- modifica ------------------------------- */
 
-const EMPTY: Row = { titolo: "", livello: "Foundation", modalita: "intensivo", stato: 0, in_evidenza: false, iscrizioni_aperte: false };
+const EMPTY: Row = { titolo: "", livello: "Foundation", modalita: "intensivo", sconto_privati: true, stato: 0, in_evidenza: false, iscrizioni_aperte: false };
 
 function Edit({ id }: { id: string }) {
   const isNew = id === "new";
@@ -321,6 +324,7 @@ function Edit({ id }: { id: string }) {
   if (!f) return <p className="text-steel">{msg || "Caricamento…"}</p>;
 
   const set = (k: string, v: string | number | boolean | null) => setF((p) => ({ ...(p as Row), [k]: v }));
+  const setMany = (patch: Row) => setF((p) => ({ ...(p as Row), ...patch }));
   const text = (k: string, extra: Partial<React.InputHTMLAttributes<HTMLInputElement>> = {}) => (
     <input className={inputCls} value={String(f[k] ?? "")} onChange={(e) => set(k, e.target.value)} {...extra} />
   );
@@ -401,6 +405,7 @@ function Edit({ id }: { id: string }) {
           <div className="flex flex-wrap items-center gap-6 md:col-span-2">
             {check("in_evidenza", "In evidenza")}
             {check("iscrizioni_aperte", "Iscrizioni aperte")}
+            {check("sconto_privati", "Sconto privati attivo per questa edizione")}
           </div>
         </div>
       </section>
@@ -408,9 +413,27 @@ function Edit({ id }: { id: string }) {
       <section className={card}>
         <h2 className={h2}>Prezzi ed early bird</h2>
         <div className="grid gap-4 md:grid-cols-3">
-          {F("standard_price", "Prezzo standard (€)", text("standard_price", { type: "number", min: 0 }))}
-          {F("early_bird_price", "Prezzo early bird (€)", text("early_bird_price", { type: "number", min: 0 }), "Se impostato ha la precedenza sulla percentuale.")}
-          {F("early_bird_percentuale", "Sconto early bird (%)", text("early_bird_percentuale", { type: "number", step: "0.01", min: 0, max: 100 }))}
+          {F("standard_price", "Prezzo standard (€)", (
+            <input type="number" min={0} className={inputCls} value={String(f.standard_price ?? "")} onChange={(e) => {
+              const std = Number(e.target.value);
+              const pct = Number(f.early_bird_percentuale);
+              setMany({ standard_price: e.target.value, ...(std > 0 && pct > 0 ? { early_bird_price: Math.round(std * (1 - pct / 100)) } : {}) });
+            }} />
+          ), "Cambiandolo, il prezzo early bird si ricalcola dalla percentuale.")}
+          {F("early_bird_price", "Prezzo early bird (€)", (
+            <input type="number" min={0} className={inputCls} value={String(f.early_bird_price ?? "")} onChange={(e) => {
+              const std = Number(f.standard_price);
+              const price = Number(e.target.value);
+              setMany({ early_bird_price: e.target.value, ...(std > 0 && price > 0 && price <= std ? { early_bird_percentuale: round2((1 - price / std) * 100) } : {}) });
+            }} />
+          ), "È il prezzo realmente applicato: cambiandolo, la percentuale si aggiorna.")}
+          {F("early_bird_percentuale", "Sconto early bird (%)", (
+            <input type="number" step="0.01" min={0} max={100} className={inputCls} value={String(f.early_bird_percentuale ?? "")} onChange={(e) => {
+              const std = Number(f.standard_price);
+              const pct = Number(e.target.value);
+              setMany({ early_bird_percentuale: e.target.value, ...(std > 0 && pct >= 0 && pct <= 100 ? { early_bird_price: Math.round(std * (1 - pct / 100)) } : {}) });
+            }} />
+          ), "Cambiandola, il prezzo early bird si ricalcola.")}
           {F("early_bird_start", "Early bird dal", dt("early_bird_start"))}
           {F("early_bird_end", "Early bird fino al", dt("early_bird_end"))}
         </div>
@@ -425,6 +448,23 @@ function Edit({ id }: { id: string }) {
               {F(`codice_sconto_${i}_data_inizio`, "Dal", dt(`codice_sconto_${i}_data_inizio`))}
               {F(`codice_sconto_${i}_data_fine`, "Al", dt(`codice_sconto_${i}_data_fine`))}
               {F(`codice_sconto_${i}_percentuale`, "Sconto (%)", text(`codice_sconto_${i}_percentuale`, { type: "number", step: "0.01", min: 0, max: 100 }))}
+              <div className="md:col-span-4 flex flex-wrap items-center gap-x-5 gap-y-1 text-[13px]">
+                <span className="font-semibold text-ink/70">Valido per:</span>
+                {SCOPES.map(([sc, label]) => {
+                  const cur = String(f[`codice_sconto_${i}_ambiti`] ?? "").split(",").map((x) => x.trim()).filter(Boolean);
+                  const effective = cur.length ? cur : SCOPES.map(([x]) => x);
+                  return (
+                    <label key={sc} className="flex items-center gap-1.5">
+                      <input type="checkbox" className="size-4 accent-flame" checked={effective.includes(sc)} onChange={() => {
+                        const next = effective.includes(sc) ? effective.filter((x) => x !== sc) : [...effective, sc];
+                        if (next.length === 0) return; // almeno una tipologia
+                        set(`codice_sconto_${i}_ambiti`, next.length === SCOPES.length ? "" : next.join(","));
+                      }} />
+                      {label}
+                    </label>
+                  );
+                })}
+              </div>
             </div>
           ))}
           <div className="max-w-xs">{F("codice_sconto_privati", "Codice sconto privati", text("codice_sconto_privati", { maxLength: 10 }))}</div>

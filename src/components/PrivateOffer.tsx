@@ -6,7 +6,7 @@ import { privatePrice, useConfig } from "../lib/useConfig";
 /** Evidenzia lo sconto per chi si iscrive come privato (persona fisica senza P.IVA). */
 export function PrivateOffer({ course, dark = false }: { course?: Course; dark?: boolean }) {
   const cfg = useConfig();
-  if (!cfg || cfg.privateDiscount <= 0) return null;
+  if (!cfg || cfg.privateDiscount <= 0 || (course && !course.privateDiscount)) return null;
   const price = course ? privatePrice(course, cfg) : null;
   return (
     <p
