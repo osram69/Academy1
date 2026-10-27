@@ -22,7 +22,10 @@ hash (`#/corsi`, `#/admin`, ...) e le API di iscrizione e pagamento sono Route H
 5. Webhook: Stripe → `https://<dominio>/api/webhook/stripe`, PayPal → `https://<dominio>/api/webhook/paypal`.
    (SumUp non ha webhook firmati: il pagamento è verificato dal server al ritorno dal checkout.)
 6. Per passare in produzione: valorizza le chiavi live e, da `#/admin/impostazioni`, porta il metodo da Sandbox a Live.
-7. Verifica: `https://<dominio>/api/config` deve rispondere con un JSON (`privateDiscount`, `methods`).
+7. Email: imposta `SMTP_HOST` (es. `smtp.hostinger.com`), `SMTP_PORT` (465), `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM`,
+   `MAIL_FROM_NAME` (e, se vuoi cambiarli, `MAIL_STAFF_TO` / `MAIL_STAFF_CC`: di default `academy@cubeng.eu` e
+   `registrazioni@cubeng.eu`, come nel plugin WordPress). Senza SMTP le iscrizioni funzionano ma le email non partono.
+8. Verifica: `https://<dominio>/api/config` deve rispondere con un JSON (`privateDiscount`, `methods`).
 
 Il server calcola prezzo, sconti e IVA da solo (il browser non decide l'importo), accetta al massimo
 12 partecipanti per edizione (limite iSAQB con un solo docente) e verifica ogni pagamento direttamente

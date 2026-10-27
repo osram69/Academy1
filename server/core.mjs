@@ -6,6 +6,7 @@ import { MAX_SEATS, computeTotals, earlyPriceEuro } from "../shared/pricing.mjs"
 import { isCapItalia, isCodiceFiscale, isCodiceFiscaleAny, isEmail, isPartitaIva, isVatIdEstero } from "../shared/validators.mjs";
 import { bankDetails, createSession, isPaid, methodStatus, paypalVerifyWebhook, stripeClient, stripeWebhookSecret } from "./payments.mjs";
 import { findGlobalCoupon, getSettings, invalidateSettings } from "./settings.mjs";
+import { mailMissing, sendOrderEmails } from "./mail.mjs";
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL;
 export const db = SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -52,6 +53,8 @@ async function markPaid(order) {
     if (c?.posti_disponibili != null) {
       await db.from("corsi").update({ posti_disponibili: Math.max(0, c.posti_disponibili - order.seats) }).eq("id_corso", order.id_corso);
     }
+    // il passaggio a "pagato" avviene una sola volta: la conferma parte una sola volta
+    if (c && order.method !== "bonifico") await sendOrderEmails({ ...order, status: "paid" }, c, "paid");
   }
 }
 
@@ -126,6 +129,17 @@ export async function apiCoupon(body, ip) {
   return ok({ code: found.code, pct: found.pct });
 }
 
+/**
+ * Causale del pagamento, breve e riconoscibile negli estratti conto:
+ * "Corso CPSA-F - 2026.12.02 - <CF o P.IVA di chi paga> - <ragione sociale o nome e cognome>" (max 127 caratteri, limite PayPal).
+ */
+function paymentDescription(course, billing) {
+  const date = String(course.data_inizio || "").replaceAll("-", ".");
+  const taxId = billing.type === "estera" ? billing.vatId : billing.type === "privato" ? billing.cf : billing.piva || billing.cf;
+  const who = billing.ragione || `${billing.nome} ${billing.cognome}`.trim();
+  return ["Corso CPSA-F", date, taxId, who].filter(Boolean).join(" - ").slice(0, 127);
+}
+
 const str = (v, max = 200) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 
 export async function apiCreateOrder(b, { origin, ip }) {
@@ -155,6 +169,7 @@ export async function apiCreateOrder(b, { origin, ip }) {
     const bl = b.billing || {};
     const billing = Object.fromEntries(["type", "nome", "cognome", "ragione", "cf", "piva", "sdi", "pec", "via", "cap", "citta", "paese", "vatId"].map((k) => [k, str(bl[k], 120)]));
     if (!billing.via || !billing.cap || !billing.citta) return fail(400, "Dati di fatturazione incompleti.");
+    billing.lang = ["it", "en", "fr", "de"].includes(b.lang) ? b.lang : "it"; // lingua delle email
 
     const available = Math.min(MAX_SEATS - (await seatsTaken(course.id_corso)), course.posti_disponibili ?? Infinity);
     if (seats > available) return fail(409, available > 0 ? `Sono rimasti solo ${available} posti.` : "Edizione al completo.");
@@ -183,9 +198,12 @@ export async function apiCreateOrder(b, { origin, ip }) {
     const ins = await db.from("iscrizioni").insert(row).select("*").single();
     if (ins.error) throw ins.error;
 
-    if (method === "bonifico") return ok({ ref, bank: bankDetails() });
+    if (method === "bonifico") {
+      void sendOrderEmails(ins.data, course, "bank"); // conferma con le coordinate; un errore SMTP non blocca l'iscrizione
+      return ok({ ref, bank: bankDetails() });
+    }
 
-    const description = `${String(course.titolo).replace(/&reg;/g, "®").replace(/<[^>]+>/g, "")} · ${course.data_inizio}`;
+    const description = paymentDescription(course, billing);
     try {
       const s = await createSession({
         provider: method, order: ins.data, description, email: participants[0].email, origin,
@@ -250,7 +268,8 @@ export async function adminGate(authHeader) {
 // stato dei metodi di pagamento: quali variabili d'ambiente mancano (solo i nomi, mai i valori)
 export async function adminStatus() {
   invalidateSettings();
-  return ok({ methods: methodStatus(await getSettings(db)), siteUrl: process.env.SITE_URL || null });
+  const missing = mailMissing();
+  return ok({ methods: methodStatus(await getSettings(db)), siteUrl: process.env.SITE_URL || null, mail: { configured: missing.length === 0, missing } });
 }
 
 export async function adminOrders() {

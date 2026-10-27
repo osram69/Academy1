@@ -49,6 +49,7 @@ export function SettingsPage({ session }: { session: Session }) {
   const [cfg, setCfg] = useState<Config | null>(null);
   const [status, setStatus] = useState<Record<MethodId, MethodStatus> | null>(null);
   const [statusErr, setStatusErr] = useState("");
+  const [mail, setMail] = useState<{ configured: boolean; missing: string[] } | null>(null);
   const [msg, setMsg] = useState("");
   const [bad, setBad] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -60,7 +61,7 @@ export function SettingsPage({ session }: { session: Session }) {
     });
     fetch("/api/admin/status", { headers: { Authorization: `Bearer ${session.access_token}` } })
       .then(async (r) => (r.ok ? r.json() : Promise.reject(new Error((await r.json().catch(() => ({}))).error || "Server non raggiungibile"))))
-      .then((j) => setStatus(j.methods))
+      .then((j) => { setStatus(j.methods); setMail(j.mail ?? null); })
       .catch((e: Error) => setStatusErr(e.message));
   }, [session.access_token]);
 
@@ -141,6 +142,18 @@ export function SettingsPage({ session }: { session: Session }) {
         <p className="mt-3 text-[12px] text-steel">
           Un metodo compare nel checkout solo se è attivo <em>e</em> ha le chiavi della modalità scelta. Passare a Live richiede le variabili senza suffisso <span className="font-mono">_TEST</span>.
         </p>
+      </section>
+
+      <section className={card}>
+        <h2 className={h2}>Email di conferma</h2>
+        <p className={hint}>
+          Alle iscrizioni partono: conferma ai partecipanti (subito per il bonifico, a pagamento riuscito per carta e PayPal),
+          copia a <span className="font-mono">MAIL_STAFF_CC</span> e riepilogo completo a <span className="font-mono">MAIL_STAFF_TO</span>.
+          Il server SMTP si imposta con le variabili d'ambiente (come per romaofficesharing).
+        </p>
+        {!mail ? <span className="text-steel">…</span> : mail.configured
+          ? <span className="rounded-full bg-mint/15 px-2.5 py-1 text-[12px] font-semibold text-mint">SMTP configurato</span>
+          : <span className="text-[13px] text-err">Email non attive. Mancano: <span className="font-mono">{mail.missing.join(", ")}</span></span>}
       </section>
 
       <section className={card}>
