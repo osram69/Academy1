@@ -4,6 +4,21 @@ import { Btn, EarlyBirdChip, IsoCube, Reveal, SeatsBar, useNow } from "./ui";
 import { PrivateOffer } from "./PrivateOffer";
 
 import { t } from "../i18n";
+/** Logo ufficiale iSAQB Accredited Training Provider (PNG con sfondo trasparente), usato senza modifiche. */
+function IsaqbBadge({ className = "" }: { className?: string }) {
+  return (
+    <div className={`inline-flex ${className}`}>
+      <img
+        src="/img/isaqb-accredited-training-provider.png"
+        alt={t("iSAQB® Accredited Training Provider")}
+        width={456}
+        height={306}
+        className="h-28 w-auto"
+      />
+    </div>
+  );
+}
+
 function FloatingCourseCard() {
   const course = nextCourse();
   const price = getLivePrice(course);
@@ -109,6 +124,9 @@ export function Hero() {
 
         {/* colonna visuale */}
         <Reveal delay={200} className="relative hidden lg:block">
+          <div className="mb-10 mr-6 flex justify-end">
+            <IsaqbBadge />
+          </div>
           <div className="relative mr-6">
             {/* HUD labels */}
             <p className="absolute -top-7 left-2 font-mono text-[10px] uppercase tracking-[0.28em] text-white/52" aria-hidden="true">
@@ -139,6 +157,7 @@ export function Hero() {
 
         {/* mobile: card corso inline */}
         <Reveal delay={120} className="lg:hidden">
+          <IsaqbBadge className="mb-6" />
           <FloatingCourseCard />
         </Reveal>
       </div>
