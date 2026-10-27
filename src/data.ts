@@ -483,19 +483,19 @@ export const FAQS = [
   },
   {
     q: t("Come funziona la politica di rimborso?"),
-    a: t("Se il corso non viene erogato per mancato raggiungimento del numero minimo di partecipanti, la quota versata è rimborsata (in alternativa puoi scegliere un'altra data). Per altre esigenze, come la sostituzione di un partecipante, scrivi a academy@cubeng.eu."),
+    a: t("Se il corso non viene erogato per mancato raggiungimento del numero minimo di partecipanti, la quota versata è rimborsata (in alternativa puoi scegliere un'altra data). Per altre esigenze, come la sostituzione di un partecipante, usa il [modulo di contatto](#/contatti?oggetto=rimborso)."),
   },
   {
     q: t("Cosa sono i corsi Prestige residenziali?"),
-    a: t("I corsi residenziali durano 4 giorni e comprendono albergo e mezza pensione, nelle più belle città italiane. Le informazioni arriveranno presto: scrivi a academy@cubeng.eu per essere avvisato."),
+    a: t("I corsi residenziali durano 4 giorni e comprendono albergo e mezza pensione, nelle più belle città italiane. Le informazioni arriveranno presto: [scrivici](#/contatti?oggetto=prestige) per essere avvisato."),
   },
   {
     q: t("Serve esperienza da architetto per iscriversi?"),
-    a: t("No: servono almeno 18 mesi di esperienza in sviluppo software. Il corso Foundation è pensato per costruire il metodo, parte dalle basi del ruolo. Se hai dubbi sul livello, scrivici a academy@cubeng.eu."),
+    a: t("No: servono almeno 18 mesi di esperienza in sviluppo software. Il corso Foundation è pensato per costruire il metodo, parte dalle basi del ruolo. Se hai dubbi sul livello, [scrivici](#/contatti?oggetto=info)."),
   },
   {
     q: t("Organizzate edizioni dedicate per il nostro team?"),
-    a: t("Per gruppi aziendali puoi contattarci per valutare edizioni dedicate. Scrivi a academy@cubeng.eu."),
+    a: t("Per gruppi aziendali puoi contattarci per valutare edizioni dedicate: [scrivici](#/contatti?oggetto=gruppi)."),
   },
 ];
 

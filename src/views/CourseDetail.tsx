@@ -31,6 +31,7 @@ import {
 } from "../data";
 
 import { t } from "../i18n";
+import { RichText } from "../components/RichText";
 /* ------------------------- rail prezzo sticky ------------------------ */
 
 function PriceRail({ course }: { course: Course }) {
@@ -85,7 +86,7 @@ function PriceRail({ course }: { course: Course }) {
           </ul>
 
           {waitlist ? (
-            <Btn href={`mailto:academy@cubeng.eu?subject=Lista%20d'attesa%20${encodeURIComponent(course.short)}`} variant="ink" size="lg" className="mt-7 w-full" withArrow>
+            <Btn href={`#/contatti?oggetto=attesa&corso=${encodeURIComponent(course.short)}`} variant="ink" size="lg" className="mt-7 w-full" withArrow>
               {t("Entra in lista d'attesa")}</Btn>
           ) : (
             <Btn href={`#/iscriviti/${course.slug}`} size="lg" className="mt-7 w-full" withArrow ariaLabel={t("Iscriviti a {name} del {range}", { name: course.title, range: fmtRange(course.start, course.end) })}>
@@ -318,7 +319,7 @@ export function CourseDetail({ course }: { course: Course }) {
                 <ul className="mt-4 space-y-2.5 text-[13.5px] leading-relaxed text-ink/70">
                   <li><strong className="text-ink">{t("Numero minimo non raggiunto:")}</strong>{" "}{t("se il corso non viene erogato per mancanza del numero minimo di partecipanti, la quota versata è rimborsata.")}</li>
                   <li><strong className="text-ink">{t("Alternativa:")}</strong>{" "}{t("puoi scegliere, in alternativa al rimborso, un'altra data.")}</li>
-                  <li><strong className="text-ink">{t("Altre richieste:")}</strong>{" "}{t("scrivi a academy@cubeng.eu.")}</li>
+                  <li><strong className="text-ink">{t("Altre richieste:")}</strong>{" "}<RichText text={t("usa il [modulo di contatto](#/contatti).")} /></li>
                 </ul>
               </div>
             </div>

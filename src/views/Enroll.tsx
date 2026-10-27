@@ -193,7 +193,7 @@ function StepConfigure({ course, count, setCount }: { course: Course; count: num
             <Users className="mt-0.5 size-4.5 shrink-0 text-gold" aria-hidden="true" />
             <span>
               <strong className="font-semibold text-ink">{t("Gruppi aziendali:")}</strong>{" "}{t("ogni edizione ha al massimo 12 partecipanti. Per più persone o per un'edizione dedicata")}{" "}
-              <a className="link-sweep font-semibold text-flame" href="mailto:academy@cubeng.eu">{t("scrivici")}</a>.
+              <a className="link-sweep font-semibold text-flame" href="#/contatti?oggetto=gruppi">{t("scrivici")}</a>.
             </span>
           </div>
         )}

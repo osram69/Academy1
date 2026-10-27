@@ -18,6 +18,7 @@ import { eur2, fmtRange, PAYMENT_METHODS, type Course, type MethodId } from "../
 import type { BankDetails } from "../lib/api";
 
 import { t } from "../i18n";
+import { RichText } from "../components/RichText";
 export type OutcomeVariant = "success" | "pending" | "bank" | "cancelled" | "error";
 
 export interface OrderInfo {
@@ -108,14 +109,14 @@ export function Outcome({ variant, order }: { variant: OutcomeVariant; order: Or
       icon: <Clock className="size-16 text-flame" strokeWidth={1.4} aria-hidden="true" />,
       kicker: t("Pagamento in verifica"),
       title: t("Stiamo aspettando la conferma del circuito."),
-      sub: t("Il pagamento non risulta ancora confermato. Se hai completato l'operazione, ricarica questa pagina tra qualche minuto; in caso di dubbi scrivi a academy@cubeng.eu indicando il riferimento dell'ordine."),
+      sub: t("Il pagamento non risulta ancora confermato. Se hai completato l'operazione, ricarica questa pagina tra qualche minuto; in caso di dubbi [scrivici](#/contatti?oggetto=iscrizione) indicando il riferimento dell'ordine."),
       tone: "border-flame/40 bg-flame/5",
     },
     bank: {
       icon: <Clock className="size-16 text-gold" strokeWidth={1.4} aria-hidden="true" />,
       kicker: t("Iscrizione registrata"),
       title: t("Manca solo il bonifico."),
-      sub: t("I posti restano riservati per alcuni giorni lavorativi. L'iscrizione è confermata alla ricezione del pagamento: se serve più tempo, scrivici."),
+      sub: t("I posti restano riservati per alcuni giorni lavorativi. L'iscrizione è confermata alla ricezione del pagamento: se serve più tempo, [scrivici](#/contatti?oggetto=iscrizione)."),
       tone: "border-gold/40 bg-amber-50",
     },
     cancelled: {
@@ -129,7 +130,7 @@ export function Outcome({ variant, order }: { variant: OutcomeVariant; order: Or
       icon: <AlertTriangle className="size-16 text-err" strokeWidth={1.4} aria-hidden="true" />,
       kicker: t("Qualcosa non ha funzionato"),
       title: t("Il pagamento non è andato a buon fine."),
-      sub: t("Riprova o scegli un altro metodo. Per assistenza scrivi a academy@cubeng.eu."),
+      sub: t("Riprova o scegli un altro metodo. Per assistenza [scrivici](#/contatti?oggetto=iscrizione)."),
       tone: "border-err/30 bg-red-50/60",
     },
   };
@@ -149,7 +150,7 @@ export function Outcome({ variant, order }: { variant: OutcomeVariant; order: Or
           <h2 className="mt-3 font-display text-[clamp(1.7rem,4vw,2.6rem)] font-bold leading-tight tracking-tight text-ink">
             {h.title}
           </h2>
-          <p className="mx-auto mt-4 max-w-lg text-[15px] leading-relaxed text-ink/65">{h.sub}</p>
+          <p className="mx-auto mt-4 max-w-lg text-[15px] leading-relaxed text-ink/65"><RichText text={h.sub} /></p>
         </div>
 
         <div className="border-t border-ink/8 bg-paper/70 p-6 sm:p-8">
@@ -214,7 +215,7 @@ export function Outcome({ variant, order }: { variant: OutcomeVariant; order: Or
                   <RotateCcw className="size-4" aria-hidden="true" />
                   {t("Riprendi l'iscrizione")}</button>
                 <a
-                  href="mailto:academy@cubeng.eu"
+                  href="#/contatti?oggetto=iscrizione"
                   className="inline-flex items-center gap-2 rounded-full border border-ink/20 px-6 py-3 font-display text-sm font-semibold text-ink transition-colors hover:border-ink"
                 >
                   <Mail className="size-4" aria-hidden="true" />

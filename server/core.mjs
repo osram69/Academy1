@@ -6,7 +6,7 @@ import { MAX_SEATS, computeTotals, earlyPriceEuro } from "../shared/pricing.mjs"
 import { isCapItalia, isCodiceFiscale, isCodiceFiscaleAny, isEmail, isPartitaIva, isVatIdEstero } from "../shared/validators.mjs";
 import { bankDetails, createSession, isPaid, methodStatus, paypalVerifyWebhook, stripeClient, stripeWebhookSecret } from "./payments.mjs";
 import { findGlobalCoupon, getSettings, invalidateSettings } from "./settings.mjs";
-import { mailMissing, sendOrderEmails } from "./mail.mjs";
+import { CONTACT_TOPICS, mailConfigured, mailMissing, sendContactEmails, sendOrderEmails } from "./mail.mjs";
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL;
 export const db = SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -281,4 +281,26 @@ export async function adminOrders() {
     .order("created_at", { ascending: false }).limit(200);
   if (error) return fail(500, error.message);
   return ok(data);
+}
+
+/* ------------------------- modulo di contatto ------------------------ */
+
+export async function apiContact(b, ip) {
+  b = b || {};
+  if (b.website) return ok({ ok: true }); // campo trappola per i bot: finge di accettare
+  if (rateLimited(`${ip}:contact`, 5, 10 * 60000)) return TOO_MANY();
+  const name = str(b.name, 100);
+  const email = str(b.email, 150);
+  const phone = str(b.phone, 40);
+  const message = str(b.message, 3000);
+  const topic = CONTACT_TOPICS.includes(b.topic) ? b.topic : "altro";
+  const lang = ["it", "en", "fr", "de"].includes(b.lang) ? b.lang : "it";
+  if (name.length < 2 || !isEmail(email) || message.length < 10 || b.consent !== true) return fail(400, "Compila i campi obbligatori.");
+  if (Number(b.elapsedMs) < 2500) return fail(400, "Compila i campi obbligatori."); // inviato troppo in fretta: probabile bot
+  if (!mailConfigured()) {
+    console.error(`Modulo di contatto: email non inviata, mancano ${mailMissing().join(", ")}`);
+    return fail(503, "Il servizio email non è attivo al momento. Scrivi a academy@cubeng.eu.");
+  }
+  const r = await sendContactEmails({ name, email, phone, message, topic, lang });
+  return r.sent ? ok({ ok: true }) : fail(502, "Non siamo riusciti a inviare il messaggio. Riprova o scrivi a academy@cubeng.eu.");
 }

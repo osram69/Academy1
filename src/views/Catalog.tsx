@@ -6,6 +6,7 @@ import { Reveal, Tag } from "../components/ui";
 import { COURSES, FORMAT_META, type CourseFormat, type CourseLevel, type Lang } from "../data";
 
 import { t } from "../i18n";
+import { RichText } from "../components/RichText";
 const FORMAT_FILTERS: { id: CourseFormat | "all"; label: string }[] = [
   { id: "all", label: t("Tutti i formati") },
   { id: "online", label: t("Live Online") },
@@ -129,7 +130,7 @@ export function Catalog() {
         {results.length === 0 ? (
           <div className="rounded-[24px] border border-dashed border-ink/20 p-16 text-center">
             <p className="font-display text-xl font-semibold text-ink">{t("Nessuna edizione con questi filtri")}</p>
-            <p className="mt-2 text-sm text-ink/55">{t("Prova ad allargare formato o lingua — oppure scrivici per un'edizione dedicata.")}</p>
+            <p className="mt-2 text-sm text-ink/55"><RichText text={t("Prova ad allargare formato o lingua — oppure [scrivici](#/contatti?oggetto=gruppi) per un'edizione dedicata.")} /></p>
             <button
               onClick={() => {
                 setFormat("all");
@@ -169,10 +170,10 @@ export function Catalog() {
                 <h2 className="font-display text-2xl font-bold tracking-tight lg:text-3xl">
                   {t("Hai un team da certificare?")}</h2>
                 <p className="mt-2 max-w-2xl text-[15px] leading-relaxed text-white/72">
-                  {t("Ogni edizione ha al massimo 12 partecipanti. Per gruppi aziendali o edizioni dedicate scrivici: valutiamo insieme la soluzione.")}</p>
+                  <RichText text={t("Ogni edizione ha al massimo 12 partecipanti. Per gruppi aziendali o edizioni dedicate [scrivici](#/contatti?oggetto=gruppi): valutiamo insieme la soluzione.")} /></p>
               </div>
               <a
-                href="mailto:academy@cubeng.eu?subject=Edizione%20privata%20per%20il%20nostro%20team"
+                href="#/contatti?oggetto=gruppi"
                 className="inline-flex items-center gap-2.5 rounded-full bg-white px-7 py-3.5 font-display text-sm font-semibold text-ink transition-all duration-300 hover:bg-flame hover:text-white hover:shadow-flame"
               >
                 {t("Richiedi un'offerta")}</a>

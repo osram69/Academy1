@@ -23,9 +23,9 @@ function getTransport() {
   return transport;
 }
 
-async function send({ to, subject, html, text }) {
+async function send({ to, subject, html, text, replyTo }) {
   const from = process.env.MAIL_FROM || process.env.SMTP_USER;
-  await getTransport().sendMail({ from: `"${process.env.MAIL_FROM_NAME || "Cube Academy"}" <${from}>`, to, subject, html, text });
+  await getTransport().sendMail({ from: `"${process.env.MAIL_FROM_NAME || "Cube Academy"}" <${from}>`, to, subject, html, text, replyTo });
 }
 
 const esc = (v) => String(v ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -218,6 +218,38 @@ export async function sendOrderEmails(order, course, kind) {
     return { sent: true };
   } catch (e) {
     console.error(`Errore invio email per ${order.ref}:`, e?.message || e);
+    return { sent: false, reason: "smtp-error" };
+  }
+}
+
+/* ------------------------- modulo di contatto ------------------------ */
+
+const TOPICS = {
+  info: "Informazioni sul corso", iscrizione: "Iscrizione o pagamento", gruppi: "Gruppi aziendali / edizioni dedicate",
+  attesa: "Lista d'attesa", rimborso: "Rimborsi e fatturazione", prestige: "Corsi residenziali Prestige", altro: "Altro",
+};
+export const CONTACT_TOPICS = Object.keys(TOPICS);
+
+const AUTOREPLY = {
+  it: { subject: "Abbiamo ricevuto la tua richiesta - Cube Academy", hello: "Gentile {name},", body: "abbiamo ricevuto il tuo messaggio e ti risponderemo il prima possibile.", copy: "Copia del tuo messaggio", bye: "Cordiali saluti," },
+  en: { subject: "We have received your request - Cube Academy", hello: "Dear {name},", body: "we have received your message and will reply as soon as possible.", copy: "A copy of your message", bye: "Kind regards," },
+  fr: { subject: "Nous avons bien reçu votre demande - Cube Academy", hello: "Bonjour {name},", body: "nous avons bien reçu votre message et vous répondrons dès que possible.", copy: "Copie de votre message", bye: "Cordialement," },
+  de: { subject: "Wir haben Ihre Anfrage erhalten - Cube Academy", hello: "Guten Tag {name},", body: "wir haben Ihre Nachricht erhalten und melden uns so schnell wie möglich.", copy: "Kopie Ihrer Nachricht", bye: "Mit freundlichen Grüßen" },
+};
+
+/** Inoltra il messaggio dal modulo di contatto allo staff (Reply-To = mittente) e manda una ricevuta al mittente. */
+export async function sendContactEmails(c) {
+  if (!mailConfigured()) return { sent: false, reason: "smtp-not-configured" };
+  try {
+    const topic = TOPICS[c.topic] || TOPICS.altro;
+    const lines = [`Nuovo messaggio dal sito (modulo di contatto)`, `Argomento: ${topic}`, `Nome: ${c.name}`, `Email: ${c.email}`, `Telefono: ${c.phone || "-"}`, `Lingua del sito: ${c.lang}`, "", c.message];
+    await send({ to: staffTo(), subject: `[Contatto] ${topic} - ${c.name}`, text: lines.join("\n"), replyTo: `"${c.name.replace(/"/g, "")}" <${c.email}>` });
+    const T = AUTOREPLY[c.lang] || AUTOREPLY.it;
+    const html = `<div style="font-family:Arial,sans-serif;font-size:14px;line-height:1.5;max-width:600px"><p>${esc(T.hello.replace("{name}", c.name))}</p><p>${esc(T.body)}</p><p style="color:#666;margin-bottom:4px">${esc(T.copy)}:</p><blockquote style="margin:0;padding:8px 14px;border-left:3px solid #ccc;white-space:pre-wrap">${esc(c.message)}</blockquote><p>${esc(T.bye)}<br>Cube Academy — Cube Engineering S.r.l.</p></div>`;
+    await send({ to: c.email, subject: T.subject, html });
+    return { sent: true };
+  } catch (e) {
+    console.error("Errore invio email di contatto:", e?.message || e);
     return { sent: false, reason: "smtp-error" };
   }
 }

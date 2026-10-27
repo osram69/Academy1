@@ -1,4 +1,4 @@
-import { Mail, MapPin, Phone, ShieldCheck, Lock, FileCheck } from "lucide-react";
+import { Mail, MapPin, Phone, Send, ShieldCheck, Lock, FileCheck } from "lucide-react";
 import { ORG, upcomingCourses } from "../data";
 
 import { t } from "../i18n";
@@ -71,8 +71,12 @@ export function Footer() {
                 </li>
               ))}
               <li>
-                <a href={`mailto:${ORG.email}`} className="link-sweep text-white/76 transition-colors hover:text-white">
+                <a href="#/contatti?oggetto=gruppi" className="link-sweep text-white/76 transition-colors hover:text-white">
                   {t("Formazione per team")}</a>
+              </li>
+              <li>
+                <a href="#/contatti" className="link-sweep text-white/76 transition-colors hover:text-white">
+                  {t("Contatti")}</a>
               </li>
             </ul>
           </nav>
@@ -88,6 +92,12 @@ export function Footer() {
                 <a href={`mailto:${ORG.email}`} className="flex items-center gap-2.5 transition-colors hover:text-white">
                   <Mail className="size-4 shrink-0 text-flame" aria-hidden="true" />
                   {ORG.email}
+                </a>
+              </li>
+              <li>
+                <a href="#/contatti" className="flex items-center gap-2.5 font-semibold text-white transition-colors hover:text-flame">
+                  <Send className="size-4 shrink-0 text-flame" aria-hidden="true" />
+                  {t("Scrivici con il modulo di contatto")}
                 </a>
               </li>
               <li>

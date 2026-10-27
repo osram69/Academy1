@@ -19,6 +19,7 @@ import { ModalitaSection } from "../components/ModalitaSection";
 import { FAQS, TRAINER, concludedCourses, eur, fmtRange, nextCourse, upcomingCourses } from "../data";
 
 import { t } from "../i18n";
+import { RichText } from "../components/RichText";
 /* ============================ cos'è CPSA-F ============================ */
 
 const WHY = [
@@ -298,9 +299,9 @@ function FaqSection() {
           </Reveal>
           <Reveal delay={160}>
             <p className="mt-6 max-w-md text-[15.5px] leading-relaxed text-ink/60">
-              {t("Non trovi la risposta? Scrivici a")}{" "}
-              <a href="mailto:academy@cubeng.eu" className="link-sweep font-semibold text-flame">
-                {t("academy@cubeng.eu")}</a>{" "}
+              {t("Non trovi la risposta?")}{" "}
+              <a href="#/contatti" className="link-sweep font-semibold text-flame">
+                {t("Scrivici con il modulo di contatto")}</a>{" "}
               {t("— ti rispondiamo il prima possibile.")}</p>
           </Reveal>
           <Reveal delay={240} className="mt-9 flex flex-wrap gap-3">
@@ -348,7 +349,7 @@ function FaqSection() {
                     )}
                   >
                     <div className="overflow-hidden">
-                      <p className="px-6 pb-6 pl-[3.7rem] text-[14.5px] leading-relaxed text-ink/65">{f.a}</p>
+                      <p className="px-6 pb-6 pl-[3.7rem] text-[14.5px] leading-relaxed text-ink/65"><RichText text={f.a} /></p>
                     </div>
                   </div>
                 </div>

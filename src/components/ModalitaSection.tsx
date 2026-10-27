@@ -47,7 +47,7 @@ export function ModalitaSection() {
                         {t("Prossima:")}{" "}<a className="link-sweep font-semibold text-ink" href={`#/corso/${next.slug}`}>{fmtRange(next.start, next.end)}</a>
                       </>
                     ) : (
-                      <>{t("Date in definizione:")}{" "}<a className="link-sweep font-semibold text-flame" href="mailto:academy@cubeng.eu">{t("scrivici")}</a></>
+                      <>{t("Date in definizione:")}{" "}<a className="link-sweep font-semibold text-flame" href="#/contatti?oggetto=info">{t("scrivici")}</a></>
                     )}
                   </p>
                 </article>

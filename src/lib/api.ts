@@ -30,6 +30,7 @@ async function call<T>(url: string, init?: RequestInit): Promise<T> {
 
 const post = (body: unknown): RequestInit => ({ method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
 
+export const sendContact = (payload: unknown) => call<{ ok: true }>("/api/contact", post(payload));
 export const getConfig = () => call<ApiConfig>("/api/config");
 export const checkCoupon = (courseId: number, code: string, billingType: string) => call<{ code: string; pct: number }>("/api/coupon", post({ courseId, code, billingType }));
 export const createOrder = (payload: unknown) => call<{ ref: string; url?: string; bank?: BankDetails }>("/api/orders", post(payload));
