@@ -8,6 +8,7 @@ import {
   type Course,
 } from "../data";
 import { Btn, EarlyBirdChip, Reveal, SeatsBar, StatusPill, Tag } from "./ui";
+import { PrivateOffer } from "./PrivateOffer";
 
 import { t } from "../i18n";
 /**
@@ -93,6 +94,12 @@ export function CourseCard({ course, index = 0 }: { course: Course; index?: numb
         <div className="mt-5">
           <SeatsBar course={course} />
         </div>
+
+        {!waitlist && !course.concluded && (
+          <div className="mt-4">
+            <PrivateOffer course={course} />
+          </div>
+        )}
 
         {/* price + actions */}
         <div className="mt-auto flex items-end justify-between gap-4 border-t border-ink/8 pt-5 [margin-top:auto]">

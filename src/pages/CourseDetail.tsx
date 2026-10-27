@@ -1,5 +1,4 @@
-import { computeTotals } from "../../shared/pricing.mjs";
-import { useConfig } from "../lib/useConfig";
+import { privatePrice, useConfig } from "../lib/useConfig";
 import { useState } from "react";
 import {
   BadgeCheck,
@@ -37,10 +36,7 @@ import { t } from "../i18n";
 function PriceRail({ course }: { course: Course }) {
   const price = getLivePrice(course);
   const cfg = useConfig();
-  const privateTotals = cfg && cfg.privateDiscount > 0 && !course.concluded
-    ? computeTotals({ listEuro: course.price, earlyEuro: price.active ? price.unit : null, seats: 1, billingType: "privato", privatePct: cfg.privateDiscount / 100 })
-    : null;
-  const privateUnit = privateTotals ? (privateTotals.subtotal_cents - privateTotals.discount_cents) / 100 : null;
+  const priv = privatePrice(course, cfg);
   const waitlist = course.status === "waitlist";
   return (
     <aside className="lg:sticky lg:top-24" aria-label={t("Riepilogo iscrizione")}>
@@ -60,9 +56,9 @@ function PriceRail({ course }: { course: Course }) {
           <p className="mt-1.5 text-[12.5px] text-white/64">
             {t("a persona + IVA 22%")}{waitlist ? t(" · prezzo indicativo per la prossima data") : ""}
           </p>
-          {privateUnit != null && (
+          {priv && (
             <p className="mt-3 rounded-lg bg-white/10 px-3 py-2 text-[12.5px] font-medium text-white">
-              {t("Privati (senza P.IVA):")}{" "}{eur(privateUnit)}{" "}{t("+ IVA, sconto −")}{cfg!.privateDiscount}{t("% sul listino")}</p>
+              {t("Privati (senza P.IVA):")}{" "}{eur(priv.unit)}{" "}{t("+ IVA, sconto −")}{priv.pct}{t("% sul listino")}</p>
           )}
           {price.active && (
             <p className="mt-3 rounded-lg bg-flame/15 px-3 py-2 text-[12.5px] font-medium text-ember">

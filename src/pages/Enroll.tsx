@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import {
   AlertTriangle,
   ArrowLeft,
@@ -29,6 +29,7 @@ import {
 import { cn } from "../utils/cn";
 import { Btn } from "../components/ui";
 import { computeTotals } from "../../shared/pricing.mjs";
+import { isCapItalia, isCodiceFiscale, isCodiceFiscaleAny, isEmail, isPartitaIva, isPhone, isSdi, isVatIdEstero } from "../../shared/validators.mjs";
 import { checkCoupon, createOrder, getConfig, type ApiConfig } from "../lib/api";
 import {
   FORMAT_META,
@@ -53,13 +54,12 @@ interface Participant {
   cognome: string;
   email: string;
   telefono: string;
-  cf: string;
   cPrivacy: boolean;
   cMarketing: boolean;
   cAV: boolean;
 }
 const emptyParticipant = (): Participant => ({
-  nome: "", cognome: "", email: "", telefono: "", cf: "",
+  nome: "", cognome: "", email: "", telefono: "",
   cPrivacy: false, cMarketing: false, cAV: false,
 });
 
@@ -87,15 +87,19 @@ const METHOD_ICONS: Record<MethodId, typeof CreditCard> = {
 
 /* ============================== micro-UI ============================= */
 
+/** Chiamata quando un campo perde il focus: da lì in poi mostra il suo errore. */
+const TouchCtx = createContext<(id?: string) => void>(() => undefined);
+
 function TextField({
   label, req, error, hint, className, ...props
 }: React.InputHTMLAttributes<HTMLInputElement> & { label: string; req?: boolean; error?: string; hint?: string }) {
+  const touch = useContext(TouchCtx);
   return (
     <div className={className}>
       <label className="label" htmlFor={props.id}>
         {label} {req && <span className="req" aria-hidden="true">*</span>}
       </label>
-      <input className={cn("field", error && "err")} aria-invalid={!!error} {...props} />
+      <input className={cn("field", error && "err")} aria-invalid={!!error} {...props} onBlur={(e) => { touch(props.id); props.onBlur?.(e); }} />
       {error ? <p className="field-error" role="alert">{error}</p> : hint ? <p className="field-note">{hint}</p> : null}
     </div>
   );
@@ -209,7 +213,7 @@ function StepParticipants({
   attempted: boolean;
 }) {
   const [open, setOpen] = useState(0);
-  const isComplete = (p: Participant) => p.nome.trim() && p.cognome.trim() && /.+@.+\..+/.test(p.email) && p.cPrivacy;
+  const isComplete = (p: Participant) => p.nome.trim() && p.cognome.trim() && isEmail(p.email) && (!p.telefono.trim() || isPhone(p.telefono)) && p.cPrivacy;
 
   return (
     <div className="space-y-4">
@@ -256,11 +260,8 @@ function StepParticipants({
                     error={attempted ? errors[k("email")] : undefined}
                     hint={t("Qui arrivano le istruzioni del corso e i materiali")} />
                   <TextField id={`${k("telefono")}`} label={t("Telefono")} type="tel" placeholder="+39 333 000 0000" autoComplete="tel"
-                    value={p.telefono} onChange={(e) => update(i, { telefono: e.target.value })} />
-                  <TextField id={`${k("cf")}`} label={t("Codice fiscale")} placeholder={t("RSSGLI85M01H501Z")} className="sm:col-span-2"
-                    value={p.cf} onChange={(e) => update(i, { cf: e.target.value.toUpperCase() })}
-                    error={attempted ? errors[k("cf")] : undefined}
-                    hint={t("Facoltativo, 16 caratteri")} />
+                    value={p.telefono} onChange={(e) => update(i, { telefono: e.target.value })}
+                    error={attempted ? errors[k("telefono")] : undefined} />
                   <fieldset className="grid gap-2.5 sm:col-span-2">
                     <legend className="sr-only">{t("Consensi di")}{" "}{p.nome || t("partecipante {n}", { n: i + 1 })}</legend>
                     <CheckRow id={`${k("privacy")}`} checked={p.cPrivacy} onChange={(v) => update(i, { cPrivacy: v })}
@@ -290,8 +291,9 @@ const BILLING_TYPES: { id: BillingType; label: string; desc: string; icon: typeo
   { id: "estera", label: t("Azienda estera"), desc: t("UE ed extra-UE"), icon: Globe },
 ];
 
-function StepBilling({ billing, set, errors, attempted }: {
+function StepBilling({ billing, set, errors, attempted, privatePct }: {
   billing: Billing;
+  privatePct: number;
   set: (patch: Partial<Billing>) => void;
   errors: Record<string, string>;
   attempted: boolean;
@@ -318,13 +320,24 @@ function StepBilling({ billing, set, errors, attempted }: {
                 <bt.icon className="size-4.5" aria-hidden="true" />
               </span>
               <span className="min-w-0">
-                <span className="block text-[14px] font-bold tracking-tight text-ink">{bt.label}</span>
+                <span className="flex items-center gap-2 text-[14px] font-bold tracking-tight text-ink">
+                  {bt.label}
+                  {bt.id === "privato" && privatePct > 0 && (
+                    <span className="rounded-full bg-mint px-2 py-0.5 font-mono text-[10.5px] font-bold text-white">−{privatePct}%</span>
+                  )}
+                </span>
                 <span className="block text-[12px] text-steel">{bt.desc}</span>
               </span>
             </label>
           ))}
         </div>
       </fieldset>
+
+      {btype === "privato" && privatePct > 0 && (
+        <p className="rounded-xl border border-mint/35 bg-emerald-50 px-4 py-3 text-[13.5px] font-medium text-mint" role="status">
+          {t("Sconto privati −{pct}% sul listino", { pct: privatePct })}{" "}{t("applicato al riepilogo ordine.")}
+        </p>
+      )}
 
       <div className="rounded-3xl border border-ink/10 bg-white p-6 shadow-card sm:p-7">
         <div className="grid gap-4 sm:grid-cols-2">
@@ -341,9 +354,9 @@ function StepBilling({ billing, set, errors, attempted }: {
           )}
 
           {btype !== "estera" && (
-            <TextField id="f-cf" label={t("Codice fiscale")} req={!isCompany} placeholder={t("RSSGLI85M01H501Z")}
+            <TextField id="f-cf" label={t("Codice fiscale")} req={!isCompany} placeholder={t("RSSMRA85M01H501Q")}
               value={billing.cf} onChange={(e) => set({ cf: e.target.value.toUpperCase() })}
-              error={err("cf")} hint={isCompany ? t("Se diverso dalla P.IVA") : undefined} />
+              error={err("cf")} hint={isCompany ? t("Se diverso dalla P.IVA") : t("16 caratteri, es. RSSMRA85M01H501Q")} />
           )}
           {(btype === "pro" || btype === "azienda") && (
             <TextField id="f-piva" label={t("Partita IVA")} req inputMode="numeric" placeholder="01234567890" maxLength={11}
@@ -351,7 +364,7 @@ function StepBilling({ billing, set, errors, attempted }: {
               error={err("piva")} hint={t("11 cifre, fattura elettronica SDI")} />
           )}
           {btype === "estera" && (
-            <TextField id="f-vatid" label={t("VAT / Tax ID")} req placeholder={t("DE123456789")}
+            <TextField id="f-vatId" label={t("VAT / Tax ID")} req placeholder={t("DE123456789")}
               value={billing.vatId} onChange={(e) => set({ vatId: e.target.value.toUpperCase() })}
               error={err("vatId")} hint={t("Per inversione contabile IVA intra-UE")} />
           )}
@@ -359,10 +372,10 @@ function StepBilling({ billing, set, errors, attempted }: {
             <>
               <TextField id="f-sdi" label={t("Codice SDI")} placeholder="A1B2C3D" maxLength={7}
                 value={billing.sdi} onChange={(e) => set({ sdi: e.target.value.toUpperCase() })}
-                error={err("sdipec")} />
+                error={err("sdi")} />
               <TextField id="f-pec" label={t("PEC")} type="email" placeholder={t("fatture@pec.acme.it")}
                 value={billing.pec} onChange={(e) => set({ pec: e.target.value })}
-                error={err("sdipec")} hint={t("SDI o PEC: almeno uno dei due")} />
+                error={err("pec")} hint={t("SDI o PEC: almeno uno dei due")} />
             </>
           )}
           {btype === "estera" && (
@@ -372,8 +385,8 @@ function StepBilling({ billing, set, errors, attempted }: {
 
           <TextField id="f-via" label={t("Indirizzo e numero civico")} req placeholder={t("Via Roma 10")} autoComplete="street-address"
             className="sm:col-span-2" value={billing.via} onChange={(e) => set({ via: e.target.value })} error={err("via")} />
-          <TextField id="f-cap" label={t("CAP")} req inputMode="numeric" placeholder="40121" autoComplete="postal-code"
-            value={billing.cap} onChange={(e) => set({ cap: e.target.value })} error={err("cap")} />
+          <TextField id="f-cap" label={t("CAP")} req inputMode="numeric" placeholder="00187" autoComplete="postal-code"
+            value={billing.cap} onChange={(e) => set({ cap: e.target.value.trim() })} error={err("cap")} />
           <TextField id="f-citta" label={t("Città")} req placeholder={t("Roma")} autoComplete="address-level2"
             value={billing.citta} onChange={(e) => set({ citta: e.target.value })} error={err("citta")} />
         </div>
@@ -738,25 +751,38 @@ export function Enroll({ course }: { course: Course }) {
       participants.forEach((p, i) => {
         if (!p.nome.trim()) errs[`p${i}-nome`] = t("Obbligatorio");
         if (!p.cognome.trim()) errs[`p${i}-cognome`] = t("Obbligatorio");
-        if (!/.+@.+\..+/.test(p.email)) errs[`p${i}-email`] = t("Email valida richiesta");
-        if (p.cf && p.cf.replace(/\s/g, "").length !== 16) errs[`p${i}-cf`] = t("Il codice fiscale ha 16 caratteri");
+        if (!p.email.trim()) errs[`p${i}-email`] = t("Obbligatorio");
+        else if (!isEmail(p.email)) errs[`p${i}-email`] = t("Email non valida");
+        if (p.telefono.trim() && !isPhone(p.telefono)) errs[`p${i}-telefono`] = t("Numero di telefono non valido");
         if (!p.cPrivacy) errs[`p${i}-privacy`] = t("Consenso necessario per procedere");
       });
     }
     if (s === 2) {
       const bt = billing.type;
       const isCompany = bt === "azienda" || bt === "estera";
+      const cf = billing.cf.trim();
       if (isCompany && !billing.ragione.trim()) errs["f-ragione"] = t("Obbligatorio");
       if (!isCompany && !billing.nome.trim()) errs["f-nome"] = t("Obbligatorio");
       if (!isCompany && !billing.cognome.trim()) errs["f-cognome"] = t("Obbligatorio");
-      if (!isCompany && billing.cf.replace(/\s/g, "").length !== 16) errs["f-cf"] = t("16 caratteri richiesti");
-      if ((bt === "pro" || bt === "azienda") && !/^\d{11}$/.test(billing.piva)) errs["f-piva"] = t("11 cifre numeriche");
-      if ((bt === "pro" || bt === "azienda") && !billing.sdi.trim() && !billing.pec.trim())
-        errs["f-sdipec"] = t("Inserisci codice SDI o PEC");
-      if (bt === "estera" && !billing.vatId.trim()) errs["f-vatId"] = t("Obbligatorio");
-      if (bt === "estera" && (!billing.paese.trim() || billing.paese === "Italia")) errs["f-paese"] = t("Indica il paese");
+      if (bt !== "estera") {
+        if (!isCompany && !cf) errs["f-cf"] = t("Obbligatorio");
+        else if (cf && !(isCompany ? isCodiceFiscaleAny(cf) : isCodiceFiscale(cf))) errs["f-cf"] = t("Codice fiscale non valido: controlla i caratteri");
+      }
+      if (bt === "pro" || bt === "azienda") {
+        if (!billing.piva.trim()) errs["f-piva"] = t("Obbligatorio");
+        else if (!isPartitaIva(billing.piva)) errs["f-piva"] = t("Partita IVA non valida: controlla le 11 cifre");
+        if (billing.sdi.trim() && !isSdi(billing.sdi)) errs["f-sdi"] = t("Il codice SDI ha 7 caratteri");
+        if (billing.pec.trim() && !isEmail(billing.pec)) errs["f-pec"] = t("PEC non valida");
+        if (!billing.sdi.trim() && !billing.pec.trim()) errs["f-pec"] = t("Inserisci codice SDI o PEC");
+      }
+      if (bt === "estera") {
+        if (!billing.vatId.trim()) errs["f-vatId"] = t("Obbligatorio");
+        else if (!isVatIdEstero(billing.vatId)) errs["f-vatId"] = t("VAT ID non valido (es. DE123456789)");
+        if (!billing.paese.trim() || billing.paese === "Italia") errs["f-paese"] = t("Indica il paese");
+      }
       if (!billing.via.trim()) errs["f-via"] = t("Obbligatorio");
       if (!billing.cap.trim()) errs["f-cap"] = t("Obbligatorio");
+      else if (bt !== "estera" && !isCapItalia(billing.cap)) errs["f-cap"] = t("CAP non valido: 5 cifre");
       if (!billing.citta.trim()) errs["f-citta"] = t("Obbligatorio");
     }
     if (s === 3) {
@@ -765,9 +791,20 @@ export function Enroll({ course }: { course: Course }) {
     }
     return errs;
   };
-  const step0Errors = useMemo(() => validate(0), []); // sempre valido
+
+  /* gli errori di un campo compaiono quando perde il focus (o dopo "Continua") */
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const touch = useCallback((id?: string) => {
+    if (id) setTouched((prev) => (prev[id] ? prev : { ...prev, [id]: true }));
+  }, []);
+  const visibleErrors = (st: number): Record<string, string> => {
+    const out: Record<string, string> = {};
+    for (const [id, msg] of Object.entries(validate(st))) {
+      if (attempted[st] || touched[id] || (id === "f-pec" && touched["f-sdi"])) out[id] = msg;
+    }
+    return out;
+  };
   const [currentErrors, setCurrentErrors] = useState<Record<string, string>>({});
-  void step0Errors;
 
   const goNext = () => {
     const errs = validate(step);
@@ -822,6 +859,7 @@ export function Enroll({ course }: { course: Course }) {
 
   /* ------------------------------ wizard ----------------------------- */
   return (
+    <TouchCtx.Provider value={touch}>
     <div className="bg-paper">
       {/* header */}
       <header className="relative overflow-hidden bg-ink pb-16 pt-32 text-white lg:pt-36">
@@ -878,10 +916,10 @@ export function Enroll({ course }: { course: Course }) {
 
           {step === 0 && <StepConfigure course={course} count={count} setCount={setCount} />}
           {step === 1 && (
-            <StepParticipants participants={participants} update={updateParticipant} errors={currentErrors} attempted={!!attempted[1]} />
+            <StepParticipants participants={participants} update={updateParticipant} errors={visibleErrors(1)} attempted />
           )}
           {step === 2 && (
-            <StepBilling billing={billing} set={setBilling} errors={currentErrors} attempted={!!attempted[2]} />
+            <StepBilling billing={billing} set={setBilling} errors={visibleErrors(2)} attempted privatePct={config?.privateDiscount ?? 0} />
           )}
           {step === 3 && (
             <StepPayment
@@ -924,5 +962,6 @@ export function Enroll({ course }: { course: Course }) {
         </div>
       </main>
     </div>
+    </TouchCtx.Provider>
   );
 }

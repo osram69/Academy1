@@ -1,6 +1,7 @@
 import { ShieldCheck, ArrowDownRight, Timer, CalendarDays, MapPin } from "lucide-react";
 import { nextCourse, fmtRange, getLivePrice, eur, STATS } from "../data";
 import { Btn, EarlyBirdChip, IsoCube, Reveal, SeatsBar, useNow } from "./ui";
+import { PrivateOffer } from "./PrivateOffer";
 
 import { t } from "../i18n";
 function FloatingCourseCard() {
@@ -80,6 +81,10 @@ export function Hero() {
           <Reveal delay={180}>
             <p className="mt-7 max-w-xl text-[17px] leading-relaxed text-white/72">
               {t("Corsi")}{" "}<strong className="font-semibold text-white/85">{t("CPSA-Foundation®")}</strong>{" "}{t("con docenti che progettano sistemi veri, in formato online o in aula. L'esame di certificazione si sostiene a parte, presso gli enti autorizzati iSAQB®.")}</p>
+          </Reveal>
+
+          <Reveal delay={220} className="mt-6">
+            <PrivateOffer course={nextCourse()} dark />
           </Reveal>
 
           <Reveal delay={260} className="mt-9 flex flex-wrap items-center gap-4">

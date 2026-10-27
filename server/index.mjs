@@ -6,6 +6,7 @@ import fs from "node:fs";
 import { fileURLToPath } from "node:url";
 import { createClient } from "@supabase/supabase-js";
 import { MAX_SEATS, computeTotals, earlyPriceEuro } from "../shared/pricing.mjs";
+import { isCapItalia, isCodiceFiscale, isCodiceFiscaleAny, isEmail, isPartitaIva, isVatIdEstero } from "../shared/validators.mjs";
 import { bankDetails, createSession, isPaid, methodStatus, paypalVerifyWebhook, stripeClient, stripeWebhookSecret } from "./payments.mjs";
 import { findGlobalCoupon, getSettings, invalidateSettings } from "./settings.mjs";
 
@@ -171,10 +172,10 @@ app.post("/api/orders", limit(10, 60000), async (req, res) => {
     const parts = Array.isArray(b.participants) ? b.participants.slice(0, MAX_SEATS) : [];
     if (parts.length !== seats) return fail(res, 400, "Dati dei partecipanti incompleti.");
     const participants = parts.map((p) => ({
-      nome: str(p.nome, 80), cognome: str(p.cognome, 80), email: str(p.email, 120), telefono: str(p.telefono, 40), cf: str(p.cf, 16).toUpperCase(),
+      nome: str(p.nome, 80), cognome: str(p.cognome, 80), email: str(p.email, 120), telefono: str(p.telefono, 40),
       consensoPrivacy: p.cPrivacy === true, consensoMarketing: p.cMarketing === true, consensoAudioVideo: p.cAV === true,
     }));
-    if (participants.some((p) => !p.nome || !p.cognome || !/.+@.+\..+/.test(p.email) || !p.consensoPrivacy)) return fail(res, 400, "Dati dei partecipanti incompleti.");
+    if (participants.some((p) => !p.nome || !p.cognome || !isEmail(p.email) || !p.consensoPrivacy)) return fail(res, 400, "Dati dei partecipanti incompleti.");
     const bl = b.billing || {};
     const billing = Object.fromEntries(["type", "nome", "cognome", "ragione", "cf", "piva", "sdi", "pec", "via", "cap", "citta", "paese", "vatId"].map((k) => [k, str(bl[k], 120)]));
     if (!billing.via || !billing.cap || !billing.citta) return fail(res, 400, "Dati di fatturazione incompleti.");
@@ -183,6 +184,14 @@ app.post("/api/orders", limit(10, 60000), async (req, res) => {
     if (seats > available) return fail(res, 409, available > 0 ? `Sono rimasti solo ${available} posti.` : "Edizione al completo.");
 
     if (!["privato", "pro", "azienda", "estera"].includes(billing.type)) return fail(res, 400, "Tipologia di fatturazione non valida.");
+    const isCompany = billing.type === "azienda" || billing.type === "estera";
+    const invalidBilling =
+      (billing.type !== "estera" && !(isCompany ? !billing.cf || isCodiceFiscaleAny(billing.cf) : isCodiceFiscale(billing.cf))) ||
+      ((billing.type === "pro" || billing.type === "azienda") && !isPartitaIva(billing.piva)) ||
+      (billing.type === "estera" && !isVatIdEstero(billing.vatId)) ||
+      (billing.type !== "estera" && !isCapItalia(billing.cap)) ||
+      (billing.pec && !isEmail(billing.pec));
+    if (invalidBilling) return fail(res, 400, "Dati di fatturazione non validi.");
     const coupon = b.coupon ? resolveCoupon(course, settings, b.coupon, billing.type) : null;
     if (b.coupon && !coupon) return fail(res, 400, "Codice sconto non valido o scaduto.");
     const t = computeTotals({
