@@ -711,6 +711,18 @@ function OrderRail({ course, count, coupon, billingType, privatePct, step, goTo,
 
 /* ============================== wizard =============================== */
 
+/** Il menu è alto 68 px; il riquadro ordine resta 2 cm (76 px) sotto di esso (sticky top-[144px]).
+ *  Porta il titolo del passo ("Passo 1 di 4 · Corso e posti") subito sotto la barra del menu, saltando l'intestazione. */
+function scrollToSteps(smooth = false) {
+  const target = document.getElementById("enroll-steps");
+  if (!target) return;
+  const bar = document.getElementById("enroll-bar");
+  const barH = bar && bar.offsetParent !== null ? bar.offsetHeight : 0; // sulla versione mobile la barra di avanzamento resta fissa sotto il menu
+  const gap = barH ? barH + 20 : 76; // su desktop 2 cm sotto il menu, la stessa distanza del riquadro ordine
+  const top = target.getBoundingClientRect().top + window.scrollY - (68 + gap);
+  window.scrollTo({ top: Math.max(0, top), behavior: smooth ? "smooth" : "instant" });
+}
+
 export function Enroll({ course }: { course: Course }) {
   const [step, setStep] = useState(0);
   const [maxStep, setMaxStep] = useState(0);
@@ -730,6 +742,12 @@ export function Enroll({ course }: { course: Course }) {
 
   useEffect(() => {
     getConfig().then(setConfig).catch(() => setConfig(null));
+  }, []);
+
+  // aprendo l'iscrizione si parte già dal titolo del passo, senza dover scorrere l'intestazione
+  useEffect(() => {
+    const id = window.setTimeout(() => scrollToSteps(), 60);
+    return () => window.clearTimeout(id);
   }, []);
 
   const setCount = (n: number) => {
@@ -817,12 +835,12 @@ export function Enroll({ course }: { course: Course }) {
     const next = Math.min(3, step + 1);
     setStep(next);
     setMaxStep((m) => Math.max(m, next));
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    scrollToSteps(true);
   };
   const goTo = (s: number) => {
     setStep(s);
     setCurrentErrors({});
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    scrollToSteps(true);
   };
 
   const applyCoupon = async () => {
@@ -878,7 +896,7 @@ export function Enroll({ course }: { course: Course }) {
       </header>
 
       {/* barra mobile sticky: progresso + totale */}
-      <div className="sticky top-[68px] z-30 border-b border-ink/10 bg-paper/92 lg:hidden">
+      <div id="enroll-bar" className="sticky top-[68px] z-30 border-b border-ink/10 bg-paper/92 lg:hidden">
         <div className="flex items-center justify-between gap-3 px-5 py-3">
           <p className="font-mono text-[11px] font-semibold uppercase tracking-widest text-ink/70">
             {t("Passo")}{" "}{step + 1}<span className="text-ink/35">/4</span> — {STEPS[step]}
@@ -901,7 +919,7 @@ export function Enroll({ course }: { course: Course }) {
 
       {/* corpo */}
       <main className="mx-auto grid max-w-7xl gap-10 px-5 py-12 lg:grid-cols-[1fr_380px] lg:px-8 lg:py-16">
-        <div>
+        <div id="enroll-steps">
           {/* header step (desktop) */}
           <div className="mb-8 hidden lg:block">
             <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.24em] text-flame">
@@ -956,7 +974,7 @@ export function Enroll({ course }: { course: Course }) {
 
         {/* rail desktop */}
         <div className="hidden lg:block">
-          <div className="sticky top-24">
+          <div className="sticky top-[144px]">
             <OrderRail course={course} count={count} coupon={coupon} billingType={billing.type} privatePct={course.privateDiscount ? config?.privateDiscount ?? 0 : 0} step={step} goTo={goTo} maxStep={maxStep} />
           </div>
         </div>
