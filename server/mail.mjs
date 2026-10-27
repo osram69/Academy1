@@ -37,10 +37,12 @@ const TEXTS = {
   it: {
     subject: "Conferma registrazione corso CPSA-F{date} - Cube Academy", on: " del {d}",
     greeting: "Gentile {name},",
-    introPaid: "Grazie per l'iscrizione al corso Certified Professional for Software Architecture – CPSA-F: abbiamo ricevuto il pagamento.",
-    introBank: "Grazie per l'iscrizione al corso Certified Professional for Software Architecture – CPSA-F: la tua iscrizione è registrata e sarà confermata alla ricezione del bonifico.",
+    intro: "Riguardo l'iscrizione al corso Certified Professional for Software Architecture – CPSA-F.",
+    thanksPaid: "La ringraziamo per l'iscrizione e per il pagamento.", thanksBank: "La ringraziamo per l'iscrizione. Restiamo in attesa del pagamento.",
+    minInfo: "Non appena sarà raggiunto il numero minimo di partecipanti, Le invieremo la conferma dell'erogazione del corso insieme a tutte le informazioni necessarie per la fruizione.",
+    refundInfo: "Se il numero minimo non dovesse essere raggiunto, provvederemo a rimborsare integralmente l'importo versato. Qualora fosse stata già emessa fattura, emetteremo una Nota di Credito.",
     nextTitle: "Passaggi successivi",
-    stepsPaid: ["Ti scriveremo con le istruzioni per collegarti al corso.", "Cube Engineering emetterà la fattura elettronica ai dati di fatturazione indicati."],
+    stepsPaid: ["Alcuni giorni prima del corso, verrà inviata una email con le informazioni riguardanti le modalità di erogazione del corso.", "Cube Engineering emetterà la fattura elettronica ai dati di fatturazione indicati."],
     stepsBank: ["Effettua il bonifico con le coordinate riportate sotto, indicando la causale.", "I posti restano riservati per alcuni giorni lavorativi: invia la distinta a {staff} per accelerare la conferma.", "Riceverai la conferma definitiva dopo la verifica del pagamento."],
     summary: "Riepilogo iscrizione",
     order: "Riferimento ordine", course: "Corso", dates: "Date", schedule: "Calendario", place: "Luogo / modalità", method: "Metodo di pagamento",
@@ -54,10 +56,12 @@ const TEXTS = {
   en: {
     subject: "Course registration confirmed{date} - Cube Academy", on: " for {d}",
     greeting: "Dear {name},",
-    introPaid: "Thank you for registering for the Certified Professional for Software Architecture – CPSA-F course: we have received your payment.",
-    introBank: "Thank you for registering for the Certified Professional for Software Architecture – CPSA-F course: your registration is recorded and will be confirmed once the bank transfer is received.",
+    intro: "Regarding your registration for the Certified Professional for Software Architecture – CPSA-F course.",
+    thanksPaid: "Thank you for registering and for your payment.", thanksBank: "Thank you for registering. We are waiting for your payment.",
+    minInfo: "As soon as the minimum number of participants is reached, we will send you the confirmation that the course will run, together with all the information you need to attend.",
+    refundInfo: "If the minimum number is not reached, we will refund the full amount paid. If an invoice has already been issued, we will issue a credit note.",
     nextTitle: "Next steps",
-    stepsPaid: ["We will write to you with the instructions for joining the course.", "Cube Engineering will issue the e-invoice to the invoicing details provided."],
+    stepsPaid: ["A few days before the course, we will send an email with the information about how the course will be delivered.", "Cube Engineering will issue the e-invoice to the invoicing details provided."],
     stepsBank: ["Make the bank transfer using the details below, quoting the payment reference.", "Seats stay reserved for a few working days: send the transfer receipt to {staff} to speed up confirmation.", "You will receive the final confirmation after the payment is verified."],
     summary: "Registration summary",
     order: "Order reference", course: "Course", dates: "Dates", schedule: "Schedule", place: "Venue / format", method: "Payment method",
@@ -71,10 +75,12 @@ const TEXTS = {
   fr: {
     subject: "Confirmation d'inscription au cours CPSA-F{date} - Cube Academy", on: " du {d}",
     greeting: "Bonjour {name},",
-    introPaid: "Merci de votre inscription au cours Certified Professional for Software Architecture – CPSA-F : nous avons bien reçu votre paiement.",
-    introBank: "Merci de votre inscription au cours Certified Professional for Software Architecture – CPSA-F : votre inscription est enregistrée et sera confirmée à la réception du virement.",
+    intro: "Concernant votre inscription au cours Certified Professional for Software Architecture – CPSA-F.",
+    thanksPaid: "Nous vous remercions de votre inscription et de votre paiement.", thanksBank: "Nous vous remercions de votre inscription. Nous restons dans l'attente du paiement.",
+    minInfo: "Dès que le nombre minimum de participants sera atteint, nous vous enverrons la confirmation de la tenue du cours, avec toutes les informations nécessaires pour y participer.",
+    refundInfo: "Si le nombre minimum n'est pas atteint, nous rembourserons intégralement la somme versée. Si une facture a déjà été émise, nous émettrons un avoir.",
     nextTitle: "Prochaines étapes",
-    stepsPaid: ["Nous vous écrirons avec les instructions pour vous connecter au cours.", "Cube Engineering émettra la facture électronique aux coordonnées de facturation indiquées."],
+    stepsPaid: ["Quelques jours avant le cours, nous enverrons un e-mail avec les informations sur les modalités de déroulement du cours.", "Cube Engineering émettra la facture électronique aux coordonnées de facturation indiquées."],
     stepsBank: ["Effectuez le virement avec les coordonnées ci-dessous, en indiquant le libellé.", "Les places restent réservées pendant quelques jours ouvrés : envoyez le justificatif à {staff} pour accélérer la confirmation.", "Vous recevrez la confirmation définitive après vérification du paiement."],
     summary: "Récapitulatif d'inscription",
     order: "Référence de commande", course: "Cours", dates: "Dates", schedule: "Calendrier", place: "Lieu / format", method: "Moyen de paiement",
@@ -88,10 +94,12 @@ const TEXTS = {
   de: {
     subject: "Anmeldebestätigung für den CPSA-F-Kurs{date} - Cube Academy", on: " am {d}",
     greeting: "Guten Tag {name},",
-    introPaid: "Vielen Dank für Ihre Anmeldung zum Kurs Certified Professional for Software Architecture – CPSA-F: Ihre Zahlung ist bei uns eingegangen.",
-    introBank: "Vielen Dank für Ihre Anmeldung zum Kurs Certified Professional for Software Architecture – CPSA-F: Ihre Anmeldung ist erfasst und wird nach Eingang der Überweisung bestätigt.",
+    intro: "Zu Ihrer Anmeldung zum Kurs Certified Professional for Software Architecture – CPSA-F.",
+    thanksPaid: "Wir danken Ihnen für Ihre Anmeldung und Ihre Zahlung.", thanksBank: "Wir danken Ihnen für Ihre Anmeldung. Wir warten auf Ihre Zahlung.",
+    minInfo: "Sobald die Mindestteilnehmerzahl erreicht ist, senden wir Ihnen die Bestätigung der Durchführung des Kurses zusammen mit allen Informationen für die Teilnahme.",
+    refundInfo: "Wird die Mindestteilnehmerzahl nicht erreicht, erstatten wir den gezahlten Betrag vollständig. Falls bereits eine Rechnung ausgestellt wurde, stellen wir eine Gutschrift aus.",
     nextTitle: "Nächste Schritte",
-    stepsPaid: ["Wir schreiben Ihnen mit den Hinweisen zur Kursteilnahme.", "Cube Engineering stellt die E-Rechnung an die angegebenen Rechnungsdaten aus."],
+    stepsPaid: ["Einige Tage vor dem Kurs senden wir eine E-Mail mit den Informationen zur Durchführung des Kurses.", "Cube Engineering stellt die E-Rechnung an die angegebenen Rechnungsdaten aus."],
     stepsBank: ["Überweisen Sie den Betrag mit den untenstehenden Daten und geben Sie den Verwendungszweck an.", "Die Plätze bleiben einige Werktage reserviert: Senden Sie den Überweisungsbeleg an {staff}, um die Bestätigung zu beschleunigen.", "Die endgültige Bestätigung erhalten Sie nach Prüfung der Zahlung."],
     summary: "Anmeldeübersicht",
     order: "Bestellreferenz", course: "Kurs", dates: "Termine", schedule: "Ablauf", place: "Ort / Format", method: "Zahlungsart",
@@ -136,7 +144,7 @@ export function buildCustomerEmail(order, course, kind) {
   const reason = `${order.ref}`;
 
   const orderRows = [
-    row(T.order, order.ref), row(T.course, plainTitle(course.titolo)), row(T.dates, dates), row(T.schedule, course.orario_it || ""),
+    row(T.order, order.ref), row(T.course, `Certified Professional for Software Architecture - CPSA® ${course.livello || "Foundation"} level`), row(T.dates, dates), row(T.schedule, course.orario_it || ""),
     row(T.place, course[`luogo_${lang}`] || course.luogo_it || ""), row(T.method, T.methods[order.method] || order.method),
   ];
   const finRows = [
@@ -157,7 +165,9 @@ export function buildCustomerEmail(order, course, kind) {
 
   const html = `<div style="font-family:Arial,sans-serif;color:#222;max-width:640px;margin:0 auto;font-size:14px;line-height:1.5">
 <p>${esc(T.greeting.replace("{name}", name))}</p>
-<p>${esc(kind === "bank" ? T.introBank : T.introPaid)}</p>
+<p>${esc(T.intro)}</p>
+<p><strong>${esc(kind === "bank" ? T.thanksBank : T.thanksPaid)}</strong></p>
+<ul><li>${esc(T.minInfo)}</li><li>${esc(T.refundInfo)}</li></ul>
 ${order.test_mode && order.method !== "bonifico" ? `<p style="background:#fff3cd;padding:8px 12px;border-radius:6px">${esc(T.test)}</p>` : ""}
 <h3 style="margin:18px 0 4px">${esc(T.nextTitle)}</h3><ol>${steps}</ol>
 <h3 style="margin:18px 0 4px">${esc(T.summary)}</h3>${table(orderRows)}
