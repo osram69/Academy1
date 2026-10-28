@@ -1,6 +1,6 @@
 import { FileCheck2 } from "lucide-react";
 import { lang } from "../i18n";
-import { COOKIE, PRIVACY } from "../legal/content";
+import { COOKIE, PRIVACY, TERMS } from "../legal/content";
 import { openCookieSettings } from "../lib/consent";
 
 // Stessi testi per le pagine (#/privacy, #/cookie-policy) e per i popup aperti dai moduli e dal footer.
@@ -63,6 +63,26 @@ export function CookiePolicyContent() {
       <button type="button" onClick={openCookieSettings} className="mt-3 rounded-full bg-ink px-5 py-2.5 font-display text-[13.5px] font-semibold text-white transition-colors hover:bg-flame">
         {c.button}
       </button>
+    </div>
+  );
+}
+
+export function TermsContent() {
+  const c = TERMS[lang];
+  return (
+    <div>
+      {lang !== "it" && (
+        <div className="flex items-start gap-3 rounded-xl border border-ink/10 bg-paper p-3.5 text-[13px] text-ink/70">
+          <FileCheck2 className="mt-0.5 size-4 shrink-0 text-flame" aria-hidden="true" />
+          <p>{c.note}</p>
+        </div>
+      )}
+      {c.sections.map(([h, b]) => (
+        <section key={h}>
+          <h3 className={h3}>{h}</h3>
+          <p className={p}>{b}</p>
+        </section>
+      ))}
     </div>
   );
 }

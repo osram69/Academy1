@@ -13,7 +13,7 @@ import { Analytics } from "./components/Analytics";
 import { Admin } from "./admin/Admin";
 import { bySlug } from "./data";
 
-type Route = { page: "home" } | { page: "admin" } | { page: "catalog" } | { page: "course"; slug: string } | { page: "enroll"; slug: string } | { page: "esito"; ref: string; status: string } | { page: "contact" } | { page: "legal"; kind: "privacy" | "cookie" };
+type Route = { page: "home" } | { page: "admin" } | { page: "catalog" } | { page: "course"; slug: string } | { page: "enroll"; slug: string } | { page: "esito"; ref: string; status: string } | { page: "contact" } | { page: "legal"; kind: "privacy" | "cookie" | "terms" };
 
 function parseRoute(hash: string): Route {
   const parts = hash.replace(/^#\/?/, "").split("?")[0].split("/").filter(Boolean);
@@ -22,6 +22,7 @@ function parseRoute(hash: string): Route {
   if (parts[0] === "contatti") return { page: "contact" };
   if (parts[0] === "privacy") return { page: "legal", kind: "privacy" };
   if (parts[0] === "cookie-policy") return { page: "legal", kind: "cookie" };
+  if (parts[0] === "condizioni") return { page: "legal", kind: "terms" };
   if (parts[0] === "corso" && parts[1]) return { page: "course", slug: parts[1] };
   if (parts[0] === "iscriviti" && parts[1]) return { page: "enroll", slug: parts[1] };
   if (parts[0] === "esito" && parts[1]) return { page: "esito", ref: decodeURIComponent(parts[1]), status: parts[2] || "pending" };

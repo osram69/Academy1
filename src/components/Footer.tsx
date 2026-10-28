@@ -1,9 +1,10 @@
 import { Mail, MapPin, Phone, Send, ShieldCheck, Lock, FileCheck } from "lucide-react";
 import { ORG, upcomingCourses } from "../data";
 
-import { t } from "../i18n";
+import { lang, t } from "../i18n";
 import { LegalLinkModal } from "./LegalLinkModal";
-import { CookiePolicyContent, PrivacyNoticeContent } from "./LegalContent";
+import { CookiePolicyContent, PrivacyNoticeContent, TermsContent } from "./LegalContent";
+import { TERMS } from "../legal/content";
 import { openCookieSettings } from "../lib/consent";
 export function Footer() {
   return (
@@ -120,6 +121,9 @@ export function Footer() {
           <p className="flex gap-5">
             <LegalLinkModal label={t("Privacy")} title={t("Informativa Privacy")} className="transition-colors hover:text-white/70">
               <PrivacyNoticeContent />
+            </LegalLinkModal>
+            <LegalLinkModal label={t("Condizioni generali")} title={TERMS[lang].title} className="transition-colors hover:text-white/70">
+              <TermsContent />
             </LegalLinkModal>
             <LegalLinkModal label={t("Cookie Policy")} title={t("Cookie Policy")} className="transition-colors hover:text-white/70">
               <CookiePolicyContent />

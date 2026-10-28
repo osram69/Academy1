@@ -31,7 +31,8 @@ import { Btn } from "../components/ui";
 import { computeTotals } from "../../shared/pricing.mjs";
 import { isCapItalia, isCodiceFiscale, isCodiceFiscaleAny, isEmail, isPartitaIva, isPhone, isSdi, isVatIdEstero } from "../../shared/validators.mjs";
 import { LegalLinkModal } from "../components/LegalLinkModal";
-import { PrivacyNoticeContent } from "../components/LegalContent";
+import { PrivacyNoticeContent, TermsContent } from "../components/LegalContent";
+import { TERMS } from "../legal/content";
 import { checkCoupon, createOrder, getConfig, type ApiConfig } from "../lib/api";
 import {
   FORMAT_META,
@@ -562,24 +563,18 @@ function StepPayment({
 
       {/* condizioni + CTA */}
       <CheckRow id="terms" checked={terms} onChange={setTerms}
-        title={<>{t("Accetto le")}{" "}<a href="#/" className="link-sweep text-flame">{t("Condizioni generali")}</a>{" "}{t("e la")}{" "}<LegalLinkModal label={t("Privacy policy")} title={t("Informativa Privacy")} className="link-sweep text-flame"><PrivacyNoticeContent /></LegalLinkModal> <span className="text-flame">*</span></>}
+        title={<>{t("Accetto le")}{" "}<LegalLinkModal label={t("Condizioni generali")} title={TERMS[lang].title} className="link-sweep text-flame"><TermsContent /></LegalLinkModal>{" "}{t("e la")}{" "}<LegalLinkModal label={t("Privacy policy")} title={t("Informativa Privacy")} className="link-sweep text-flame"><PrivacyNoticeContent /></LegalLinkModal> <span className="text-flame">*</span></>}
         desc={t("Inclusa la politica di rimborso: se il corso non viene erogato per mancanza del numero minimo di partecipanti, la quota è rimborsata.")}
         error={attempted ? errors.terms : undefined} />
 
-      {config?.testMode && (
-        <p className="rounded-xl border border-dashed border-ink/25 bg-white/70 px-4 py-3 text-center font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-steel">
-          {t("Ambiente di prova: pagamenti sandbox, nessun addebito reale")}</p>
-      )}
-      {payError && <p className="field-error" role="alert">{payError}</p>}
-
-      <div className="sticky bottom-3 z-20">
+      <div>
         <button
           type="button"
           onClick={onPay}
           disabled={!method || busy}
           className={cn(
             "group flex w-full items-center justify-between gap-4 rounded-2xl p-5 font-display font-bold text-white transition-all duration-300 disabled:cursor-not-allowed",
-            method ? "bg-flame shadow-flame hover:bg-ink" : "bg-ink/25"
+            method && terms ? "bg-mint shadow-card hover:bg-[#0f5a37]" : "bg-ink/25"
           )}
           aria-label={method ? t("{action}, totale {total}", { action: active?.cta ?? t("Procedi"), total: eur2(total) }) : t("Scegli un metodo di pagamento per proseguire")}
           aria-disabled={!method}
@@ -597,6 +592,11 @@ function StepPayment({
           <ShieldCheck className="size-3.5 text-mint" aria-hidden="true" />
           {t("Transazione cifrata TLS · PCI-DSS · nessun dato carta sui nostri server")}</p>
       </div>
+      {config?.testMode && (
+        <p className="rounded-xl border border-dashed border-ink/25 bg-white/70 px-4 py-3 text-center font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-steel">
+          {t("Ambiente di prova: pagamenti sandbox, nessun addebito reale")}</p>
+      )}
+      {payError && <p className="field-error" role="alert">{payError}</p>}
     </div>
   );
 }
