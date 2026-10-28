@@ -100,12 +100,12 @@ export function Catalog() {
           </Reveal>
           <Reveal delay={80}>
             <h1 className="mt-6 max-w-3xl font-display text-[clamp(2.6rem,6vw,4.6rem)] font-bold leading-[1.0] tracking-[-0.03em]">
-              {t("Ogni edizione.")}{" "}<em className="font-serif italic text-flame">{t("Una sola schermata.")}</em>
+              {t("Trova la data")}{" "}<em className="font-serif italic text-flame">{t("che fa per te.")}</em>
             </h1>
           </Reveal>
           <Reveal delay={160}>
             <p className="mt-6 max-w-xl text-[16px] leading-relaxed text-white/68">
-              {t("Niente più tabelle da foglio di calcolo: ogni corso è una scheda con posti, early bird e prezzo in tempo reale. Filtra per formato, livello e lingua.")}</p>
+              {t("Intensivo, nel weekend, la sera o a mezze giornate: confronta le prossime edizioni, i posti disponibili e il prezzo, con early bird e sconto per i privati. Filtra per formato, livello e lingua.")}</p>
           </Reveal>
         </div>
       </header>
