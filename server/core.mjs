@@ -4,6 +4,7 @@ import crypto from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import { MAX_SEATS, computeTotals, earlyPriceEuro } from "../shared/pricing.mjs";
 import { isCapItalia, isCodiceFiscale, isCodiceFiscaleAny, isEmail, isPartitaIva, isVatIdEstero } from "../shared/validators.mjs";
+import { courseCode } from "./course.mjs";
 import { bankDetails, createSession, isPaid, methodStatus, paypalVerifyWebhook, stripeClient, stripeWebhookSecret } from "./payments.mjs";
 import { findGlobalCoupon, getSettings, invalidateSettings } from "./settings.mjs";
 import { CONTACT_TOPICS, mailConfigured, mailMissing, sendContactEmails, sendOrderEmails } from "./mail.mjs";
@@ -140,7 +141,7 @@ function paymentDescription(course, billing) {
   const date = String(course.data_inizio || "").replaceAll("-", ".");
   const taxId = billing.type === "estera" ? billing.vatId : billing.type === "privato" ? billing.cf : billing.piva || billing.cf;
   const who = billing.ragione || `${billing.nome} ${billing.cognome}`.trim();
-  return ["Corso CPSA-F", date, taxId, who].filter(Boolean).join(" - ").slice(0, 127);
+  return [courseCode(course) === "Workshop" ? "Workshop" : `Corso ${courseCode(course)}`, date, taxId, who].filter(Boolean).join(" - ").slice(0, 127);
 }
 
 const str = (v, max = 200) => (typeof v === "string" ? v.trim().slice(0, max) : "");

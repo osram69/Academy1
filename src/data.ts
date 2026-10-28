@@ -410,7 +410,7 @@ const fromRow = (r: PublicRow): ApiCourse => ({
   orario: r.orario_it ?? "",
   privateDiscount: r.sconto_privati !== false,
   residential: /residential/i.test(r.titolo),
-  level: r.livello,
+  level: (["Foundation", "Advanced", "Workshop"].find((l) => l.toLowerCase() === String(r.livello ?? "").trim().toLowerCase()) ?? "Foundation") as CourseLevel,
   stato: r.stato,
   open: r.iscrizioni_aperte,
   price: r.standard_price,

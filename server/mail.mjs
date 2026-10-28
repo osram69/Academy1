@@ -4,6 +4,7 @@
 // SMTP: stesse variabili di romaofficesharing (SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, MAIL_FROM, MAIL_FROM_NAME).
 import nodemailer from "nodemailer";
 import { bankDetails } from "./payments.mjs";
+import { courseCode, normLevel } from "./course.mjs";
 
 export const mailMissing = () => ["SMTP_HOST", "SMTP_USER", "SMTP_PASS"].filter((n) => !process.env[n]);
 export const mailConfigured = () => mailMissing().length === 0;
@@ -136,15 +137,19 @@ export function buildCustomerEmail(order, course, kind) {
   const T = TEXTS[lang];
   const locale = LOCALES[lang];
   const dates = dateRange(course, locale);
+  const code = courseCode(course);
+  const isWorkshop = code === "Workshop";
   const subject = (order.test_mode && order.method !== "bonifico" ? "[TEST] " : "") +
-    T.subject.replace("{date}", dates ? T.on.replace("{d}", dates) : "");
+    T.subject.replace("{date}", dates ? T.on.replace("{d}", dates) : "").replace("CPSA-F", code);
+  // il testo base cita il corso CPSA-F: per Advanced/Workshop si sostituisce con la sigla o il titolo reale
+  const intro = T.intro.replace(/Certified Professional for Software Architecture – CPSA-F/, isWorkshop ? plainTitle(course.titolo) : `Certified Professional for Software Architecture – ${code}`);
   const staff = staffTo();
   const name = order.participants?.[0] ? `${order.participants[0].nome} ${order.participants[0].cognome}`.trim() : "";
   const steps = (kind === "bank" ? T.stepsBank : T.stepsPaid).map((s) => `<li>${esc(s.replace("{staff}", staff))}</li>`).join("");
   const reason = `${order.ref}`;
 
   const orderRows = [
-    row(T.order, order.ref), row(T.course, `Certified Professional for Software Architecture - CPSA® ${course.livello || "Foundation"} level`), row(T.dates, dates), row(T.schedule, course.orario_it || ""),
+    row(T.order, order.ref), row(T.course, isWorkshop ? plainTitle(course.titolo) : `Certified Professional for Software Architecture - CPSA® ${normLevel(course.livello)} level`), row(T.dates, dates), row(T.schedule, course.orario_it || ""),
     row(T.place, course[`luogo_${lang}`] || course.luogo_it || ""), row(T.method, T.methods[order.method] || order.method),
   ];
   const finRows = [
@@ -165,7 +170,7 @@ export function buildCustomerEmail(order, course, kind) {
 
   const html = `<div style="font-family:Arial,sans-serif;color:#222;max-width:640px;margin:0 auto;font-size:14px;line-height:1.5">
 <p>${esc(T.greeting.replace("{name}", name))}</p>
-<p>${esc(T.intro)}</p>
+<p>${esc(intro)}</p>
 <p><strong>${esc(kind === "bank" ? T.thanksBank : T.thanksPaid)}</strong></p>
 <ul><li>${esc(T.minInfo)}</li><li>${esc(T.refundInfo)}</li></ul>
 ${order.test_mode && order.method !== "bonifico" ? `<p style="background:#fff3cd;padding:8px 12px;border-radius:6px">${esc(T.test)}</p>` : ""}
@@ -175,7 +180,7 @@ ${order.test_mode && order.method !== "bonifico" ? `<p style="background:#fff3cd
 ${bankBlock}
 <h3 style="margin:18px 0 4px">${esc(T.participants)}</h3><ul>${people}</ul>
 <h3 style="margin:18px 0 4px">${esc(T.billing)}</h3>${table(billingRows.slice(1))}
-<p>${esc(T.exam)}</p>
+${isWorkshop ? "" : `<p>${esc(T.exam)}</p>`}
 <p>${esc(T.closing)}</p>
 <p>${esc(T.signature)}<br>Cube Academy — Cube Engineering S.r.l.<br>Via Venti Settembre 118, 00187 Roma<br><a href="mailto:academy@cubeng.eu">academy@cubeng.eu</a></p></div>`;
   return { subject, html };
@@ -183,7 +188,7 @@ ${bankBlock}
 
 export function buildStaffSummary(order, course, kind) {
   const lines = [
-    `Nuova iscrizione CPSA-F${order.test_mode && order.method !== "bonifico" ? " [PROVA - sandbox]" : ""}`,
+    `Nuova iscrizione ${courseCode(course)}${order.test_mode && order.method !== "bonifico" ? " [PROVA - sandbox]" : ""}`,
     `Stato: ${kind === "bank" ? "registrata, in attesa di bonifico" : "pagata"}`,
     `Rif.: ${order.ref}`, `Corso: ${plainTitle(course.titolo)} (#${course.id_corso}) — ${dateRange(course, "it-IT")}`,
     `Modalità: ${course.modalita || "intensivo"}  Orario: ${course.orario_it || "-"}`,

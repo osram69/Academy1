@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase, supabaseConfigured } from "../lib/supabase";
+import { CalendarClock, CheckCheck, CircleCheck, CircleHelp, EyeOff, Play, type LucideIcon } from "lucide-react";
 import { MODALITA } from "../data";
 import { SettingsPage } from "./Settings";
 import { OrdersPage } from "./Orders";
@@ -20,6 +21,16 @@ const STATI: Record<number, string> = {
   4: "In corso",
   5: "Completato",
 };
+/** Nell'elenco lo stato è mostrato come icona (il nome completo resta nel tooltip). */
+const STATO_ICON: Record<number, [LucideIcon, string]> = {
+  0: [CalendarClock, "text-sky-600"],
+  1: [CircleCheck, "text-mint"],
+  2: [EyeOff, "text-steel"],
+  3: [CircleHelp, "text-amber-600"],
+  4: [Play, "text-flame"],
+  5: [CheckCheck, "text-ink/60"],
+};
+const LEVELS = ["Foundation", "Advanced", "Workshop"];
 const LANGS: [string, string][] = [
   ["it", "Italiano"],
   ["en", "English"],
@@ -198,7 +209,7 @@ function List() {
   const load = useCallback(async () => {
     const { data, error } = await supabase
       .from("corsi")
-      .select("id_corso, titolo, stato, in_evidenza, iscrizioni_aperte, data_it, data_inizio")
+      .select("id_corso, titolo, livello, stato, in_evidenza, iscrizioni_aperte, data_it, data_inizio")
       .order("id_corso", { ascending: false });
     if (error) {
       setIsErr(true);
@@ -231,7 +242,7 @@ function List() {
         <table className="w-full min-w-[820px] text-left text-[13.5px]">
           <thead className="border-b border-ink/10 bg-sand/40 text-[11.5px] uppercase tracking-wider text-steel">
             <tr>
-              {["ID", "Titolo", "Stato", "Iscrizioni", "Date", "Evid.", "Azioni"].map((h) => (
+              {["ID", "Titolo", "Tipo", "Stato", "Iscrizioni", "Date", "Evid.", "Azioni"].map((h) => (
                 <th key={h} className="px-4 py-3 font-semibold">{h}</th>
               ))}
             </tr>
@@ -241,7 +252,14 @@ function List() {
               <tr key={String(r.id_corso)} className="border-b border-ink/5 last:border-0">
                 <td className="px-4 py-3 font-mono text-[12px] text-steel">{r.id_corso}</td>
                 <td className="px-4 py-3">{strip(r.titolo)}</td>
-                <td className="px-4 py-3">{STATI[Number(r.stato)] ?? "?"}</td>
+                <td className="px-4 py-3 text-ink/70">{r.livello}</td>
+                <td className="px-4 py-3">
+                  {(() => {
+                    const [Icon, cls] = STATO_ICON[Number(r.stato)] ?? [CircleHelp, "text-steel"];
+                    const label = STATI[Number(r.stato)] ?? "?";
+                    return <span title={label} aria-label={label} role="img" className="inline-flex"><Icon className={`size-5 ${cls}`} aria-hidden="true" /></span>;
+                  })()}
+                </td>
                 <td className="px-4 py-3">
                   <button
                     className={`rounded-full px-3 py-1 text-[12px] font-semibold ${r.iscrizioni_aperte ? "bg-mint/15 text-mint" : "bg-err/10 text-err"}`}
@@ -284,13 +302,13 @@ function List() {
             ))}
             {rows && !rows.length && (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-steel">
+                <td colSpan={8} className="px-4 py-8 text-center text-steel">
                   Nessun corso visibile. Se sai che ce ne sono, l'email con cui hai fatto l'accesso potrebbe non essere abilitata (tabella admin_emails).
                 </td>
               </tr>
             )}
             {!rows && (
-              <tr><td colSpan={7} className="px-4 py-8 text-center text-steel">Caricamento…</td></tr>
+              <tr><td colSpan={8} className="px-4 py-8 text-center text-steel">Caricamento…</td></tr>
             )}
           </tbody>
         </table>
@@ -386,7 +404,11 @@ function Edit({ id }: { id: string }) {
         <h2 className={h2}>Dati generali</h2>
         <div className="grid gap-4 md:grid-cols-2">
           <div className="md:col-span-2">{F("titolo", "Titolo (accetta HTML, es. <br>)", text("titolo", { maxLength: 255, required: true }))}</div>
-          {F("livello", "Livello", text("livello", { maxLength: 10 }))}
+          {F("livello", "Tipo di corso", (
+            <select className={inputCls} value={LEVELS.includes(String(f.livello)) ? String(f.livello) : "Foundation"} onChange={(e) => set("livello", e.target.value)}>
+              {LEVELS.map((l) => <option key={l} value={l}>{l}</option>)}
+            </select>
+          ), "Foundation (CPSA-F), Advanced (CPSA-A) o Workshop: determina filtro del catalogo, causale di pagamento ed email.")}
           {F("stato", "Stato", (
             <select className={inputCls} value={Number(f.stato)} onChange={(e) => set("stato", Number(e.target.value))}>
               {Object.entries(STATI).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
