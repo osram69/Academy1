@@ -5,6 +5,8 @@ import { isEmail, isPhone } from "../../shared/validators.mjs";
 import { ORG } from "../data";
 import { lang, t } from "../i18n";
 import { sendContact } from "../lib/api";
+import { LegalLinkModal } from "../components/LegalLinkModal";
+import { PrivacyNoticeContent } from "../components/LegalContent";
 
 /* Pagina "Contatti": modulo di contatto (#/contatti). Accetta #/contatti?oggetto=gruppi&corso=<nome> per precompilare. */
 
@@ -139,7 +141,9 @@ export function Contact() {
               <label htmlFor="c-consent" className={cn("flex cursor-pointer items-start gap-3 rounded-xl border p-3.5", show("consent") ? "border-err/50 bg-red-50/50" : "border-ink/12 bg-white")}>
                 <input id="c-consent" type="checkbox" className="mt-1 size-4 accent-flame" checked={form.consent} onChange={(e) => set({ consent: e.target.checked })} onBlur={() => touch("consent")} />
                 <span className="text-[13px] leading-snug text-ink/75">
-                  {t("Acconsento al trattamento dei miei dati per rispondere a questa richiesta (GDPR 2016/679).")}{" "}<span className="text-flame">*</span>
+                  {t("Acconsento al trattamento dei miei dati per rispondere a questa richiesta (GDPR 2016/679).")}{" "}
+                  <LegalLinkModal label={t("(leggi l'informativa privacy)")} title={t("Informativa Privacy")}><PrivacyNoticeContent /></LegalLinkModal>{" "}
+                  <span className="text-flame">*</span>
                 </span>
               </label>
               {show("consent") && <p className="field-error" role="alert">{show("consent")}</p>}

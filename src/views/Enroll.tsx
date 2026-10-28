@@ -30,6 +30,8 @@ import { cn } from "../utils/cn";
 import { Btn } from "../components/ui";
 import { computeTotals } from "../../shared/pricing.mjs";
 import { isCapItalia, isCodiceFiscale, isCodiceFiscaleAny, isEmail, isPartitaIva, isPhone, isSdi, isVatIdEstero } from "../../shared/validators.mjs";
+import { LegalLinkModal } from "../components/LegalLinkModal";
+import { PrivacyNoticeContent } from "../components/LegalContent";
 import { checkCoupon, createOrder, getConfig, type ApiConfig } from "../lib/api";
 import {
   FORMAT_META,
@@ -107,7 +109,7 @@ function TextField({
 
 function CheckRow({
   checked, onChange, title, desc, error, id,
-}: { checked: boolean; onChange: (v: boolean) => void; title: React.ReactNode; desc?: string; error?: string; id: string }) {
+}: { checked: boolean; onChange: (v: boolean) => void; title: React.ReactNode; desc?: React.ReactNode; error?: string; id: string }) {
   return (
     <div>
       <label htmlFor={id} className={cn(
@@ -266,7 +268,7 @@ function StepParticipants({
                     <legend className="sr-only">{t("Consensi di")}{" "}{p.nome || t("partecipante {n}", { n: i + 1 })}</legend>
                     <CheckRow id={`${k("privacy")}`} checked={p.cPrivacy} onChange={(v) => update(i, { cPrivacy: v })}
                       title={<>{t("Consenso privacy")}{" "}<span className="text-flame">*</span>{" "}{t("— necessario per l'iscrizione")}</>}
-                      desc={t("Trattamento dati per gestione del corso e adempimenti fiscali (GDPR 2016/679).")}
+                      desc={<>{t("Trattamento dati per gestione del corso e adempimenti fiscali (GDPR 2016/679).")}{" "}<LegalLinkModal label={t("(leggi l'informativa privacy)")} title={t("Informativa Privacy")}><PrivacyNoticeContent /></LegalLinkModal></>}
                       error={attempted ? errors[k("privacy")] : undefined} />
                     <CheckRow id={`${k("marketing")}`} checked={p.cMarketing} onChange={(v) => update(i, { cMarketing: v })}
                       title={t("Novità e offerte (facoltativo)")}
@@ -527,7 +529,7 @@ function StepPayment({
 
       {/* condizioni + CTA */}
       <CheckRow id="terms" checked={terms} onChange={setTerms}
-        title={<>{t("Accetto le")}{" "}<a href="#/" className="link-sweep text-flame">{t("Condizioni generali")}</a>{" "}{t("e la")}{" "}<a href="#/" className="link-sweep text-flame">{t("Privacy policy")}</a> <span className="text-flame">*</span></>}
+        title={<>{t("Accetto le")}{" "}<a href="#/" className="link-sweep text-flame">{t("Condizioni generali")}</a>{" "}{t("e la")}{" "}<LegalLinkModal label={t("Privacy policy")} title={t("Informativa Privacy")} className="link-sweep text-flame"><PrivacyNoticeContent /></LegalLinkModal> <span className="text-flame">*</span></>}
         desc={t("Inclusa la politica di rimborso: se il corso non viene erogato per mancanza del numero minimo di partecipanti, la quota è rimborsata.")}
         error={attempted ? errors.terms : undefined} />
 

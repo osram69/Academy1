@@ -42,6 +42,14 @@ I testi stanno in `src/i18n/{en,fr,de}.ts`: la chiave è il testo italiano usato
 Un testo senza traduzione compare in italiano. Luogo e lingua dei corsi vengono dalle colonne
 `luogo_xx`/`lingua_xx` del database, già modificabili dal pannello.
 
+## Privacy e cookie
+
+Informativa privacy e cookie policy (IT/EN/FR/DE) stanno in `src/legal/content.ts` e si aprono come pagine
+(`#/privacy`, `#/cookie-policy`) e come popup dal footer, dal banner e dal consenso privacy dei moduli.
+All'apertura del sito il banner chiede la scelta sui cookie (necessari, analitici, marketing; si riapre da
+"Impostazioni cookie" nel footer). Google Tag Manager si attiva solo con `NEXT_PUBLIC_GTM_ID` e dopo il consenso.
+I testi vanno rivisti dal titolare / dal consulente legale prima della pubblicazione.
+
 ## Pannello di gestione (`#/admin`)
 
 - **Corsi**: edizioni, prezzi, early bird, posti, modalità di fruizione e calendario delle sessioni.

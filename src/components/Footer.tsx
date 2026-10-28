@@ -2,6 +2,9 @@ import { Mail, MapPin, Phone, Send, ShieldCheck, Lock, FileCheck } from "lucide-
 import { ORG, upcomingCourses } from "../data";
 
 import { t } from "../i18n";
+import { LegalLinkModal } from "./LegalLinkModal";
+import { CookiePolicyContent, PrivacyNoticeContent } from "./LegalContent";
+import { openCookieSettings } from "../lib/consent";
 export function Footer() {
   return (
     <footer className="relative overflow-hidden bg-ink text-white">
@@ -115,9 +118,13 @@ export function Footer() {
             © 2026 {ORG.company}{ORG.vat ? ` · ${ORG.vat}` : ""}
           </p>
           <p className="flex gap-5">
-            <a href="#/" className="transition-colors hover:text-white/70">{t("Privacy")}</a>
-            <a href="#/" className="transition-colors hover:text-white/70">{t("Cookie")}</a>
-            <a href="#/" className="transition-colors hover:text-white/70">{t("Termini")}</a>
+            <LegalLinkModal label={t("Privacy")} title={t("Informativa Privacy")} className="transition-colors hover:text-white/70">
+              <PrivacyNoticeContent />
+            </LegalLinkModal>
+            <LegalLinkModal label={t("Cookie Policy")} title={t("Cookie Policy")} className="transition-colors hover:text-white/70">
+              <CookiePolicyContent />
+            </LegalLinkModal>
+            <button type="button" onClick={openCookieSettings} className="transition-colors hover:text-white/70">{t("Impostazioni cookie")}</button>
           </p>
         </div>
       </div>
