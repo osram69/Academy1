@@ -5,6 +5,7 @@ import { isEmail, isPhone } from "../../shared/validators.mjs";
 import { ORG } from "../data";
 import { lang, t } from "../i18n";
 import { sendContact } from "../lib/api";
+import { Tag } from "../components/ui";
 import { LegalLinkModal } from "../components/LegalLinkModal";
 import { PrivacyNoticeContent } from "../components/LegalContent";
 
@@ -77,7 +78,7 @@ export function Contact() {
       <header className="relative overflow-hidden bg-ink pb-14 pt-32 text-white lg:pt-36">
         <div className="bg-blueprint-dark absolute inset-0" aria-hidden="true" />
         <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
-          <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.24em] text-flame">{t("Contatti")}</p>
+          <Tag dark>{t("Contatti")}</Tag>
           <h1 className="mt-4 max-w-2xl font-display text-[clamp(1.9rem,4.5vw,3.2rem)] font-bold leading-[1.05] tracking-[-0.025em]">
             {t("Scrivici,")}{" "}<em className="font-serif italic text-flame">{t("ti rispondiamo noi.")}</em>
           </h1>
