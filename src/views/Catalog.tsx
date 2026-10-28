@@ -105,7 +105,7 @@ export function Catalog() {
           </Reveal>
           <Reveal delay={160}>
             <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-white/68">
-              {t("Intensivo, nel weekend, la sera o a mezze giornate: confronta le prossime edizioni, i posti disponibili e il prezzo, con early bird e sconto per i privati. Filtra per formato, livello e lingua.")}</p>
+              {t("Confronta le prossime edizioni: date, posti e prezzi. Filtra per formato, livello e lingua.")}</p>
           </Reveal>
         </div>
       </header>

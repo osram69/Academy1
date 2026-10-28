@@ -204,7 +204,7 @@ export const de: Record<string, string> = {
   "Catalogo 2026": "Katalog 2026",
   "Trova la data": "Finden Sie den Termin,",
   "che fa per te.": "der zu Ihnen passt.",
-  "Intensivo, nel weekend, la sera o a mezze giornate: confronta le prossime edizioni, i posti disponibili e il prezzo, con early bird e sconto per i privati. Filtra per formato, livello e lingua.": "Intensiv, am Wochenende, abends oder in Halbtagen: Vergleichen Sie die nächsten Termine, freie Plätze und Preise, mit Frühbucherrabatt und Rabatt für Privatpersonen. Filtern Sie nach Format, Stufe und Sprache.",
+  "Confronta le prossime edizioni: date, posti e prezzi. Filtra per formato, livello e lingua.": "Vergleichen Sie die nächsten Termine: Daten, Plätze und Preise. Filtern Sie nach Format, Stufe und Sprache.",
   "Filtra": "Filtern",
   "Formato": "Format",
   "Livello": "Stufe",
