@@ -87,7 +87,7 @@ export function Catalog() {
   return (
     <div className="bg-paper">
       {/* header */}
-      <header className="relative overflow-hidden bg-ink pb-20 pt-40 text-white lg:pb-24">
+      <header className="relative overflow-hidden bg-ink pb-14 pt-32 text-white lg:pt-36">
         <div className="bg-blueprint-dark absolute inset-0" aria-hidden="true" />
         <div
           className="absolute -left-40 top-0 size-[480px] rounded-full opacity-25"
@@ -99,12 +99,12 @@ export function Catalog() {
             <Tag dark>{t("Catalogo 2026")}</Tag>
           </Reveal>
           <Reveal delay={80}>
-            <h1 className="mt-6 max-w-3xl font-display text-[clamp(2.6rem,6vw,4.6rem)] font-bold leading-[1.0] tracking-[-0.03em]">
+            <h1 className="mt-4 max-w-3xl font-display text-[clamp(1.9rem,4.5vw,3.2rem)] font-bold leading-[1.05] tracking-[-0.025em]">
               {t("Trova la data")}{" "}<em className="font-serif italic text-flame">{t("che fa per te.")}</em>
             </h1>
           </Reveal>
           <Reveal delay={160}>
-            <p className="mt-6 max-w-xl text-[16px] leading-relaxed text-white/68">
+            <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-white/68">
               {t("Intensivo, nel weekend, la sera o a mezze giornate: confronta le prossime edizioni, i posti disponibili e il prezzo, con early bird e sconto per i privati. Filtra per formato, livello e lingua.")}</p>
           </Reveal>
         </div>
