@@ -321,7 +321,7 @@ export const fr: Record<string, string> = {
   "Quante persone iscrivi?": "Combien de personnes inscrivez-vous ?",
   "Riduci partecipanti": "Moins de participants",
   "Aumenta partecipanti": "Plus de participants",
-  "Iscrizione a titolo personale: un solo partecipante. Per iscrivere più persone scegli «Per la mia azienda».": "Inscription à titre personnel : un seul participant. Pour inscrire plusieurs personnes, choisissez « Pour mon entreprise ».",
+  "Iscrizione a titolo personale: un solo partecipante. Per iscrivere più persone scegli «Per me, come professionista» o «Per la mia azienda».": "Inscription à titre personnel : un seul participant. Pour inscrire plusieurs personnes, choisissez « Pour moi, en tant que professionnel » ou « Pour mon entreprise ».",
   "Massimo": "Maximum",
   "posti per questa edizione ·": "places pour cette édition ·",
   "Prezzo a persona": "Prix par personne",

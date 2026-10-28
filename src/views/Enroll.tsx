@@ -48,8 +48,8 @@ import {
 import { lang, t } from "../i18n";
 /** Limite iSAQB: max 12 partecipanti per corso con un solo docente. */
 const MAX_SEATS = 12;
-/** Iscrizione a titolo personale (per me stesso / come professionista): un solo partecipante. */
-const maxSeatsFor = (type: string) => (type === "privato" || type === "pro" ? 1 : MAX_SEATS);
+/** Il singolo privato (per me stesso) iscrive una sola persona; professionisti e aziende fino a 12. */
+const maxSeatsFor = (type: string) => (type === "privato" ? 1 : MAX_SEATS);
 
 /* ================================ tipi =============================== */
 
@@ -242,7 +242,7 @@ function StepConfigure({ course, count, setCount, maxSeats, billingType, setBill
             ))}
           </div>
         </div>
-        {maxSeats === 1 && <p className="field-note font-medium text-flame">{t("Iscrizione a titolo personale: un solo partecipante. Per iscrivere più persone scegli «Per la mia azienda».")}</p>}
+        {maxSeats === 1 && <p className="field-note font-medium text-flame">{t("Iscrizione a titolo personale: un solo partecipante. Per iscrivere più persone scegli «Per me, come professionista» o «Per la mia azienda».")}</p>}
         <p className="field-note"><>{t("Massimo")}{" "}{course.seatsLeft != null ? Math.min(MAX_SEATS, course.seatsLeft) : MAX_SEATS}{" "}{t("posti per questa edizione ·")}{" "}</>{t("Prezzo a persona")}{" "}{eur(price.unit)}{" "}{t("+ IVA")}</p>
         {count >= 5 && (
           <div className="mt-4 flex items-start gap-3 rounded-xl border border-gold/30 bg-amber-50 p-4 text-[13px] leading-snug text-ink/75">
