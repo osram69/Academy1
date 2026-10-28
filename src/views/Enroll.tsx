@@ -68,17 +68,17 @@ const emptyParticipant = (): Participant => ({
 type BillingType = "privato" | "pro" | "azienda" | "estera";
 
 interface Billing {
-  type: BillingType;
+  type: BillingType | ""; // vuoto finché non si sceglie per chi ci si iscrive: il prezzo non presume alcuno sconto
   nome: string; cognome: string; ragione: string;
   cf: string; piva: string; sdi: string; pec: string;
   via: string; cap: string; citta: string; paese: string; vatId: string;
 }
 const emptyBilling = (): Billing => ({
-  type: "privato", nome: "", cognome: "", ragione: "", cf: "", piva: "",
+  type: "", nome: "", cognome: "", ragione: "", cf: "", piva: "",
   sdi: "", pec: "", via: "", cap: "", citta: "", paese: "Italia", vatId: "",
 });
 
-const STEPS = [t("Corso e posti"), t("Partecipanti"), t("Fatturazione"), t("Pagamento")];
+const STEPS = [t("Corso, posti e sconti"), t("Partecipanti"), t("Fatturazione"), t("Pagamento")];
 
 const METHOD_ICONS: Record<MethodId, typeof CreditCard> = {
   stripe: CreditCard,
@@ -135,7 +135,58 @@ function CheckRow({
 
 /* ======================= step 1 · corso e posti ====================== */
 
-function StepConfigure({ course, count, setCount }: { course: Course; count: number; setCount: (n: number) => void }) {
+/** Per chi ci si iscrive: decide fatturazione e sconti, quindi si sceglie subito. */
+const AUDIENCE: { id: BillingType; label: string; desc: string; icon: typeof User }[] = [
+  { id: "privato", label: t("Per me stesso"), desc: t("Come privato, senza P.IVA"), icon: User },
+  { id: "pro", label: t("Per me, come professionista"), desc: t("Con la mia P.IVA individuale"), icon: CreditCard },
+  { id: "azienda", label: t("Per la mia azienda"), desc: t("Azienda italiana: fattura con SDI o PEC"), icon: Building2 },
+  { id: "estera", label: t("Per un'azienda estera"), desc: t("UE ed extra-UE"), icon: Globe },
+];
+
+interface CouponProps {
+  coupon: { code: string; pct: number } | null;
+  setCoupon: (c: { code: string; pct: number } | null) => void;
+  couponInput: string; setCouponInput: (v: string) => void; couponError: string | null;
+  onApplyCoupon: () => void;
+}
+
+function CouponBox({ coupon, setCoupon, couponInput, setCouponInput, couponError, onApplyCoupon }: CouponProps) {
+  return (
+    <div className="rounded-3xl border border-ink/10 bg-white p-6 shadow-card sm:p-7">
+      <label htmlFor="coupon" className="label">{t("Codice sconto")}</label>
+      {coupon ? (
+        <div className="flex items-center justify-between gap-3 rounded-xl border border-mint/35 bg-emerald-50 px-4 py-3">
+          <span className="flex items-center gap-2.5 text-[14px] font-semibold text-mint">
+            <TicketPercent className="size-4.5" aria-hidden="true" />
+            {coupon.code}{" "}{t("— sconto −")}{Math.round(coupon.pct * 100)}{t("% applicato")}</span>
+          <button type="button" onClick={() => setCoupon(null)} aria-label={t("Rimuovi codice sconto")}
+            className="grid size-8 place-items-center rounded-full text-mint transition-colors hover:bg-mint hover:text-white">
+            <X className="size-4" aria-hidden="true" />
+          </button>
+        </div>
+      ) : (
+        <>
+          <div className="flex gap-2.5">
+            <input id="coupon" className={cn("field uppercase", couponError && "err")} placeholder={t("Inserisci il codice")}
+              value={couponInput}
+              onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+              onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); onApplyCoupon(); } }} />
+            <Btn variant="ink" type="button" onClick={onApplyCoupon} ariaLabel={t("Applica codice sconto")}>
+              {t("Applica")}</Btn>
+          </div>
+          {couponError && <p className="field-error" role="alert">{couponError}</p>}
+          <p className="field-note">{t("Gli sconti si cumulano con l'early bird.")}</p>
+        </>
+      )}
+    </div>
+  );
+}
+
+function StepConfigure({ course, count, setCount, billingType, setBillingType, privatePct, errors, ...couponProps }: {
+  course: Course; count: number; setCount: (n: number) => void;
+  billingType: BillingType | ""; setBillingType: (t: BillingType) => void; privatePct: number;
+  errors: Record<string, string>;
+} & CouponProps) {
   const price = getLivePrice(course);
   const fmt = FORMAT_META[course.format];
   return (
@@ -200,6 +251,43 @@ function StepConfigure({ course, count, setCount }: { course: Course; count: num
           </div>
         )}
       </div>
+
+      <fieldset className="rounded-3xl border border-ink/10 bg-white p-6 shadow-card sm:p-7">
+        <legend className="sr-only">{t("Per chi ti stai iscrivendo?")}</legend>
+        <p className="label">{t("Per chi ti stai iscrivendo?")}{" "}<span className="req" aria-hidden="true">*</span></p>
+        <div className="grid gap-2.5 sm:grid-cols-2" role="radiogroup" aria-label={t("Per chi ti stai iscrivendo?")}>
+          {AUDIENCE.map((a) => (
+            <label key={a.id} className={cn(
+              "flex cursor-pointer items-center gap-3.5 rounded-2xl border p-4 transition-all",
+              billingType === a.id ? "border-flame bg-flame/[0.06] shadow-card" : "border-ink/12 bg-white hover:border-ink/35"
+            )}>
+              <input type="radio" name="audience" className="sr-only" checked={billingType === a.id} onChange={() => setBillingType(a.id)} />
+              <span className={cn("grid size-10 shrink-0 place-items-center rounded-xl transition-colors",
+                billingType === a.id ? "bg-flame text-white" : "bg-ink/6 text-ink/50")}>
+                <a.icon className="size-4.5" aria-hidden="true" />
+              </span>
+              <span className="min-w-0">
+                <span className="flex items-center gap-2 text-[14px] font-bold tracking-tight text-ink">
+                  {a.label}
+                  {a.id === "privato" && privatePct > 0 && (
+                    <span className="rounded-full bg-mint px-2 py-0.5 font-mono text-[10.5px] font-bold text-white">−{privatePct}%</span>
+                  )}
+                </span>
+                <span className="block text-[12px] text-steel">{a.desc}</span>
+              </span>
+            </label>
+          ))}
+        </div>
+        {errors.type && <p className="field-error mt-3" role="alert">{errors.type}</p>}
+        <p className="field-note">{t("Il prezzo nel riepilogo si adatta alla tua scelta.")}</p>
+        {billingType === "privato" && privatePct > 0 && (
+          <p className="mt-3 rounded-xl border border-mint/35 bg-emerald-50 px-4 py-3 text-[13.5px] font-medium text-mint" role="status">
+            {t("Sconto privati −{pct}% sul listino", { pct: privatePct })}{" "}{t("applicato al riepilogo ordine.")}
+          </p>
+        )}
+      </fieldset>
+
+      <CouponBox {...couponProps} />
     </div>
   );
 }
@@ -293,9 +381,10 @@ const BILLING_TYPES: { id: BillingType; label: string; desc: string; icon: typeo
   { id: "estera", label: t("Azienda estera"), desc: t("UE ed extra-UE"), icon: Globe },
 ];
 
-function StepBilling({ billing, set, errors, attempted, privatePct }: {
+function StepBilling({ billing, set, errors, attempted, privatePct, onEditType }: {
   billing: Billing;
   privatePct: number;
+  onEditType: () => void;
   set: (patch: Partial<Billing>) => void;
   errors: Record<string, string>;
   attempted: boolean;
@@ -307,39 +396,13 @@ function StepBilling({ billing, set, errors, attempted, privatePct }: {
 
   return (
     <div className="space-y-5">
-      <fieldset>
-        <legend className="label">{t("Chi riceve la fattura?")}{" "}<span className="req" aria-hidden="true">*</span></legend>
-        <div className="grid gap-2.5 sm:grid-cols-2" role="radiogroup" aria-label={t("Tipo di soggetto fatturante")}>
-          {BILLING_TYPES.map((bt) => (
-            <label key={bt.id} className={cn(
-              "flex cursor-pointer items-center gap-3.5 rounded-2xl border p-4 transition-all",
-              btype === bt.id ? "border-flame bg-flame/[0.06] shadow-card" : "border-ink/12 bg-white hover:border-ink/35"
-            )}>
-              <input type="radio" name="billing-type" className="sr-only" checked={btype === bt.id}
-                onChange={() => set({ type: bt.id })} />
-              <span className={cn("grid size-10 shrink-0 place-items-center rounded-xl transition-colors",
-                btype === bt.id ? "bg-flame text-white" : "bg-ink/6 text-ink/50")}>
-                <bt.icon className="size-4.5" aria-hidden="true" />
-              </span>
-              <span className="min-w-0">
-                <span className="flex items-center gap-2 text-[14px] font-bold tracking-tight text-ink">
-                  {bt.label}
-                  {bt.id === "privato" && privatePct > 0 && (
-                    <span className="rounded-full bg-mint px-2 py-0.5 font-mono text-[10.5px] font-bold text-white">−{privatePct}%</span>
-                  )}
-                </span>
-                <span className="block text-[12px] text-steel">{bt.desc}</span>
-              </span>
-            </label>
-          ))}
-        </div>
-      </fieldset>
-
-      {btype === "privato" && privatePct > 0 && (
-        <p className="rounded-xl border border-mint/35 bg-emerald-50 px-4 py-3 text-[13.5px] font-medium text-mint" role="status">
-          {t("Sconto privati −{pct}% sul listino", { pct: privatePct })}{" "}{t("applicato al riepilogo ordine.")}
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-ink/10 bg-white px-5 py-4 shadow-card">
+        <p className="text-[14px] text-ink/75">
+          {t("Fatturazione a")}{" "}<strong className="font-semibold text-ink">{BILLING_TYPES.find((x) => x.id === btype)?.label}</strong>
+          {btype === "privato" && privatePct > 0 && <span className="ml-2 rounded-full bg-mint px-2 py-0.5 font-mono text-[10.5px] font-bold text-white">−{privatePct}%</span>}
         </p>
-      )}
+        <button type="button" onClick={onEditType} className="link-sweep text-[13px] font-semibold text-flame">{t("Modifica")}</button>
+      </div>
 
       <div className="rounded-3xl border border-ink/10 bg-white p-6 shadow-card sm:p-7">
         <div className="grid gap-4 sm:grid-cols-2">
@@ -410,15 +473,11 @@ const SPEED_META = {
 } as const;
 
 function StepPayment({
-  method, setMethod, coupon, setCoupon, couponInput, setCouponInput, couponError, onApplyCoupon,
+  method, setMethod,
   terms, setTerms, errors, attempted, total, onPay, config, payError, busy,
 }: {
   method: MethodId | null;
   setMethod: (m: MethodId) => void;
-  coupon: { code: string; pct: number } | null;
-  setCoupon: (c: { code: string; pct: number } | null) => void;
-  couponInput: string; setCouponInput: (v: string) => void; couponError: string | null;
-  onApplyCoupon: () => void;
   terms: boolean; setTerms: (v: boolean) => void;
   errors: Record<string, string>; attempted: boolean;
   total: number;
@@ -428,35 +487,6 @@ function StepPayment({
   const active = PAYMENT_METHODS.find((m) => m.id === method);
   return (
     <div className="space-y-5">
-      {/* coupon */}
-      <div className="rounded-3xl border border-ink/10 bg-white p-6 shadow-card">
-        <label htmlFor="coupon" className="label">{t("Codice sconto")}</label>
-        {coupon ? (
-          <div className="flex items-center justify-between gap-3 rounded-xl border border-mint/35 bg-emerald-50 px-4 py-3">
-            <span className="flex items-center gap-2.5 text-[14px] font-semibold text-mint">
-              <TicketPercent className="size-4.5" aria-hidden="true" />
-              {coupon.code}{" "}{t("— sconto −")}{Math.round(coupon.pct * 100)}{t("% applicato")}</span>
-            <button onClick={() => setCoupon(null)} aria-label={t("Rimuovi codice sconto")}
-              className="grid size-8 place-items-center rounded-full text-mint transition-colors hover:bg-mint hover:text-white">
-              <X className="size-4" aria-hidden="true" />
-            </button>
-          </div>
-        ) : (
-          <>
-            <div className="flex gap-2.5">
-              <input id="coupon" className={cn("field uppercase", couponError && "err")} placeholder={t("Inserisci il codice")}
-                value={couponInput}
-                onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
-                onKeyDown={(e) => e.key === "Enter" && onApplyCoupon()} />
-              <Btn variant="ink" type="button" onClick={onApplyCoupon} ariaLabel={t("Applica codice sconto")}>
-                {t("Applica")}</Btn>
-            </div>
-            {couponError && <p className="field-error" role="alert">{couponError}</p>}
-            <p className="field-note">{t("Gli sconti si cumulano con l'early bird.")}</p>
-          </>
-        )}
-      </div>
-
       {/* metodi */}
       <fieldset className="rounded-3xl border border-ink/10 bg-white p-6 shadow-card">
         <legend className="sr-only">{t("Scegli il metodo di pagamento")}</legend>
@@ -624,6 +654,11 @@ function OrderRail({ course, count, coupon, billingType, privatePct, step, goTo,
                 <dd className="font-semibold tabular-nums">−{eur(ebSave)}</dd>
               </div>
             )}
+            {!billingType && privatePct > 0 && (
+              <p className="rounded-lg bg-flame/8 px-3 py-2 text-[12px] font-medium text-flame">
+                {t("Scegli per chi ti iscrivi per vedere il prezzo definitivo: i privati hanno −{pct}% sul listino.", { pct: privatePct })}
+              </p>
+            )}
             {tot.applied && extraSave > 0 && (
               <div className="flex justify-between gap-4 text-mint">
                 <dt className="font-medium">{tot.applied === "PRIVATO" ? t("Sconto privati −{pct}% sul listino", { pct: privatePct }) : t("Codice {code}", { code: tot.applied })}</dt>
@@ -738,6 +773,7 @@ export function Enroll({ course }: { course: Course }) {
   const [couponError, setCouponError] = useState<string | null>(null);
   const [terms, setTerms] = useState(false);
   const [config, setConfig] = useState<ApiConfig | null>(null);
+  const privatePct = course.privateDiscount ? config?.privateDiscount ?? 0 : 0;
   const [payError, setPayError] = useState("");
   const [busy, setBusy] = useState(false);
   const [mobileSummary, setMobileSummary] = useState(false);
@@ -767,6 +803,7 @@ export function Enroll({ course }: { course: Course }) {
   /* ---------------------------- validazione -------------------------- */
   const validate = (s: number): Record<string, string> => {
     const errs: Record<string, string> = {};
+    if (s === 0 && !billing.type) errs.type = t("Scegli per chi ti stai iscrivendo");
     if (s === 1) {
       participants.forEach((p, i) => {
         if (!p.nome.trim()) errs[`p${i}-nome`] = t("Obbligatorio");
@@ -848,6 +885,10 @@ export function Enroll({ course }: { course: Course }) {
   const applyCoupon = async () => {
     const code = couponInput.trim();
     if (!code) return;
+    if (!billing.type) {
+      setCouponError(t("Scegli prima per chi ti stai iscrivendo"));
+      return;
+    }
     try {
       setCoupon(await checkCoupon(Number(course.slug), code, billing.type));
       setCouponError(null);
@@ -856,6 +897,21 @@ export function Enroll({ course }: { course: Course }) {
       setCouponError((e as Error).message);
     }
   };
+
+  // un codice può valere solo per certe tipologie: se cambia la scelta lo si ricontrolla
+  useEffect(() => {
+    if (!coupon || !billing.type) return;
+    let cancelled = false;
+    checkCoupon(Number(course.slug), coupon.code, billing.type)
+      .then((c) => { if (!cancelled) setCoupon(c); })
+      .catch(() => {
+        if (cancelled) return;
+        setCoupon(null);
+        setCouponError(t("Il codice non vale per questa tipologia: l'abbiamo rimosso."));
+      });
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [billing.type]);
 
   const pay = async () => {
     const errs = validate(3);
@@ -875,7 +931,7 @@ export function Enroll({ course }: { course: Course }) {
   };
 
   /* ------------------------------ prezzo ----------------------------- */
-  const total = orderTotals(course, count, coupon, billing.type, course.privateDiscount ? config?.privateDiscount ?? 0 : 0).t.total_cents / 100;
+  const total = orderTotals(course, count, coupon, billing.type, privatePct).t.total_cents / 100;
 
   /* ------------------------------ wizard ----------------------------- */
   return (
@@ -914,7 +970,7 @@ export function Enroll({ course }: { course: Course }) {
         </div>
         {mobileSummary && (
           <div className="border-t border-ink/8 px-5 pb-5 pt-4">
-            <OrderRail course={course} count={count} coupon={coupon} billingType={billing.type} privatePct={course.privateDiscount ? config?.privateDiscount ?? 0 : 0} step={step} goTo={goTo} maxStep={maxStep} />
+            <OrderRail course={course} count={count} coupon={coupon} billingType={billing.type} privatePct={privatePct} step={step} goTo={goTo} maxStep={maxStep} />
           </div>
         )}
       </div>
@@ -934,19 +990,23 @@ export function Enroll({ course }: { course: Course }) {
             )}
           </div>
 
-          {step === 0 && <StepConfigure course={course} count={count} setCount={setCount} />}
+          {step === 0 && (
+            <StepConfigure course={course} count={count} setCount={setCount}
+              billingType={billing.type} setBillingType={(type) => { setBilling({ type }); setCurrentErrors({}); }} privatePct={privatePct}
+              errors={visibleErrors(0)}
+              coupon={coupon} setCoupon={setCoupon}
+              couponInput={couponInput} setCouponInput={setCouponInput} couponError={couponError}
+              onApplyCoupon={applyCoupon} />
+          )}
           {step === 1 && (
             <StepParticipants participants={participants} update={updateParticipant} errors={visibleErrors(1)} attempted />
           )}
           {step === 2 && (
-            <StepBilling billing={billing} set={setBilling} errors={visibleErrors(2)} attempted privatePct={course.privateDiscount ? config?.privateDiscount ?? 0 : 0} />
+            <StepBilling billing={billing} set={setBilling} errors={visibleErrors(2)} attempted privatePct={privatePct} onEditType={() => goTo(0)} />
           )}
           {step === 3 && (
             <StepPayment
               method={method} setMethod={setMethod}
-              coupon={coupon} setCoupon={setCoupon}
-              couponInput={couponInput} setCouponInput={setCouponInput} couponError={couponError}
-              onApplyCoupon={applyCoupon}
               terms={terms} setTerms={setTerms}
               errors={currentErrors} attempted={!!attempted[3]}
               total={total} onPay={pay} config={config} payError={payError} busy={busy}
@@ -977,7 +1037,7 @@ export function Enroll({ course }: { course: Course }) {
         {/* rail desktop */}
         <div className="hidden lg:block">
           <div className="sticky top-[144px]">
-            <OrderRail course={course} count={count} coupon={coupon} billingType={billing.type} privatePct={course.privateDiscount ? config?.privateDiscount ?? 0 : 0} step={step} goTo={goTo} maxStep={maxStep} />
+            <OrderRail course={course} count={count} coupon={coupon} billingType={billing.type} privatePct={privatePct} step={step} goTo={goTo} maxStep={maxStep} />
           </div>
         </div>
       </main>
