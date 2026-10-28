@@ -321,6 +321,7 @@ export const fr: Record<string, string> = {
   "Quante persone iscrivi?": "Combien de personnes inscrivez-vous ?",
   "Riduci partecipanti": "Moins de participants",
   "Aumenta partecipanti": "Plus de participants",
+  "Iscrizione a titolo personale: un solo partecipante. Per iscrivere più persone scegli «Per la mia azienda».": "Inscription à titre personnel : un seul participant. Pour inscrire plusieurs personnes, choisissez « Pour mon entreprise ».",
   "Massimo": "Maximum",
   "posti per questa edizione ·": "places pour cette édition ·",
   "Prezzo a persona": "Prix par personne",
@@ -555,4 +556,5 @@ export const fr: Record<string, string> = {
   "Compila i campi obbligatori.": "Veuillez remplir les champs obligatoires.",
   "Il servizio email non è attivo al momento. Scrivi a academy@cubeng.eu.": "Le service e-mail n'est pas actif pour le moment. Écrivez à academy@cubeng.eu.",
   "Non siamo riusciti a inviare il messaggio. Riprova o scrivi a academy@cubeng.eu.": "Nous n'avons pas pu envoyer le message. Réessayez ou écrivez à academy@cubeng.eu.",
+  "Per un'iscrizione a titolo personale è previsto un solo partecipante.": "Une inscription à titre personnel est prévue pour un seul participant.",
 };

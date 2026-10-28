@@ -48,6 +48,8 @@ import {
 import { lang, t } from "../i18n";
 /** Limite iSAQB: max 12 partecipanti per corso con un solo docente. */
 const MAX_SEATS = 12;
+/** Iscrizione a titolo personale (per me stesso / come professionista): un solo partecipante. */
+const maxSeatsFor = (type: string) => (type === "privato" || type === "pro" ? 1 : MAX_SEATS);
 
 /* ================================ tipi =============================== */
 
@@ -182,8 +184,8 @@ function CouponBox({ coupon, setCoupon, couponInput, setCouponInput, couponError
   );
 }
 
-function StepConfigure({ course, count, setCount, billingType, setBillingType, privatePct, errors, ...couponProps }: {
-  course: Course; count: number; setCount: (n: number) => void;
+function StepConfigure({ course, count, setCount, maxSeats, billingType, setBillingType, privatePct, errors, ...couponProps }: {
+  course: Course; count: number; setCount: (n: number) => void; maxSeats: number;
   billingType: BillingType | ""; setBillingType: (t: BillingType) => void; privatePct: number;
   errors: Record<string, string>;
 } & CouponProps) {
@@ -225,13 +227,13 @@ function StepConfigure({ course, count, setCount, billingType, setBillingType, p
               <Minus className="size-4" aria-hidden="true" />
             </button>
             <span className="min-w-14 text-center font-display text-2xl font-bold tabular-nums" aria-live="polite">{count}</span>
-            <button onClick={() => setCount(Math.min(MAX_SEATS, count + 1))} disabled={count >= MAX_SEATS} aria-label={t("Aumenta partecipanti")}
+            <button onClick={() => setCount(Math.min(maxSeats, count + 1))} disabled={count >= maxSeats} aria-label={t("Aumenta partecipanti")}
               className="grid size-10 place-items-center rounded-full text-ink/70 transition-colors hover:bg-ink hover:text-white disabled:opacity-30">
               <Plus className="size-4" aria-hidden="true" />
             </button>
           </div>
           <div className="flex flex-wrap gap-1.5">
-            {[1, 2, 3, 5, 12].map((n) => (
+            {[1, 2, 3, 5, 12].filter((n) => n <= maxSeats).map((n) => (
               <button key={n} onClick={() => setCount(n)} aria-pressed={count === n}
                 className={cn("rounded-full px-3.5 py-2 font-mono text-[12px] font-semibold transition-colors",
                   count === n ? "bg-ink text-white" : "border border-ink/15 text-ink/55 hover:border-ink hover:text-ink")}>
@@ -240,6 +242,7 @@ function StepConfigure({ course, count, setCount, billingType, setBillingType, p
             ))}
           </div>
         </div>
+        {maxSeats === 1 && <p className="field-note font-medium text-flame">{t("Iscrizione a titolo personale: un solo partecipante. Per iscrivere più persone scegli «Per la mia azienda».")}</p>}
         <p className="field-note"><>{t("Massimo")}{" "}{course.seatsLeft != null ? Math.min(MAX_SEATS, course.seatsLeft) : MAX_SEATS}{" "}{t("posti per questa edizione ·")}{" "}</>{t("Prezzo a persona")}{" "}{eur(price.unit)}{" "}{t("+ IVA")}</p>
         {count >= 5 && (
           <div className="mt-4 flex items-start gap-3 rounded-xl border border-gold/30 bg-amber-50 p-4 text-[13px] leading-snug text-ink/75">
@@ -789,7 +792,7 @@ export function Enroll({ course }: { course: Course }) {
   }, []);
 
   const setCount = (n: number) => {
-    const clamped = Math.max(1, Math.min(MAX_SEATS, n));
+    const clamped = Math.max(1, Math.min(maxSeatsFor(billing.type), n));
     setCountRaw(clamped);
     setParticipants((ps) => {
       if (clamped > ps.length) return [...ps, ...Array.from({ length: clamped - ps.length }, emptyParticipant)];
@@ -992,7 +995,8 @@ export function Enroll({ course }: { course: Course }) {
 
           {step === 0 && (
             <StepConfigure course={course} count={count} setCount={setCount}
-              billingType={billing.type} setBillingType={(type) => { setBilling({ type }); setCurrentErrors({}); }} privatePct={privatePct}
+              maxSeats={maxSeatsFor(billing.type)}
+              billingType={billing.type} setBillingType={(type) => { setBilling({ type }); setCurrentErrors({}); if (maxSeatsFor(type) < count) setCount(maxSeatsFor(type)); }} privatePct={privatePct}
               errors={visibleErrors(0)}
               coupon={coupon} setCoupon={setCoupon}
               couponInput={couponInput} setCouponInput={setCouponInput} couponError={couponError}

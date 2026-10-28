@@ -178,6 +178,7 @@ export async function apiCreateOrder(b, { origin, ip }) {
     if (seats > available) return fail(409, available > 0 ? `Sono rimasti solo ${available} posti.` : "Edizione al completo.");
 
     if (!["privato", "pro", "azienda", "estera"].includes(billing.type)) return fail(400, "Tipologia di fatturazione non valida.");
+    if ((billing.type === "privato" || billing.type === "pro") && seats > 1) return fail(400, "Per un'iscrizione a titolo personale è previsto un solo partecipante.");
     const isCompany = billing.type === "azienda" || billing.type === "estera";
     const invalidBilling =
       (billing.type !== "estera" && !(isCompany ? !billing.cf || isCodiceFiscaleAny(billing.cf) : isCodiceFiscale(billing.cf))) ||
