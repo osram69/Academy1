@@ -31,6 +31,8 @@ import { Btn } from "../components/ui";
 import { computeTotals } from "../../shared/pricing.mjs";
 import { isCapItalia, isCodiceFiscale, isCodiceFiscaleAny, isEmail, isPartitaIva, isPhone, isSdi, isVatIdEstero } from "../../shared/validators.mjs";
 import { LegalLinkModal } from "../components/LegalLinkModal";
+import { ExtLink } from "../components/IsaqbLinks";
+import { isaqbLinks } from "../links";
 import { PrivacyNoticeContent, TermsContent } from "../components/LegalContent";
 import { TERMS } from "../legal/content";
 import { checkCoupon, createOrder, getConfig, type ApiConfig } from "../lib/api";
@@ -315,7 +317,7 @@ function StepParticipants({
       <div className="flex items-start gap-3 rounded-2xl border border-ink/10 bg-white p-4.5 text-[13.5px] leading-snug text-ink/70">
         <Info className="mt-0.5 size-4.5 shrink-0 text-flame" aria-hidden="true" />
         <p>
-          {t("Servono i dati dei partecipanti per l'iscrizione al corso e l'attestato di partecipazione.")}{" "}<strong className="font-semibold text-ink">{t("L'esame iSAQB non è incluso")}</strong>{t(": si organizza a parte con gli enti autorizzati (280 € + IVA).")}</p>
+          {t("Servono i dati dei partecipanti per l'iscrizione al corso e l'attestato di partecipazione.")}{" "}<strong className="font-semibold text-ink">{t("L'esame iSAQB non è incluso")}</strong>{t(": si organizza a parte con gli enti autorizzati (280 € + IVA).")}{" "}<ExtLink href={isaqbLinks().exams.href} className="text-flame">{isaqbLinks().exams.label}</ExtLink></p>
       </div>
 
       {participants.map((p, i) => {

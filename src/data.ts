@@ -7,6 +7,7 @@
 import { supabase, supabaseConfigured } from "./lib/supabase";
 
 import { lang, locale, t } from "./i18n";
+import { isaqbLinks } from "./links";
 const DAY = 86400000;
 
 export type CourseFormat = "online" | "aula" | "prestige";
@@ -476,6 +477,7 @@ export const FAQS = [
   {
     q: t("L'esame di certificazione è incluso nel prezzo?"),
     a: t("No. La tassa d'esame CPSA-F (280 € + IVA) non è inclusa nel prezzo del corso e si paga separatamente all'ente di certificazione autorizzato iSAQB®, con cui organizzi l'esame in autonomia al termine del corso. Durante l'ultima giornata svolgiamo una simulazione d'esame con discussione e correzione."),
+    links: [isaqbLinks().exams, isaqbLinks().certification, isaqbLinks().cpsaF],
   },
   {
     q: t("Posso pagare con bonifico e fattura alla mia azienda?"),

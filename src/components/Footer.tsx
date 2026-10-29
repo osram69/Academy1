@@ -1,5 +1,7 @@
 import { Mail, MapPin, Phone, Send, ShieldCheck, Lock, FileCheck } from "lucide-react";
 import { ORG, upcomingCourses } from "../data";
+import { isaqbLinks } from "../links";
+import { ExtLink } from "./IsaqbLinks";
 
 import { lang, t } from "../i18n";
 import { LegalLinkModal } from "./LegalLinkModal";
@@ -75,6 +77,10 @@ export function Footer() {
                 </li>
               ))}
               <li>
+                <a href="#/eventi" className="link-sweep text-white/76 transition-colors hover:text-white">
+                  {t("Eventi")}</a>
+              </li>
+              <li>
                 <a href="#/contatti?oggetto=gruppi" className="link-sweep text-white/76 transition-colors hover:text-white">
                   {t("Formazione per team")}</a>
               </li>
@@ -82,6 +88,14 @@ export function Footer() {
                 <a href="#/contatti" className="link-sweep text-white/76 transition-colors hover:text-white">
                   {t("Contatti")}</a>
               </li>
+            </ul>
+            <h3 className="mt-7 font-mono text-[11px] font-medium uppercase tracking-[0.22em] text-white/56">{t("Risorse iSAQB")}</h3>
+            <ul className="mt-4 space-y-2.5 text-sm">
+              {[isaqbLinks().cpsaF, isaqbLinks().about, isaqbLinks().certification, isaqbLinks().exams, isaqbLinks().isaqbIt].map((x) => (
+                <li key={x.href}>
+                  <ExtLink href={x.href} className="font-normal text-white/76 transition-colors hover:text-white">{x.label}</ExtLink>
+                </li>
+              ))}
             </ul>
           </nav>
 

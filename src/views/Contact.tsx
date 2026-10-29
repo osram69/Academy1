@@ -168,6 +168,21 @@ export function Contact() {
               <li><a href={`tel:${ORG.phone.replace(/[ .]/g, "")}`} className="flex items-center gap-3 hover:text-flame"><Phone className="size-4 shrink-0 text-flame" aria-hidden="true" />{ORG.phone}</a></li>
               <li><a href={`mailto:${ORG.email}`} className="flex items-center gap-3 hover:text-flame"><Mail className="size-4 shrink-0 text-flame" aria-hidden="true" />{ORG.email}</a></li>
             </ul>
+            <iframe
+              title={t("Mappa della sede di Via Venti Settembre 118, Roma")}
+              loading="lazy"
+              referrerPolicy="no-referrer"
+              className="mt-5 h-48 w-full rounded-xl border border-ink/10"
+              src="https://www.openstreetmap.org/export/embed.html?bbox=12.4894%2C41.9010%2C12.4975%2C41.9065&layer=mapnik&marker=41.9037423%2C12.4934357"
+            />
+            <a
+              href="https://www.openstreetmap.org/?mlat=41.9037423&mlon=12.4934357#map=17/41.9037423/12.4934357"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="link-sweep mt-2 inline-block text-[12.5px] font-semibold text-flame"
+            >
+              {t("Apri la mappa ingrandita")}
+            </a>
           </div>
         </aside>
       </main>

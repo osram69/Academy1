@@ -7,19 +7,21 @@ import { CourseDetail } from "./views/CourseDetail";
 import { Enroll } from "./views/Enroll";
 import { Esito } from "./views/Esito";
 import { Contact } from "./views/Contact";
+import { Events } from "./views/Events";
 import { LegalPage } from "./views/Legal";
 import { CookieConsent } from "./components/CookieConsent";
 import { Analytics } from "./components/Analytics";
 import { Admin } from "./admin/Admin";
 import { bySlug } from "./data";
 
-type Route = { page: "home" } | { page: "admin" } | { page: "catalog" } | { page: "course"; slug: string } | { page: "enroll"; slug: string } | { page: "esito"; ref: string; status: string } | { page: "contact" } | { page: "legal"; kind: "privacy" | "cookie" | "terms" };
+type Route = { page: "home" } | { page: "admin" } | { page: "catalog" } | { page: "course"; slug: string } | { page: "enroll"; slug: string } | { page: "esito"; ref: string; status: string } | { page: "contact" } | { page: "events" } | { page: "legal"; kind: "privacy" | "cookie" | "terms" };
 
 function parseRoute(hash: string): Route {
   const parts = hash.replace(/^#\/?/, "").split("?")[0].split("/").filter(Boolean);
   if (parts[0] === "admin") return { page: "admin" };
   if (parts[0] === "corsi") return { page: "catalog" };
   if (parts[0] === "contatti") return { page: "contact" };
+  if (parts[0] === "eventi") return { page: "events" };
   if (parts[0] === "privacy") return { page: "legal", kind: "privacy" };
   if (parts[0] === "cookie-policy") return { page: "legal", kind: "cookie" };
   if (parts[0] === "condizioni") return { page: "legal", kind: "terms" };
@@ -64,6 +66,9 @@ export default function App() {
       break;
     case "contact":
       page = <Contact key={hash} />;
+      break;
+    case "events":
+      page = <Events />;
       break;
     case "esito":
       page = <Esito refCode={route.ref} status={route.status} />;

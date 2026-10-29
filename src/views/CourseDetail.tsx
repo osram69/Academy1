@@ -32,6 +32,8 @@ import {
 
 import { t } from "../i18n";
 import { RichText } from "../components/RichText";
+import { ExtLink } from "../components/IsaqbLinks";
+import { isaqbLinks } from "../links";
 /* ------------------------- rail prezzo sticky ------------------------ */
 
 function PriceRail({ course }: { course: Course }) {
@@ -184,6 +186,12 @@ export function CourseDetail({ course }: { course: Course }) {
                 {t("Esame non incluso · 280 € + IVA")}</span>
             )}
           </div>
+
+          {!course.examIncluded && (
+            <p className="mt-4 text-[13.5px]">
+              <ExtLink href={isaqbLinks().exams.href} className="text-ember">{isaqbLinks().exams.label}</ExtLink>
+            </p>
+          )}
 
           <h1 className="mt-7 max-w-4xl font-display text-[clamp(2.2rem,5vw,4rem)] font-bold leading-[1.03] tracking-[-0.025em]">
             {course.title}

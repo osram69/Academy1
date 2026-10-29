@@ -9,6 +9,7 @@ const LINKS = [
   { label: t("Catalogo corsi"), href: "#/corsi" },
   { label: t("Certificazione"), href: "#/", section: "certificazione" },
   { label: t("Prestige"), href: "#/", section: "formati" },
+  { label: t("Eventi"), href: "#/eventi" },
   { label: t("FAQ"), href: "#/", section: "faq" },
   { label: t("Contatti"), href: "#/contatti" },
 ];
@@ -38,7 +39,7 @@ export function Nav({ route }: { route: string }) {
   };
 
   const isActive = (href: string) =>
-    href === "#/corsi" ? route.startsWith("#/corsi") || route.startsWith("#/corso/") : href === "#/contatti" ? route.startsWith("#/contatti") : route === "#/" || route === "";
+    href === "#/corsi" ? route.startsWith("#/corsi") || route.startsWith("#/corso/") : href === "#/contatti" ? route.startsWith("#/contatti") : href === "#/eventi" ? route.startsWith("#/eventi") : route === "#/" || route === "";
 
   return (
     <header className="fixed inset-x-0 top-0 z-50">

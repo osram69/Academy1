@@ -16,6 +16,7 @@ import { Hero } from "../components/Hero";
 import { ConcludedSection, CourseCard } from "../components/CourseCard";
 import { Btn, IsoCube, Reveal, Tag } from "../components/ui";
 import { ModalitaSection } from "../components/ModalitaSection";
+import { ExtLink, IsaqbLinks } from "../components/IsaqbLinks";
 import { FAQS, TRAINER, concludedCourses, eur, fmtRange, nextCourse, upcomingCourses } from "../data";
 
 import { t } from "../i18n";
@@ -63,6 +64,9 @@ function CertificationSection() {
           <Reveal delay={240} className="mt-8">
             <Btn href="#/corsi" variant="ink" withArrow>
               {t("Scegli la tua edizione")}</Btn>
+          </Reveal>
+          <Reveal delay={280} className="mt-6">
+            <IsaqbLinks className="max-w-md" />
           </Reveal>
           <Reveal delay={300} className="mt-12 hidden lg:block">
             <figure className="ticks relative max-w-sm p-2.5">
@@ -136,7 +140,7 @@ const FORMATS = [
     text: t("Aula virtuale su Zoom con docente accreditato iSAQB®, esercitazioni ed esame simulato nell'ultima giornata."),
     points: [t("24 ore su 3 giornate"), t("Max 12 partecipanti"), t("Zero trasferte")],
     dark: false,
-    img: null as string | null,
+    img: "https://images.pexels.com/photos/4175446/pexels-photo-4175446.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200" as string | null,
   },
   {
     id: "aula",
@@ -146,7 +150,7 @@ const FORMATS = [
     text: t("Corso in presenza a Roma, con docente accreditato iSAQB® e gruppi di massimo 12 partecipanti."),
     points: [t("Sede a Roma"), t("Max 12 partecipanti"), t("Docente accreditato iSAQB®")],
     dark: false,
-    img: null as string | null,
+    img: "https://images.pexels.com/photos/1181396/pexels-photo-1181396.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200" as string | null,
   },
   {
     id: "prestige",
@@ -182,7 +186,7 @@ function FormatsSection() {
 
         <div className="mt-14 grid gap-5 md:grid-cols-3">
           {FORMATS.map((f, i) => (
-            <Reveal key={f.id} delay={i * 120} className={cn(i === 2 && "md:-translate-y-6")}>
+            <Reveal key={f.id} delay={i * 120}>
               <article
                 className={cn(
                   "group relative flex h-full flex-col overflow-hidden rounded-[24px] border p-7 transition-all duration-500 hover:-translate-y-1.5",
@@ -202,7 +206,7 @@ function FormatsSection() {
                     <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/60 to-ink/20" aria-hidden="true" />
                   </>
                 )}
-                <div className="relative flex h-full flex-col">
+                <div className="relative flex flex-1 flex-col">
                   <div className="flex items-center justify-between">
                     <span
                       className={cn(
@@ -218,8 +222,8 @@ function FormatsSection() {
                   </div>
                   <h3 className="mt-6 font-display text-2xl font-bold tracking-tight">{f.title}</h3>
                   <p className={cn("mt-1 font-serif text-lg italic", f.dark ? "text-ember" : "text-white/72")}>{f.claim}</p>
-                  <p className="mt-4 text-[14.5px] leading-relaxed text-white/68">{f.text}</p>
-                  <ul className="mt-6 space-y-2.5 border-t border-white/10 pt-5 [margin-top:auto]">
+                  <p className="mb-6 mt-4 text-[14.5px] leading-relaxed text-white/68">{f.text}</p>
+                  <ul className="mt-auto space-y-2.5 border-t border-white/10 pt-5">
                     {f.points.map((p) => (
                       <li key={p} className="flex items-start gap-2.5 text-[13.5px] font-medium text-white/75">
                         <Check className={cn("mt-0.5 size-4 shrink-0", f.dark ? "text-ember" : "text-flame")} aria-hidden="true" />
@@ -350,6 +354,11 @@ function FaqSection() {
                   >
                     <div className="overflow-hidden">
                       <p className="px-6 pb-6 pl-[3.7rem] text-[14.5px] leading-relaxed text-ink/65"><RichText text={f.a} /></p>
+                      {f.links && (
+                        <div className="-mt-3 flex flex-wrap gap-x-6 gap-y-2 px-6 pb-6 pl-[3.7rem] text-[14px]">
+                          {f.links.map((l) => <ExtLink key={l.href} href={l.href} className="text-flame">{l.label}</ExtLink>)}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
