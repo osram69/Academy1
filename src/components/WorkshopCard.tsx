@@ -286,7 +286,7 @@ export function WorkshopTicker() {
       className="group block h-9 overflow-hidden border-t border-white/10 bg-ink2"
     >
       <div className="flex h-full items-center overflow-hidden" aria-hidden="true">
-        <div className="flex shrink-0 animate-marquee items-center gap-10 whitespace-nowrap pr-10 group-hover:[animation-play-state:paused] motion-reduce:animate-none">
+        <div style={{ animationDuration: "52s" }} className="flex shrink-0 animate-marquee items-center gap-10 whitespace-nowrap pr-10 group-hover:[animation-play-state:paused] motion-reduce:animate-none">
           {[0, 1].map((copy) => (
             <div key={copy} className="flex items-center gap-10">
               {[0, 1, 2].map((n) => <span key={n} className="flex items-center gap-10">{item}</span>)}
@@ -307,12 +307,13 @@ export function WorkshopPromo() {
     <section id="workshop" className="scroll-mt-[calc(69px+var(--ribbon-h,0px))] bg-paper py-12 lg:py-16" aria-label={t("Prossimo workshop")}>
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <Reveal>
-          <div className="overflow-hidden rounded-[28px] border border-ink/10 bg-white shadow-card">
-            <div className="bg-ink">
+          <div className="grid overflow-hidden rounded-[28px] border border-ink/10 bg-white shadow-card md:grid-cols-[1.2fr_1fr]">
+            {/* immagine a larghezza piena e senza ritagli (formato evento LinkedIn 1,91:1): lo spazio avanzato sopra e sotto resta bianco */}
+            <div className="flex items-center bg-white">
               {w.image ? (
-                <img src={w.image} alt="" loading="lazy" className="block h-auto max-h-[460px] w-full object-cover" />
+                <img src={w.image} alt="" loading="lazy" className="block h-auto w-full" />
               ) : (
-                <div className="bg-blueprint-dark grid h-40 place-items-center text-white/30">
+                <div className="bg-blueprint-dark grid aspect-[1.91/1] w-full place-items-center text-white/30">
                   <Presentation className="size-14" aria-hidden="true" />
                 </div>
               )}
