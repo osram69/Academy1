@@ -17,6 +17,7 @@ import { ConcludedSection, CourseCard } from "../components/CourseCard";
 import { Btn, IsoCube, Reveal, Tag } from "../components/ui";
 import { ModalitaSection } from "../components/ModalitaSection";
 import { ExtLink, IsaqbLinks } from "../components/IsaqbLinks";
+import { WorkshopPromo } from "../components/WorkshopCard";
 import { FAQS, TRAINER, concludedCourses, eur, fmtRange, nextCourse, upcomingCourses } from "../data";
 
 import { t } from "../i18n";
@@ -415,6 +416,7 @@ export function Home() {
   return (
     <>
       <Hero />
+      <WorkshopPromo />
       <CertificationSection />
       <ModalitaSection />
       <FormatsSection />

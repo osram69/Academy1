@@ -3,7 +3,8 @@ import { ListFilter, UsersRound } from "lucide-react";
 import { cn } from "../utils/cn";
 import { ConcludedSection, CourseCard } from "../components/CourseCard";
 import { Reveal, Tag } from "../components/ui";
-import { COURSES, FORMAT_META, type CourseFormat, type CourseLevel, type Lang } from "../data";
+import { COURSES, FORMAT_META, WORKSHOPS, type CourseFormat, type CourseLevel, type Lang } from "../data";
+import { WorkshopsSection } from "../components/WorkshopCard";
 
 import { t } from "../i18n";
 import { RichText } from "../components/RichText";
@@ -65,6 +66,14 @@ export function Catalog() {
   const [level, setLevel] = useState<CourseLevel | "all">("all");
   const [lang, setLang] = useState<Lang | "all">("all");
 
+  // i workshop non sono corsi: compaiono in una sezione propria, nascosti se il filtro li esclude
+  const showWorkshops =
+    WORKSHOPS.length > 0 &&
+    (level === "all" || level === "Workshop") &&
+    format === "all" &&
+    (lang === "all" || WORKSHOPS.some((w) => (/^ital/i.test(w.language) ? "IT" : "EN") === lang));
+  const onlyWorkshops = level === "Workshop";
+
   const filtered = useMemo(
     () =>
       COURSES.filter(
@@ -120,14 +129,15 @@ export function Catalog() {
           <FilterGroup label={t("Livello")} options={LEVEL_FILTERS} value={level} onChange={setLevel} />
           <FilterGroup label={t("Lingua")} options={LANG_FILTERS} value={lang} onChange={setLang} />
           <p className="ml-auto font-mono text-[11.5px] uppercase tracking-widest text-steel" role="status" aria-live="polite">
-            {results.length} {results.length === 1 ? t("edizione") : t("edizioni")}
+            {onlyWorkshops ? `${WORKSHOPS.length} ${t("workshop")}` : `${results.length} ${results.length === 1 ? t("edizione") : t("edizioni")}`}
           </p>
         </div>
       </div>
 
       {/* griglia */}
       <main className="mx-auto max-w-7xl px-5 py-16 lg:px-8 lg:py-20">
-        {results.length === 0 ? (
+        {showWorkshops && <WorkshopsSection />}
+        {onlyWorkshops ? null : results.length === 0 ? (
           <div className="rounded-[24px] border border-dashed border-ink/20 p-16 text-center">
             <p className="font-display text-xl font-semibold text-ink">{t("Nessuna edizione con questi filtri")}</p>
             <p className="mt-2 text-sm text-ink/55"><RichText text={t("Prova ad allargare formato o lingua — oppure [scrivici](#/contatti?oggetto=gruppi) per un'edizione dedicata.")} /></p>
@@ -151,7 +161,7 @@ export function Catalog() {
           </div>
         )}
 
-        <ConcludedSection courses={concluded} />
+        {!onlyWorkshops && <ConcludedSection courses={concluded} />}
 
         {/* banner team */}
         <Reveal className="mt-16">

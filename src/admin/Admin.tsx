@@ -5,6 +5,7 @@ import { CalendarClock, CheckCheck, CircleCheck, CircleHelp, EyeOff, Play, type 
 import { MODALITA } from "../data";
 import { SettingsPage } from "./Settings";
 import { OrdersPage } from "./Orders";
+import { EventsAdmin } from "./Events";
 
 /* Pannello di gestione corsi (sostituisce il plugin WordPress "Cube Academy - Gestione Corsi").
    Rotte: #/admin (elenco) · #/admin/corso/new · #/admin/corso/<id>
@@ -47,7 +48,7 @@ const DATES = ["data_inizio", "data_fine"];
 const BOOLS = ["in_evidenza", "iscrizioni_aperte", "sconto_privati"];
 // testo NOT NULL nel DB: vuoto = stringa vuota (gli altri testi vuoti diventano NULL)
 const TEXT_REQUIRED = ["titolo", "livello", ...LANGS.flatMap(([l]) => [`link_readmore_${l}`, `link_booking_${l}`, `home_subtitle_${l}`])];
-const URLS = LANGS.flatMap(([l]) => [`link_readmore_${l}`, `link_booking_${l}`]);
+const URLS = [...LANGS.flatMap(([l]) => [`link_readmore_${l}`, `link_booking_${l}`]), "link_evento", "immagine_url"];
 const LIMITS: Record<string, number> = { livello: 10, titolo: 255 };
 
 const SCOPES: [string, string][] = [["privato", "Privati"], ["pro", "Liberi professionisti"], ["azienda", "Aziende italiane"], ["estera", "Aziende estere"]];
@@ -124,7 +125,7 @@ function Shell({ children, right }: { children: ReactNode; right?: ReactNode }) 
             <span className="border-l border-white/20 pl-3 font-display text-[15px] font-semibold tracking-tight text-ember">Gestione</span>
           </a>
           <nav className="flex items-center gap-5 text-[13px] font-medium" aria-label="Sezioni del pannello">
-            {[["#/admin", "Corsi"], ["#/admin/iscrizioni", "Iscrizioni"], ["#/admin/impostazioni", "Impostazioni"]].map(([h, l]) => (
+            {[["#/admin", "Corsi"], ["#/admin/eventi", "Eventi"], ["#/admin/iscrizioni", "Iscrizioni"], ["#/admin/impostazioni", "Impostazioni"]].map(([h, l]) => (
               <a key={h} href={h} className="text-white/75 hover:text-white">{l}</a>
             ))}
           </nav>
@@ -233,7 +234,10 @@ function List() {
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-display text-2xl font-bold tracking-tight">Corsi</h1>
-        <button className={btnPrimary} onClick={() => go("#/admin/corso/new")}>+ Nuovo corso</button>
+        <div className="flex flex-wrap gap-2">
+          <button className={btnPrimary} onClick={() => go("#/admin/corso/new")}>+ Nuovo corso</button>
+          <button className={`${btnCls} border border-ink/20 text-ink hover:bg-sand`} onClick={() => go("#/admin/corso/new-workshop")}>+ Nuovo workshop</button>
+        </div>
       </div>
       {msg && (
         <p role="status" className={`mt-4 rounded-lg px-4 py-2 text-[13px] ${isErr ? "bg-err/10 text-err" : "bg-mint/10 text-mint"}`}>{msg}</p>
@@ -261,14 +265,14 @@ function List() {
                   })()}
                 </td>
                 <td className="px-4 py-3">
-                  <button
+                  {r.livello === "Workshop" ? <span className="text-steel" title="Gratuito: si prenota su LinkedIn">—</span> : <button
                     className={`rounded-full px-3 py-1 text-[12px] font-semibold ${r.iscrizioni_aperte ? "bg-mint/15 text-mint" : "bg-err/10 text-err"}`}
                     onClick={() =>
                       act(() => supabase.from("corsi").update({ iscrizioni_aperte: !r.iscrizioni_aperte }).eq("id_corso", r.id_corso as number), "Stato iscrizioni aggiornato.")
                     }
                   >
                     {r.iscrizioni_aperte ? "Aperte" : "Chiuse"}
-                  </button>
+                  </button>}
                 </td>
                 <td className="px-4 py-3 text-ink/70">{r.data_it}</td>
                 <td className="px-4 py-3">{r.in_evidenza ? "✓" : ""}</td>
@@ -321,9 +325,14 @@ function List() {
 
 const EMPTY: Row = { titolo: "", livello: "Foundation", modalita: "intensivo", sconto_privati: true, stato: 0, in_evidenza: false, iscrizioni_aperte: false };
 
+/** Il workshop è una presentazione gratuita di circa un'ora: la prenotazione avviene sull'evento LinkedIn. */
+const EMPTY_WS: Row = { titolo: "", livello: "Workshop", stato: 0, in_evidenza: false, iscrizioni_aperte: false, luogo_it: "Online", lingua_it: "Italiano" };
+const WS_STATI = [0, 5, 2];
+
 function Edit({ id }: { id: string }) {
-  const isNew = id === "new";
-  const [f, setF] = useState<Row | null>(isNew ? EMPTY : null);
+  const isNew = id === "new" || id === "new-workshop";
+  const [f, setF] = useState<Row | null>(id === "new-workshop" ? EMPTY_WS : isNew ? EMPTY : null);
+  const [uploading, setUploading] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
@@ -350,12 +359,32 @@ function Edit({ id }: { id: string }) {
     <Field label={label} error={errors[k]} hint={hint}>{node}</Field>
   );
 
+  const isWs = String(f.livello) === "Workshop";
+
+  const upload = async (file: File) => {
+    if (!file.type.startsWith("image/")) return setMsg("Scegli un file immagine (JPG, PNG o WebP).");
+    if (file.size > 5 * 1024 * 1024) return setMsg("L'immagine supera i 5 MB: riducila prima di caricarla.");
+    setUploading(true);
+    setMsg("");
+    const path = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+    const up = await supabase.storage.from("workshop").upload(path, file, { contentType: file.type, cacheControl: "31536000" });
+    if (up.error) setMsg(`Caricamento non riuscito: ${up.error.message} (hai eseguito supabase/migrazione-4.sql?)`);
+    else set("immagine_url", supabase.storage.from("workshop").getPublicUrl(path).data.publicUrl);
+    setUploading(false);
+  };
+
   const save = async (e: FormEvent) => {
     e.preventDefault();
     setBusy(true);
     setErrors({});
     setMsg("");
     const { data, errors: errs } = toPayload(f);
+    if (isWs) {
+      if (!data.data_inizio) errs.data_inizio = "indica la data del workshop";
+      if (!data.link_evento) errs.link_evento = "inserisci il link all'evento LinkedIn";
+      data.data_fine = data.data_inizio; // evento di un'ora: un solo giorno
+      data.iscrizioni_aperte = false;
+    }
     if (Object.keys(errs).length) {
       setErrors(errs);
       setMsg("Controlla i campi evidenziati.");
@@ -392,7 +421,7 @@ function Edit({ id }: { id: string }) {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <a href="#/admin" className="text-[13px] text-flame hover:underline">← Torna all'elenco</a>
-          <h1 className="mt-1 font-display text-2xl font-bold tracking-tight">{isNew ? "Nuovo corso" : `Modifica corso #${id}`}</h1>
+          <h1 className="mt-1 font-display text-2xl font-bold tracking-tight">{isNew ? (isWs ? "Nuovo workshop" : "Nuovo corso") : `${isWs ? "Modifica workshop" : "Modifica corso"} #${id}`}</h1>
         </div>
         <button className={btnPrimary} disabled={busy}>{busy ? "Salvataggio…" : "Salva corso"}</button>
       </div>
@@ -400,6 +429,74 @@ function Edit({ id }: { id: string }) {
         <p role="status" className={`rounded-lg px-4 py-2 text-[13px] ${failed ? "bg-err/10 text-err" : "bg-mint/10 text-mint"}`}>{msg}</p>
       )}
 
+      {isWs ? (
+        <>
+          <section className={card}>
+            <h2 className={h2}>Dati del workshop</h2>
+            <p className="mb-4 text-[13px] text-steel">
+              Presentazione gratuita di circa un'ora, pensata per far conoscere iSAQB®: non ha prezzi, iscrizioni o codici sconto.
+              Chi vuole partecipare si registra sull'evento LinkedIn.
+            </p>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="md:col-span-2">{F("titolo", "Titolo (accetta HTML, es. <br>)", text("titolo", { maxLength: 255, required: true }))}</div>
+              {F("livello", "Tipo", (
+                <select className={inputCls} value="Workshop" onChange={(e) => set("livello", e.target.value)}>
+                  {LEVELS.map((l) => <option key={l} value={l}>{l}</option>)}
+                </select>
+              ), "Cambiandolo in Foundation o Advanced il record torna a essere un corso a pagamento.")}
+              {F("stato", "Stato", (
+                <select className={inputCls} value={Number(f.stato)} onChange={(e) => set("stato", Number(e.target.value))}>
+                  {WS_STATI.map((v) => <option key={v} value={v}>{STATI[v]}</option>)}
+                </select>
+              ), "“In Programma” lo mostra come prossimo workshop (anche in home); dopo la data passa da solo tra i workshop svolti.")}
+              {F("data_inizio", "Data", <input type="date" className={inputCls} value={toDate(f.data_inizio)} onChange={(e) => set("data_inizio", e.target.value)} />)}
+              {F("orario_it", "Orario", text("orario_it", { maxLength: 60, placeholder: "Es. 18:00–19:00" }))}
+              {F("lingua_it", "Lingua", text("lingua_it", { maxLength: 11, placeholder: "Italiano" }))}
+              <div className="md:col-span-2">
+                {F("link_evento", "Link all'evento LinkedIn", text("link_evento", { type: "url", maxLength: 300, placeholder: "https://www.linkedin.com/events/…" }), "Il sito non gestisce iscrizioni: il pulsante “Partecipa” porta a questo indirizzo.")}
+              </div>
+            </div>
+          </section>
+
+          <section className={card}>
+            <h2 className={h2}>Immagine di presentazione</h2>
+            <div className="grid gap-5 md:grid-cols-[minmax(0,320px)_1fr]">
+              <div className="grid aspect-[16/9] place-items-center overflow-hidden rounded-xl border border-ink/10 bg-sand/40 text-[12px] text-steel">
+                {f.immagine_url ? <img src={String(f.immagine_url)} alt="Anteprima" className="size-full object-cover" /> : "Nessuna immagine"}
+              </div>
+              <div className="space-y-4">
+                <Field label="Carica un file (JPG, PNG, WebP · max 5 MB)" hint="Formato consigliato 16:9, ad esempio 1200 × 675 px.">
+                  <input type="file" accept="image/*" disabled={uploading} onChange={(e) => { const file = e.target.files?.[0]; if (file) upload(file); e.target.value = ""; }} className="block w-full text-[13px] file:mr-3 file:rounded-full file:border-0 file:bg-ink file:px-4 file:py-2 file:text-[13px] file:font-semibold file:text-white" />
+                </Field>
+                {uploading && <p className="text-[12.5px] text-steel">Caricamento…</p>}
+                {F("immagine_url", "…oppure indirizzo dell'immagine", text("immagine_url", { type: "url", maxLength: 500, placeholder: "https://…" }))}
+                {!!f.immagine_url && <button type="button" className="text-[12.5px] font-semibold text-err hover:underline" onClick={() => set("immagine_url", "")}>Rimuovi immagine</button>}
+              </div>
+            </div>
+          </section>
+
+          <section className={card}>
+            <h2 className={h2}>Contenuti per lingua</h2>
+            <div role="tablist" className="mb-5 flex flex-wrap gap-2">
+              {LANGS.map(([code, label]) => (
+                <button type="button" role="tab" aria-selected={lang === code} key={code} onClick={() => setLang(code)}
+                  className={`rounded-full px-4 py-1.5 text-[13px] font-semibold ${lang === code ? "bg-ink text-white" : "border border-ink/20 text-ink/70 hover:bg-sand"}`}>
+                  {label}
+                </button>
+              ))}
+            </div>
+            {LANGS.map(([code]) => (
+              <div key={code} hidden={lang !== code} className="grid gap-4">
+                {F(`luogo_${code}`, "Dove / modalità", text(`luogo_${code}`, { maxLength: 40, placeholder: "Es. Online (LinkedIn Live)" }))}
+                {F(`home_subtitle_${code}`, "Descrizione breve (testo semplice)", (
+                  <textarea className={inputCls} rows={4} value={String(f[`home_subtitle_${code}`] ?? "")} onChange={(e) => set(`home_subtitle_${code}`, e.target.value)} />
+                ), "Compare nella scheda del workshop e nel richiamo in home. Se vuota in una lingua, si usa quella italiana.")}
+              </div>
+            ))}
+          </section>
+        </>
+      ) : (
+      <>
       <section className={card}>
         <h2 className={h2}>Dati generali</h2>
         <div className="grid gap-4 md:grid-cols-2">
@@ -531,8 +628,11 @@ function Edit({ id }: { id: string }) {
         ))}
       </section>
 
+      </>
+      )}
+
       <div className="flex justify-end">
-        <button className={btnPrimary} disabled={busy}>{busy ? "Salvataggio…" : "Salva corso"}</button>
+        <button className={btnPrimary} disabled={busy}>{busy ? "Salvataggio…" : isWs ? "Salva workshop" : "Salva corso"}</button>
       </div>
     </form>
   );
@@ -594,6 +694,8 @@ export function Admin({ hash }: { hash: string }) {
         <p className="text-steel">Verifica permessi…</p>
       ) : m ? (
         <Edit key={m[1]} id={m[1]} />
+      ) : /^#\/admin\/(eventi|evento\/)/.test(hash) ? (
+        <EventsAdmin hash={hash} />
       ) : /^#\/admin\/impostazioni/.test(hash) ? (
         <SettingsPage session={session} />
       ) : /^#\/admin\/iscrizioni/.test(hash) ? (

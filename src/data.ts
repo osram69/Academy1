@@ -392,7 +392,55 @@ interface PublicRow {
   sconto_privati?: boolean | null;
   lingua_it: string | null;
   link_booking_it: string | null;
+  // solo workshop
+  immagine_url?: string | null;
+  link_evento?: string | null;
+  home_subtitle_it?: string | null;
+  home_subtitle_en?: string | null;
+  home_subtitle_fr?: string | null;
+  home_subtitle_de?: string | null;
 }
+
+/* ----------------------------- workshop ---------------------------- */
+/* Presentazioni gratuite di circa un'ora: non sono corsi (niente prezzi, iscrizioni o ordini).
+   La partecipazione si prenota sull'evento LinkedIn indicato nel pannello. */
+
+export interface Workshop {
+  id: string;
+  title: string;
+  start: Date;
+  time: string; // es. "18:00–19:00"
+  place: string;
+  language: string;
+  description: string;
+  image: string | null;
+  eventUrl: string;
+  concluded: boolean;
+}
+
+export let WORKSHOPS: Workshop[] = [];
+
+const toWorkshop = (r: PublicRow): Workshop => {
+  const key = lang as "it" | "en" | "fr" | "de";
+  const start = new Date(`${(r.data_inizio || "").slice(0, 10)}T00:00:00`);
+  const endOfDay = new Date(start.getTime() + DAY - 1);
+  return {
+    id: String(r.id_corso),
+    title: plain(r.titolo),
+    start,
+    time: r.orario_it ?? "",
+    place: (r[`luogo_${key}` as "luogo_it"] || r.luogo_it || "").trim(),
+    language: r.lingua_it ?? "",
+    description: plain((r[`home_subtitle_${key}` as "home_subtitle_it"] || r.home_subtitle_it || "")),
+    image: r.immagine_url || null,
+    eventUrl: r.link_evento || "",
+    concluded: r.stato === 5 || endOfDay.getTime() < Date.now(),
+  };
+};
+
+/** Prossimi workshop, dal più vicino. */
+export const upcomingWorkshops = () => WORKSHOPS.filter((w) => !w.concluded).sort((a, b) => a.start.getTime() - b.start.getTime());
+export const pastWorkshops = () => WORKSHOPS.filter((w) => w.concluded).sort((a, b) => b.start.getTime() - a.start.getTime());
 
 const ENTITIES: Record<string, string> = { "&reg;": "®", "&amp;": "&", "&nbsp;": " ", "&quot;": '"', "&#039;": "'", "&trade;": "™" };
 const plain = (html: string) =>
@@ -433,7 +481,11 @@ export async function loadCourses(): Promise<void> {
   // vista pubblica: solo corsi visibili e campi sicuri (vedi supabase/schema.sql)
   const { data, error } = await supabase.from("corsi_public").select("*").order("data_inizio", { ascending: true });
   if (error) throw error;
-  COURSES = (data as PublicRow[]).map(fromRow).filter((r) => r.start).map(toCourse);
+  // i workshop (livello "Workshop") hanno un modello proprio: non entrano nell'elenco dei corsi
+  const rows = (data as PublicRow[]).filter((r) => r.data_inizio);
+  const isWorkshop = (r: PublicRow) => String(r.livello ?? "").trim().toLowerCase() === "workshop";
+  WORKSHOPS = rows.filter(isWorkshop).filter((r) => r.stato !== 2).map(toWorkshop);
+  COURSES = rows.filter((r) => !isWorkshop(r)).map(fromRow).map(toCourse);
 }
 
 export const upcomingCourses = () =>

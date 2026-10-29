@@ -160,6 +160,8 @@ export async function apiCreateOrder(b, { origin, ip }) {
 
     const course = await getCourse(Number(b.courseId));
     if (!course || !course.iscrizioni_aperte || course.stato === 5 || course.stato === 2) return fail(400, "Le iscrizioni a questo corso non sono aperte.");
+    // i workshop sono eventi gratuiti prenotati su LinkedIn: non hanno ordini né pagamenti
+    if (String(course.livello || "").trim().toLowerCase() === "workshop") return fail(400, "Questo workshop è gratuito e si prenota sull'evento LinkedIn.");
 
     const seats = Number(b.seats);
     if (!Number.isInteger(seats) || seats < 1 || seats > MAX_SEATS) return fail(400, `Puoi iscrivere da 1 a ${MAX_SEATS} partecipanti.`);
