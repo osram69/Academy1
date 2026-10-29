@@ -25,16 +25,12 @@ export default function ClientApp() {
 
   const boot = useCallback(async () => {
     setState("loading");
-    document.title = t("Cube Academy — Certificazione iSAQB® CPSA-F");
-    document
-      .querySelector('meta[name="description"]')
-      ?.setAttribute("content", t("Cube Academy — Training Provider accreditato iSAQB® dal 2024. Corsi CPSA-Foundation online e in aula a Roma."));
     try {
       await loadCourses();
       setState("ready");
     } catch (e) {
       console.error(e);
-      setState(window.location.hash.startsWith("#/admin") ? "ready" : "error");
+      setState(window.location.pathname.startsWith("/admin") ? "ready" : "error");
     }
   }, []);
 

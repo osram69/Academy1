@@ -1,3 +1,4 @@
+import { navigate } from "../lib/nav";
 import { useEffect, useState } from "react";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { cn } from "../utils/cn";
@@ -6,13 +7,13 @@ import { WorkshopTicker } from "./WorkshopCard";
 
 import { LANGS, lang, setLang, t } from "../i18n";
 const LINKS = [
-  { label: t("Home"), href: "#/" },
-  { label: t("Catalogo corsi"), href: "#/corsi" },
-  { label: t("Certificazione"), href: "#/", section: "certificazione" },
-  { label: t("Prestige"), href: "#/", section: "formati" },
-  { label: t("Eventi"), href: "#/eventi" },
-  { label: t("FAQ"), href: "#/", section: "faq" },
-  { label: t("Contatti"), href: "#/contatti" },
+  { label: t("Home"), href: "/" },
+  { label: t("Catalogo corsi"), href: "/corsi" },
+  { label: t("Certificazione"), href: "/", section: "certificazione" },
+  { label: t("Prestige"), href: "/", section: "formati" },
+  { label: t("Eventi"), href: "/eventi" },
+  { label: t("FAQ"), href: "/", section: "faq" },
+  { label: t("Contatti"), href: "/contatti" },
 ];
 
 
@@ -35,12 +36,12 @@ export function Nav({ route }: { route: string }) {
     if (!section) return;
     e.preventDefault();
     setOpen(false);
-    if (window.location.hash !== href) window.location.hash = href;
+    navigate(href);
     setTimeout(() => document.getElementById(section)?.scrollIntoView({ behavior: "smooth", block: "start" }), 120);
   };
 
   const isActive = (href: string) =>
-    href === "#/corsi" ? route.startsWith("#/corsi") || route.startsWith("#/corso/") : href === "#/contatti" ? route.startsWith("#/contatti") : href === "#/eventi" ? route.startsWith("#/eventi") : route === "#/" || route === "";
+    href === "/corsi" ? route.startsWith("/corsi") || route.startsWith("/corso/") : href === "/contatti" ? route.startsWith("/contatti") : href === "/eventi" ? route.startsWith("/eventi") : route === "/" || route === "";
 
   return (
     <header className="fixed inset-x-0 top-0 z-50">
@@ -53,7 +54,7 @@ export function Nav({ route }: { route: string }) {
       >
         <div className="mx-auto flex h-[68px] max-w-7xl items-center justify-between gap-4 px-5 lg:px-8">
           {/* logo */}
-          <a href="#/" className="group flex items-center gap-3" aria-label={t("Cube Academy — Home")}>
+          <a href="/" className="group flex items-center gap-3" aria-label={t("Cube Academy — Home")}>
             <img
               src="/img/logo-cube-academy.png"
               alt={t("Cube Academy")}
@@ -122,7 +123,7 @@ export function Nav({ route }: { route: string }) {
             </div>
 
             <a
-              href={`#/iscriviti/${next.slug}`}
+              href={`/iscriviti/${next.slug}`}
               className="group hidden items-center gap-2.5 rounded-full bg-flame py-2 pl-4 pr-5 font-display text-[13px] font-semibold text-white shadow-flame transition-all duration-300 hover:bg-white hover:text-ink md:inline-flex"
             >
               {t("Iscriviti")}<span className="font-mono text-[10px] font-medium tracking-wider opacity-75">
@@ -167,7 +168,7 @@ export function Nav({ route }: { route: string }) {
           ))}
         </nav>
         <a
-          href={`#/iscriviti/${next.slug}`}
+          href={`/iscriviti/${next.slug}`}
           className="mt-auto inline-flex items-center justify-center rounded-full bg-flame py-4 font-display font-semibold text-white"
         >
           {t("Iscriviti alla prossima edizione")}</a>

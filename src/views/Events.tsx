@@ -1,3 +1,4 @@
+import { leadingId } from "../lib/slug";
 import { useEffect, useState } from "react";
 import { ArrowLeft, CalendarDays, MapPin } from "lucide-react";
 import { t } from "../i18n";
@@ -72,7 +73,7 @@ export function Events() {
                       {e.place && <span className="inline-flex items-center gap-1.5"><MapPin className="size-3.5" aria-hidden="true" />{e.place}</span>}
                     </p>
                     <h2 className="mt-3 font-display text-xl font-bold tracking-tight text-ink">
-                      <a href={`#/eventi/${e.id}`} className="after:absolute after:inset-0 after:content-[''] hover:text-flame">{e.title}</a>
+                      <a href={`/eventi/${e.slug}`} className="after:absolute after:inset-0 after:content-[''] hover:text-flame">{e.title}</a>
                     </h2>
                     {e.text && <p className="mt-2.5 line-clamp-3 text-[14.5px] leading-relaxed text-ink/65">{paragraphs(e.text)[0]}</p>}
                     <p className="mt-auto pt-5 text-[14px] font-semibold text-flame">{t("Leggi tutto")}</p>
@@ -90,12 +91,13 @@ export function Events() {
 /** Pagina dell'evento: immagine, date, descrizione completa e link al sito dell'evento. */
 export function EventDetail({ id }: { id: string }) {
   const items = useEvents();
-  const e = items?.find((x) => x.id === id);
+  const lead = leadingId(id);
+  const e = items?.find((x) => x.slug === id || x.id === id || (lead != null && x.id === String(lead)));
   return (
     <div className="bg-paper">
       <Header title={e?.title ?? t("Eventi")} />
       <main className="mx-auto max-w-4xl px-5 py-10 lg:px-8 lg:py-14">
-        <a href="#/eventi" className="link-sweep inline-flex items-center gap-1.5 text-[14px] font-semibold text-flame">
+        <a href="/eventi" className="link-sweep inline-flex items-center gap-1.5 text-[14px] font-semibold text-flame">
           <ArrowLeft className="size-4" aria-hidden="true" />{t("Tutti gli eventi")}
         </a>
         {items === null ? (

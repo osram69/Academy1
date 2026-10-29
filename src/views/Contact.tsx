@@ -9,7 +9,7 @@ import { Tag } from "../components/ui";
 import { LegalLinkModal } from "../components/LegalLinkModal";
 import { PrivacyNoticeContent } from "../components/LegalContent";
 
-/* Pagina "Contatti": modulo di contatto (#/contatti). Accetta #/contatti?oggetto=gruppi&corso=<nome> per precompilare. */
+/* Pagina "Contatti": modulo di contatto (/contatti). Accetta #/contatti?oggetto=gruppi&corso=<nome> per precompilare. */
 
 const TOPICS: { id: string; label: string }[] = [
   { id: "info", label: t("Informazioni sul corso") },
@@ -24,7 +24,7 @@ const TOPICS: { id: string; label: string }[] = [
 type Field = "name" | "email" | "phone" | "message" | "consent";
 
 function initialFromHash() {
-  const query = new URLSearchParams((window.location.hash.split("?")[1] ?? ""));
+  const query = new URLSearchParams(window.location.search);
   const topic = TOPICS.some((x) => x.id === query.get("oggetto")) ? (query.get("oggetto") as string) : "info";
   const course = query.get("corso") ?? "";
   let message = "";
@@ -94,7 +94,7 @@ export function Contact() {
             <p className="mx-auto mt-3 max-w-md text-[15px] leading-relaxed text-ink/70">
               {t("Grazie, abbiamo ricevuto la tua richiesta. Ti risponderemo il prima possibile all'indirizzo indicato: ti abbiamo mandato anche una copia del messaggio.")}
             </p>
-            <a href="#/" className="mt-6 inline-flex rounded-full bg-ink px-6 py-3 font-display text-sm font-semibold text-white transition-colors hover:bg-flame">{t("Torna alla home")}</a>
+            <a href="/" className="mt-6 inline-flex rounded-full bg-ink px-6 py-3 font-display text-sm font-semibold text-white transition-colors hover:bg-flame">{t("Torna alla home")}</a>
           </section>
         ) : (
           <form onSubmit={submit} noValidate className="space-y-5 rounded-3xl border border-ink/10 bg-white p-6 shadow-card sm:p-8">

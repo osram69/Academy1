@@ -63,7 +63,7 @@ function CertificationSection() {
               <strong className="font-semibold text-ink">{t("iSAQB® CPSA-Foundation")}</strong>{" "}{t("è la certificazione di architettura software più riconosciuta in Europa. Non un badge da LinkedIn: un percorso strutturato che cambia come progetti, documenti e difendi le tue decisioni.")}</p>
           </Reveal>
           <Reveal delay={240} className="mt-8">
-            <Btn href="#/corsi" variant="ink" withArrow>
+            <Btn href="/corsi" variant="ink" withArrow>
               {t("Scegli la tua edizione")}</Btn>
           </Reveal>
           <Reveal delay={280} className="mt-6">
@@ -118,7 +118,7 @@ function CertificationSection() {
                 <p className="mt-0.5 text-[13px] leading-snug text-white/68">{TRAINER.role}</p>
               </div>
               <a
-                href="#/corso/cpsa-f-online"
+                href={`/corso/${nextCourse().slug}`}
                 className="link-sweep ml-auto shrink-0 text-[13px] font-medium text-ember"
               >
                 {t("Conosci i docenti →")}</a>
@@ -233,7 +233,7 @@ function FormatsSection() {
                     ))}
                   </ul>
                   <a
-                    href="#/corsi"
+                    href="/corsi"
                     className="mt-7 inline-flex items-center gap-2 text-[13.5px] font-semibold text-white transition-colors hover:text-ember"
                     aria-label={t("Vedi le edizioni in formato {format}", { format: f.title })}
                   >
@@ -269,7 +269,7 @@ function EditionsSection() {
             </Reveal>
           </div>
           <Reveal delay={160}>
-            <Btn href="#/corsi" variant="ghost" withArrow>
+            <Btn href="/corsi" variant="ghost" withArrow>
               {t("Tutto il catalogo")}</Btn>
           </Reveal>
         </div>
@@ -303,7 +303,7 @@ function FaqSection() {
           <Reveal delay={160}>
             <p className="mt-6 max-w-md text-[15.5px] leading-relaxed text-ink/60">
               {t("Non trovi la risposta?")}{" "}
-              <a href="#/contatti" className="link-sweep font-semibold text-flame">
+              <a href="/contatti" className="link-sweep font-semibold text-flame">
                 {t("Scrivici con il modulo di contatto")}</a>{" "}
               {t("— ti rispondiamo il prima possibile.")}</p>
           </Reveal>
@@ -398,9 +398,9 @@ function CtaSection() {
             {next.short} · {fmtRange(next.start, next.end)} · {next.location}{t(". Early bird attivo: blocchi il prezzo ora, il materiale del corso è incluso nel prezzo.")}</p>
         </Reveal>
         <Reveal delay={260} className="mt-10 flex flex-wrap gap-4">
-          <Btn href={`#/iscriviti/${next.slug}`} size="lg" withArrow ariaLabel={t("Iscriviti ora alla prossima edizione")}>
+          <Btn href={`/iscriviti/${next.slug}`} size="lg" withArrow ariaLabel={t("Iscriviti ora alla prossima edizione")}>
             {t("Iscriviti ora")}</Btn>
-          <Btn href="#/corsi" variant="line-dark" size="lg">
+          <Btn href="/corsi" variant="line-dark" size="lg">
             {t("Confronta le date")}</Btn>
         </Reveal>
       </div>

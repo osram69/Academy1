@@ -1,3 +1,4 @@
+import { navigate } from "../lib/nav";
 import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase, supabaseConfigured } from "../lib/supabase";
@@ -10,7 +11,7 @@ import { translateFromItalian } from "./translate";
 import { RichEditor } from "./RichEditor";
 
 /* Pannello di gestione corsi (sostituisce il plugin WordPress "Cube Academy - Gestione Corsi").
-   Rotte: #/admin (elenco) · #/admin/corso/new · #/admin/corso/<id>
+   Rotte: /admin (elenco) · /admin/corso/new · /admin/corso/<id>
    Accesso: utenti Supabase Auth la cui email è in public.admin_emails (RLS lato database). */
 
 type Row = Record<string, string | number | boolean | null>;
@@ -106,9 +107,7 @@ function toPayload(f: Row): { data: Row; errors: Errors } {
   return { data, errors };
 }
 
-const go = (hash: string) => {
-  window.location.hash = hash;
-};
+const go = (path: string) => navigate(path);
 
 /* ------------------------------- UI helpers ------------------------------ */
 
@@ -122,17 +121,17 @@ function Shell({ children, right }: { children: ReactNode; right?: ReactNode }) 
     <div className="min-h-screen bg-paper">
       <header className="border-b border-ink/10 bg-ink text-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-4">
-          <a href="#/admin" className="flex items-center gap-3" aria-label="Cube Academy — Gestione corsi">
+          <a href="/admin" className="flex items-center gap-3" aria-label="Cube Academy — Gestione corsi">
             <img src="/img/logo-cube-academy.png" alt="Cube Academy" width={1000} height={173} className="h-7 w-auto" />
             <span className="border-l border-white/20 pl-3 font-display text-[15px] font-semibold tracking-tight text-ember">Gestione</span>
           </a>
           <nav className="flex items-center gap-5 text-[13px] font-medium" aria-label="Sezioni del pannello">
-            {[["#/admin", "Corsi"], ["#/admin/eventi", "Eventi"], ["#/admin/iscrizioni", "Iscrizioni"], ["#/admin/impostazioni", "Impostazioni"]].map(([h, l]) => (
+            {[["/admin", "Corsi"], ["/admin/eventi", "Eventi"], ["/admin/iscrizioni", "Iscrizioni"], ["/admin/impostazioni", "Impostazioni"]].map(([h, l]) => (
               <a key={h} href={h} className="text-white/75 hover:text-white">{l}</a>
             ))}
           </nav>
           <div className="flex items-center gap-3 text-[13px]">
-            <a href="#/" className="text-white/70 hover:text-white">Vai al sito</a>
+            <a href="/" className="text-white/70 hover:text-white">Vai al sito</a>
             {right}
           </div>
         </div>
@@ -237,8 +236,8 @@ function List() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-display text-2xl font-bold tracking-tight">Corsi</h1>
         <div className="flex flex-wrap gap-2">
-          <button className={btnPrimary} onClick={() => go("#/admin/corso/new")}>+ Nuovo corso</button>
-          <button className={`${btnCls} border border-ink/20 text-ink hover:bg-sand`} onClick={() => go("#/admin/corso/new-workshop")}>+ Nuovo workshop</button>
+          <button className={btnPrimary} onClick={() => go("/admin/corso/new")}>+ Nuovo corso</button>
+          <button className={`${btnCls} border border-ink/20 text-ink hover:bg-sand`} onClick={() => go("/admin/corso/new-workshop")}>+ Nuovo workshop</button>
         </div>
       </div>
       {msg && (
@@ -279,7 +278,7 @@ function List() {
                 <td className="px-4 py-3 text-ink/70">{r.data_it}</td>
                 <td className="px-4 py-3">{r.in_evidenza ? "✓" : ""}</td>
                 <td className="whitespace-nowrap px-4 py-3">
-                  <button className="mr-3 font-semibold text-flame hover:underline" onClick={() => go(`#/admin/corso/${r.id_corso}`)}>Modifica</button>
+                  <button className="mr-3 font-semibold text-flame hover:underline" onClick={() => go(`/admin/corso/${r.id_corso}`)}>Modifica</button>
                   <button
                     className="mr-3 font-semibold text-ink/70 hover:underline"
                     onClick={async () => {
@@ -289,7 +288,7 @@ function List() {
                       delete copy.id_corso;
                       const ins = await supabase.from("corsi").insert(copy).select("id_corso").single();
                       if (ins.error) return act(async () => ({ error: ins.error }), "");
-                      go(`#/admin/corso/${(ins.data as Row).id_corso}`);
+                      go(`/admin/corso/${(ins.data as Row).id_corso}`);
                     }}
                   >
                     Duplica
@@ -455,7 +454,7 @@ function Edit({ id }: { id: string }) {
     if (isNew) {
       const r = await supabase.from("corsi").insert(data).select("id_corso").single();
       if (r.error) setMsg(r.error.message);
-      else go(`#/admin/corso/${(r.data as Row).id_corso}`);
+      else go(`/admin/corso/${(r.data as Row).id_corso}`);
     } else {
       const r = await supabase.from("corsi").update(data).eq("id_corso", Number(id)).select("id_corso");
       setMsg(r.error ? r.error.message : r.data?.length ? "Corso salvato." : "Nessuna modifica salvata: permessi insufficienti?");
@@ -481,7 +480,7 @@ function Edit({ id }: { id: string }) {
     <form onSubmit={save} className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <a href="#/admin" className="text-[13px] text-flame hover:underline">← Torna all'elenco</a>
+          <a href="/admin" className="text-[13px] text-flame hover:underline">← Torna all'elenco</a>
           <h1 className="mt-1 font-display text-2xl font-bold tracking-tight">{isNew ? (isWs ? "Nuovo workshop" : "Nuovo corso") : `${isWs ? "Modifica workshop" : "Modifica corso"} #${id}`}</h1>
         </div>
         <button className={btnPrimary} disabled={busy}>{busy ? "Salvataggio…" : isWs ? "Salva workshop" : "Salva corso"}</button>

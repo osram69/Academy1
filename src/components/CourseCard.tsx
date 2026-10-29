@@ -70,7 +70,7 @@ export function CourseCard({ course, index = 0 }: { course: Course; index?: numb
 
         <h3 className="mt-3.5 font-display text-[21px] font-bold leading-snug tracking-tight text-ink">
           <a
-            href={`#/corso/${course.slug}`}
+            href={`/corso/${course.slug}`}
             className="transition-colors after:absolute after:inset-0 after:content-[''] hover:text-flame focus-visible:outline-none"
           >
             {course.title}
@@ -117,7 +117,7 @@ export function CourseCard({ course, index = 0 }: { course: Course; index?: numb
             </p>
           </div>
           <a
-            href={waitlist ? `#/corso/${course.slug}` : `#/iscriviti/${course.slug}`}
+            href={waitlist ? `/corso/${course.slug}` : `/iscriviti/${course.slug}`}
             aria-label={
               waitlist
                 ? t("Entra in lista d'attesa per {name}", { name: course.short })

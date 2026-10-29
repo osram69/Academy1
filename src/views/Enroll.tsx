@@ -1,3 +1,4 @@
+import { navigate } from "../lib/nav";
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import {
   AlertTriangle,
@@ -211,7 +212,7 @@ function StepConfigure({ course, count, setCount, maxSeats, billingType, setBill
             {fmtRange(course.start, course.end)} · {course.effort} · {course.location}
           </p>
           <div className="mt-4 flex flex-wrap items-center gap-3">
-            <a href="#/corsi" className="link-sweep text-[13px] font-semibold text-flame">
+            <a href="/corsi" className="link-sweep text-[13px] font-semibold text-flame">
               {t("Cambia edizione o corso →")}</a>
             {course.seatsLeft != null && (
               <span className="inline-flex items-center gap-1.5 rounded-full bg-mint/10 px-3 py-1 text-[12px] font-semibold text-mint">
@@ -253,7 +254,7 @@ function StepConfigure({ course, count, setCount, maxSeats, billingType, setBill
             <Users className="mt-0.5 size-4.5 shrink-0 text-gold" aria-hidden="true" />
             <span>
               <strong className="font-semibold text-ink">{t("Gruppi aziendali:")}</strong>{" "}{t("ogni edizione ha al massimo 12 partecipanti. Per più persone o per un'edizione dedicata")}{" "}
-              <a className="link-sweep font-semibold text-flame" href="#/contatti?oggetto=gruppi">{t("scrivici")}</a>.
+              <a className="link-sweep font-semibold text-flame" href="/contatti?oggetto=gruppi">{t("scrivici")}</a>.
             </span>
           </div>
         )}
@@ -901,7 +902,7 @@ export function Enroll({ course }: { course: Course }) {
       return;
     }
     try {
-      setCoupon(await checkCoupon(Number(course.slug), code, billing.type));
+      setCoupon(await checkCoupon(course.id, code, billing.type));
       setCouponError(null);
     } catch (e) {
       setCoupon(null);
@@ -913,7 +914,7 @@ export function Enroll({ course }: { course: Course }) {
   useEffect(() => {
     if (!coupon || !billing.type) return;
     let cancelled = false;
-    checkCoupon(Number(course.slug), coupon.code, billing.type)
+    checkCoupon(course.id, coupon.code, billing.type)
       .then((c) => { if (!cancelled) setCoupon(c); })
       .catch(() => {
         if (cancelled) return;
@@ -932,9 +933,9 @@ export function Enroll({ course }: { course: Course }) {
     setBusy(true);
     setPayError("");
     try {
-      const res = await createOrder({ lang, courseId: Number(course.slug), seats: count, method, coupon: coupon?.code ?? null, participants, billing });
+      const res = await createOrder({ lang, courseId: course.id, seats: count, method, coupon: coupon?.code ?? null, participants, billing });
       if (res.url) window.location.href = res.url; // checkout del provider
-      else window.location.hash = `#/esito/${encodeURIComponent(res.ref)}/pending`; // bonifico
+      else navigate(`/esito/${encodeURIComponent(res.ref)}/pending`); // bonifico
     } catch (e) {
       setPayError((e as Error).message);
       setBusy(false);
@@ -1033,7 +1034,7 @@ export function Enroll({ course }: { course: Course }) {
                 <ArrowLeft className="size-4" aria-hidden="true" />
                 {t("Indietro")}</button>
             ) : (
-              <a href={`#/corso/${course.slug}`} className="inline-flex items-center gap-2 text-[13px] font-semibold text-steel transition-colors hover:text-ink">
+              <a href={`/corso/${course.slug}`} className="inline-flex items-center gap-2 text-[13px] font-semibold text-steel transition-colors hover:text-ink">
                 <ArrowLeft className="size-4" aria-hidden="true" />
                 {t("Torna alla scheda corso")}</a>
             )}

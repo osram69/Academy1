@@ -53,7 +53,7 @@ function FloatingCourseCard() {
             <span className="ml-2 align-middle text-[12px] font-normal text-white/56 line-through">{eur(price.original)}</span>
           )}
         </p>
-        <Btn href={`#/iscriviti/${course.slug}`} size="sm" ariaLabel={t("Iscriviti alla prossima edizione")}>
+        <Btn href={`/iscriviti/${course.slug}`} size="sm" ariaLabel={t("Iscriviti alla prossima edizione")}>
           {t("Blocca il posto")}</Btn>
       </div>
     </div>
@@ -103,9 +103,9 @@ export function Hero() {
           </Reveal>
 
           <Reveal delay={260} className="mt-9 flex flex-wrap items-center gap-4">
-            <Btn href={`#/iscriviti/${nextCourse().slug}`} size="lg" withArrow ariaLabel={t("Vai all'iscrizione della prossima edizione")}>
+            <Btn href={`/iscriviti/${nextCourse().slug}`} size="lg" withArrow ariaLabel={t("Vai all'iscrizione della prossima edizione")}>
               {t("Iscriviti alla prossima edizione")}</Btn>
-            <Btn href="#/corsi" variant="line-dark" size="lg">
+            <Btn href="/corsi" variant="line-dark" size="lg">
               {t("Calendario completo")}</Btn>
           </Reveal>
 

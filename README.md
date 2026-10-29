@@ -3,12 +3,12 @@
 Sito React in un'app **Next.js** (come romaofficesharing.it). I corsi
 vivono in un database **Supabase** (Postgres) e il sito li legge dal browser; iscrizioni e pagamenti
 (Stripe, PayPal, SumUp, bonifico) passano dal server, che custodisce le chiavi segrete. Il pannello
-`#/admin` sostituisce il plugin WordPress "Cube Academy - Gestione Corsi".
+`/admin` sostituisce il plugin WordPress "Cube Academy - Gestione Corsi".
 
 ## Deploy su Hostinger (app Next.js)
 
 Il progetto è un'app **Next.js** (come romaofficesharing.it): l'interfaccia è una single-page app a rotte con
-hash (`#/corsi`, `#/admin`, ...) e le API di iscrizione e pagamento sono Route Handler (`src/app/api`).
+percorsi veri (`/corsi`, `/admin`, ...) e le API di iscrizione e pagamento sono Route Handler (`src/app/api`).
 
 1. hPanel → **Siti web → Aggiungi sito → App Node.js**, collega il repository GitHub (branch `main`).
 2. Framework **Next.js**, Node 20+, build `npm run build`, output `.next`, start `npm start`.
@@ -25,11 +25,11 @@ hash (`#/corsi`, `#/admin`, ...) e le API di iscrizione e pagamento sono Route H
    `supabase/migrazione-6.sql` (titolo dei workshop nelle altre lingue).
 5. Webhook: Stripe → `https://<dominio>/api/webhook/stripe`, PayPal → `https://<dominio>/api/webhook/paypal`.
    (SumUp non ha webhook firmati: il pagamento è verificato dal server al ritorno dal checkout.)
-6. Per passare in produzione: valorizza le chiavi live e, da `#/admin/impostazioni`, porta il metodo da Sandbox a Live.
+6. Per passare in produzione: valorizza le chiavi live e, da `/admin/impostazioni`, porta il metodo da Sandbox a Live.
 7. Email: imposta `SMTP_HOST` (es. `smtp.hostinger.com`), `SMTP_PORT` (465), `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM`,
    `MAIL_FROM_NAME` (e, se vuoi cambiarli, `MAIL_STAFF_TO` / `MAIL_STAFF_CC`: di default `academy@cubeng.eu` e
    `registrazioni@cubeng.eu`, come nel plugin WordPress). Senza SMTP le iscrizioni funzionano ma le email non partono.
-   Lo stesso SMTP serve al **modulo di contatto** (`#/contatti`): il messaggio arriva a `MAIL_STAFF_TO` con
+   Lo stesso SMTP serve al **modulo di contatto** (`/contatti`): il messaggio arriva a `MAIL_STAFF_TO` con
    Reply-To del mittente, e il mittente riceve una copia.
    **Traduzioni automatiche**: il pulsante «Traduci per le altre lingue» dei workshop e degli eventi usa Claude se
    imposti `ANTHROPIC_API_KEY` (modello in `TRANSLATE_MODEL`, default `claude-haiku-5-5`); senza chiave ripiega
@@ -41,9 +41,18 @@ Il server calcola prezzo, sconti e IVA da solo (il browser non decide l'importo)
 12 partecipanti per edizione (limite iSAQB con un solo docente) e verifica ogni pagamento direttamente
 sul provider prima di segnare l'ordine come pagato. Un metodo senza chiavi configurate resta disattivato.
 
+## SEO e indirizzi
+
+Gli indirizzi sono percorsi veri (`/corsi`, `/corso/<id>-<descrizione>`, `/eventi/<id>-<titolo>`, `/contatti`, `/privacy`,
+`/condizioni`, `/cookie-policy`): per ciascuno il server consegna titolo, descrizione, canonical, Open Graph e dati
+strutturati (Course, Event, ItemList, BreadcrumbList, Organization), letti dal database e rinfrescati ogni 5 minuti.
+`/sitemap.xml` e `/robots.txt` si generano da soli (corsi in programma ed eventi inclusi); un corso concluso o inesistente
+risponde 404. I vecchi indirizzi con hash (`/#/corso/12`) e gli indirizzi brevi (`/corso/12`) si portano al nuovo.
+Il dominio si imposta con `SITE_URL` (default `https://academy.cubeng.eu`).
+
 ## Lingue (IT · EN · FR · DE)
 
-Il sito pubblico è tradotto in quattro lingue; il pannello `#/admin` resta in italiano. La lingua si sceglie
+Il sito pubblico è tradotto in quattro lingue; il pannello `/admin` resta in italiano. La lingua si sceglie
 dal selettore in alto (si ricorda nel browser; al primo accesso segue la lingua del browser).
 I testi stanno in `src/i18n/{en,fr,de}.ts`: la chiave è il testo italiano usato nel codice con `t("...")`.
 Un testo senza traduzione compare in italiano. Luogo e lingua dei corsi vengono dalle colonne
@@ -52,12 +61,12 @@ Un testo senza traduzione compare in italiano. Luogo e lingua dei corsi vengono 
 ## Privacy e cookie
 
 Informativa privacy e cookie policy (IT/EN/FR/DE) stanno in `src/legal/content.ts` e si aprono come pagine
-(`#/privacy`, `#/cookie-policy`) e come popup dal footer, dal banner e dal consenso privacy dei moduli.
+(`/privacy`, `/cookie-policy`) e come popup dal footer, dal banner e dal consenso privacy dei moduli.
 All'apertura del sito il banner chiede la scelta sui cookie (necessari, analitici, marketing; si riapre da
 "Impostazioni cookie" nel footer). Google Tag Manager si attiva solo con `NEXT_PUBLIC_GTM_ID` e dopo il consenso.
 I testi vanno rivisti dal titolare / dal consulente legale prima della pubblicazione.
 
-## Pannello di gestione (`#/admin`)
+## Pannello di gestione (`/admin`)
 
 - **Corsi**: edizioni, prezzi, early bird, posti, modalità di fruizione e calendario delle sessioni.
 - **Iscrizioni**: elenco degli ordini (sandbox marcati "prova").

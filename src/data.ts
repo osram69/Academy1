@@ -4,6 +4,7 @@
 /*  (early bird attivo, countdown, edizioni imminenti).                */
 /* ------------------------------------------------------------------ */
 
+import { courseSlug, leadingId } from "./lib/slug";
 import { supabase, supabaseConfigured } from "./lib/supabase";
 
 import { lang, locale, t } from "./i18n";
@@ -55,6 +56,7 @@ export interface CourseModule {
 }
 
 export interface Course {
+  id: number;
   slug: string;
   short: string;
   title: string;
@@ -330,7 +332,8 @@ function toCourse(a: ApiCourse): Course {
   const mod = MODALITA[a.modalita];
   const short = `CPSA-F ${a.modalita !== "intensivo" ? mod.short : online ? t("Online") : loc} · ${fmtDate(start)}`;
   return {
-    slug: String(a.id),
+    id: a.id,
+    slug: courseSlug({ id: a.id, level: a.level, online, residential: a.residential, locationIt: a.location.IT || "", start: a.start }),
     short,
     title: a.title,
     level: (a.level as CourseLevel) || "Foundation",
@@ -531,7 +534,8 @@ const plain = (html: string) =>
   html
     .replace(/<br\s*\/?>/gi, " ")
     .replace(/<[^>]+>/g, "")
-    .replace(/&[a-z#0-9]+;/gi, (e) => ENTITIES[e.toLowerCase()] ?? e)
+    .replace(/&#(x?[0-9a-f]+);/gi, (_e, n: string) => String.fromCodePoint(n[0].toLowerCase() === "x" ? parseInt(n.slice(1), 16) : parseInt(n, 10)))
+    .replace(/&[a-z]+;/gi, (e) => ENTITIES[e.toLowerCase()] ?? e)
     .replace(/\s+/g, " ")
     .trim();
 
@@ -584,7 +588,11 @@ export const nextCourse = (): Course => {
   return up.find((c) => c.status !== "waitlist") ?? up[0] ?? concludedCourses()[0] ?? EMPTY_COURSE;
 };
 
-export const bySlug = (slug: string) => COURSES.find((c) => c.slug === slug);
+/** Trova il corso dall'indirizzo: conta solo l'id numerico in testa, il resto dello slug è descrittivo. */
+export const bySlug = (slug: string) => {
+  const id = leadingId(slug);
+  return COURSES.find((c) => c.slug === slug) ?? (id != null ? COURSES.find((c) => c.id === id) : undefined);
+};
 
 const EMPTY_COURSE: Course = {
   ...toCourse({
@@ -621,19 +629,19 @@ export const FAQS = [
   },
   {
     q: t("Come funziona la politica di rimborso?"),
-    a: t("Se il corso non viene erogato per mancato raggiungimento del numero minimo di partecipanti, la quota versata è rimborsata (in alternativa puoi scegliere un'altra data). Per altre esigenze, come la sostituzione di un partecipante, usa il [modulo di contatto](#/contatti?oggetto=rimborso)."),
+    a: t("Se il corso non viene erogato per mancato raggiungimento del numero minimo di partecipanti, la quota versata è rimborsata (in alternativa puoi scegliere un'altra data). Per altre esigenze, come la sostituzione di un partecipante, usa il [modulo di contatto](/contatti?oggetto=rimborso)."),
   },
   {
     q: t("Cosa sono i corsi Prestige residenziali?"),
-    a: t("I corsi residenziali durano 4 giorni e comprendono albergo e mezza pensione, nelle più belle città italiane. Le informazioni arriveranno presto: [scrivici](#/contatti?oggetto=prestige) per essere avvisato."),
+    a: t("I corsi residenziali durano 4 giorni e comprendono albergo e mezza pensione, nelle più belle città italiane. Le informazioni arriveranno presto: [scrivici](/contatti?oggetto=prestige) per essere avvisato."),
   },
   {
     q: t("Serve esperienza da architetto per iscriversi?"),
-    a: t("No: servono almeno 18 mesi di esperienza in sviluppo software. Il corso Foundation è pensato per costruire il metodo, parte dalle basi del ruolo. Se hai dubbi sul livello, [scrivici](#/contatti?oggetto=info)."),
+    a: t("No: servono almeno 18 mesi di esperienza in sviluppo software. Il corso Foundation è pensato per costruire il metodo, parte dalle basi del ruolo. Se hai dubbi sul livello, [scrivici](/contatti?oggetto=info)."),
   },
   {
     q: t("Organizzate edizioni dedicate per il nostro team?"),
-    a: t("Per gruppi aziendali puoi contattarci per valutare edizioni dedicate: [scrivici](#/contatti?oggetto=gruppi)."),
+    a: t("Per gruppi aziendali puoi contattarci per valutare edizioni dedicate: [scrivici](/contatti?oggetto=gruppi)."),
   },
 ];
 

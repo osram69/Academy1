@@ -3,7 +3,7 @@ import { lang } from "../i18n";
 import { COOKIE, PRIVACY, TERMS } from "../legal/content";
 import { openCookieSettings } from "../lib/consent";
 
-// Stessi testi per le pagine (#/privacy, #/cookie-policy) e per i popup aperti dai moduli e dal footer.
+// Stessi testi per le pagine (/privacy, #/cookie-policy) e per i popup aperti dai moduli e dal footer.
 const h3 = "mt-5 font-display text-[15.5px] font-bold tracking-tight text-ink";
 const p = "mt-1.5 text-[14px] leading-relaxed text-ink/75";
 

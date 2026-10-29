@@ -1,3 +1,4 @@
+import { navigate } from "../lib/nav";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { supabase } from "../lib/supabase";
 import { Field, btnCls, btnPrimary, inputCls } from "./Admin";
@@ -9,7 +10,7 @@ import { translateFromItalian } from "./translate";
 type Row = Record<string, string | number | boolean | null>;
 
 const LANGS: [string, string][] = [["it", "Italiano"], ["en", "English"], ["fr", "Français"], ["de", "Deutsch"]];
-const go = (hash: string) => { window.location.hash = hash; };
+const go = (path: string) => navigate(path);
 const toDate = (v: unknown) => String(v ?? "").slice(0, 10);
 const fmt = (v: unknown) => (v ? new Date(`${toDate(v)}T12:00:00`).toLocaleDateString("it-IT", { day: "numeric", month: "short", year: "numeric" }) : "—");
 
@@ -43,7 +44,7 @@ function List() {
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-display text-2xl font-bold tracking-tight">Eventi</h1>
-        <button className={btnPrimary} onClick={() => go("#/admin/evento/new")}>+ Nuovo evento</button>
+        <button className={btnPrimary} onClick={() => go("/admin/evento/new")}>+ Nuovo evento</button>
       </div>
       {msg && <p role="status" className={`mt-4 rounded-lg px-4 py-2 text-[13px] ${isErr ? "bg-err/10 text-err" : "bg-mint/10 text-mint"}`}>{msg}</p>}
       <div className="mt-5 overflow-x-auto rounded-2xl border border-ink/10 bg-white">
@@ -71,7 +72,7 @@ function List() {
                   </button>
                 </td>
                 <td className="whitespace-nowrap px-4 py-3">
-                  <button className="mr-3 font-semibold text-flame hover:underline" onClick={() => go(`#/admin/evento/${r.id}`)}>Modifica</button>
+                  <button className="mr-3 font-semibold text-flame hover:underline" onClick={() => go(`/admin/evento/${r.id}`)}>Modifica</button>
                   <button
                     className="font-semibold text-err hover:underline"
                     onClick={() => { if (confirm("Eliminare definitivamente questo evento?")) act(() => supabase.from("eventi").delete().eq("id", r.id as number), "Evento eliminato."); }}
@@ -176,7 +177,7 @@ function Edit({ id }: { id: string }) {
     if (isNew) {
       const r = await supabase.from("eventi").insert(data).select("id").single();
       if (r.error) setMsg(r.error.message);
-      else go(`#/admin/evento/${(r.data as Row).id}`);
+      else go(`/admin/evento/${(r.data as Row).id}`);
     } else {
       const r = await supabase.from("eventi").update(data).eq("id", Number(id)).select("id");
       setMsg(r.error ? r.error.message : r.data?.length ? "Evento salvato." : "Nessuna modifica salvata: permessi insufficienti?");
@@ -192,11 +193,11 @@ function Edit({ id }: { id: string }) {
     <form onSubmit={save} className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <a href="#/admin/eventi" className="text-[13px] text-flame hover:underline">← Torna agli eventi</a>
+          <a href="/admin/eventi" className="text-[13px] text-flame hover:underline">← Torna agli eventi</a>
           <h1 className="mt-1 font-display text-2xl font-bold tracking-tight">{isNew ? "Nuovo evento" : `Modifica evento #${id}`}</h1>
         </div>
         <div className="flex gap-2">
-          {!isNew && <a href={`#/eventi/${id}`} target="_blank" rel="noopener noreferrer" className={`${btnCls} border border-ink/20 text-ink hover:bg-sand`}>Anteprima sul sito</a>}
+          {!isNew && <a href={`/eventi/${id}`} target="_blank" rel="noopener noreferrer" className={`${btnCls} border border-ink/20 text-ink hover:bg-sand`}>Anteprima sul sito</a>}
           <button className={btnPrimary} disabled={busy}>{busy ? "Salvataggio…" : "Salva evento"}</button>
         </div>
       </div>

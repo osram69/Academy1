@@ -44,10 +44,10 @@ export function ModalitaSection() {
                   <p className="mt-4 border-t border-ink/8 pt-4 text-[12.5px] text-steel">
                     {next ? (
                       <>
-                        {t("Prossima:")}{" "}<a className="link-sweep font-semibold text-ink" href={`#/corso/${next.slug}`}>{fmtRange(next.start, next.end)}</a>
+                        {t("Prossima:")}{" "}<a className="link-sweep font-semibold text-ink" href={`/corso/${next.slug}`}>{fmtRange(next.start, next.end)}</a>
                       </>
                     ) : (
-                      <>{t("Date in definizione:")}{" "}<a className="link-sweep font-semibold text-flame" href="#/contatti?oggetto=info">{t("scrivici")}</a></>
+                      <>{t("Date in definizione:")}{" "}<a className="link-sweep font-semibold text-flame" href="/contatti?oggetto=info">{t("scrivici")}</a></>
                     )}
                   </p>
                 </article>

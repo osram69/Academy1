@@ -88,10 +88,10 @@ function PriceRail({ course }: { course: Course }) {
           </ul>
 
           {waitlist ? (
-            <Btn href={`#/contatti?oggetto=attesa&corso=${encodeURIComponent(course.short)}`} variant="ink" size="lg" className="mt-7 w-full" withArrow>
+            <Btn href={`/contatti?oggetto=attesa&corso=${encodeURIComponent(course.short)}`} variant="ink" size="lg" className="mt-7 w-full" withArrow>
               {t("Entra in lista d'attesa")}</Btn>
           ) : (
-            <Btn href={`#/iscriviti/${course.slug}`} size="lg" className="mt-7 w-full" withArrow ariaLabel={t("Iscriviti a {name} del {range}", { name: course.title, range: fmtRange(course.start, course.end) })}>
+            <Btn href={`/iscriviti/${course.slug}`} size="lg" className="mt-7 w-full" withArrow ariaLabel={t("Iscriviti a {name} del {range}", { name: course.title, range: fmtRange(course.start, course.end) })}>
               {t("Iscriviti ora")}</Btn>
           )}
 
@@ -163,9 +163,9 @@ export function CourseDetail({ course }: { course: Course }) {
         <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/75 to-ink/40" aria-hidden="true" />
         <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
           <nav aria-label={t("Breadcrumb")} className="flex items-center gap-2 font-mono text-[11.5px] uppercase tracking-widest text-white/60">
-            <a href="#/" className="transition-colors hover:text-white">{t("Home")}</a>
+            <a href="/" className="transition-colors hover:text-white">{t("Home")}</a>
             <ChevronRight className="size-3.5" aria-hidden="true" />
-            <a href="#/corsi" className="transition-colors hover:text-white">{t("Catalogo")}</a>
+            <a href="/corsi" className="transition-colors hover:text-white">{t("Catalogo")}</a>
             <ChevronRight className="size-3.5" aria-hidden="true" />
             <span className="text-ember" aria-current="page">{course.short}</span>
           </nav>
@@ -327,7 +327,7 @@ export function CourseDetail({ course }: { course: Course }) {
                 <ul className="mt-4 space-y-2.5 text-[13.5px] leading-relaxed text-ink/70">
                   <li><strong className="text-ink">{t("Numero minimo non raggiunto:")}</strong>{" "}{t("se il corso non viene erogato per mancanza del numero minimo di partecipanti, la quota versata è rimborsata.")}</li>
                   <li><strong className="text-ink">{t("Alternativa:")}</strong>{" "}{t("puoi scegliere, in alternativa al rimborso, un'altra data.")}</li>
-                  <li><strong className="text-ink">{t("Altre richieste:")}</strong>{" "}<RichText text={t("usa il [modulo di contatto](#/contatti).")} /></li>
+                  <li><strong className="text-ink">{t("Altre richieste:")}</strong>{" "}<RichText text={t("usa il [modulo di contatto](/contatti).")} /></li>
                 </ul>
               </div>
             </div>
@@ -349,7 +349,7 @@ export function CourseDetail({ course }: { course: Course }) {
                 {t("Altre edizioni in calendario")}</h2>
             </Reveal>
             <Reveal delay={120}>
-              <Btn href="#/corsi" variant="ghost" withArrow>{t("Catalogo completo")}</Btn>
+              <Btn href="/corsi" variant="ghost" withArrow>{t("Catalogo completo")}</Btn>
             </Reveal>
           </div>
           <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3 lg:pb-10">
@@ -372,7 +372,7 @@ export function CourseDetail({ course }: { course: Course }) {
                 {eur(getLivePrice(course).unit)}{" "}{t("+ IVA")}{course.seatsLeft != null && <> · <span className="text-flame">{course.seatsLeft}{" "}{t("posti")}</span></>}
               </p>
             </div>
-            <Btn href={`#/iscriviti/${course.slug}`} ariaLabel={t("Iscriviti a {name}", { name: course.short })}>
+            <Btn href={`/iscriviti/${course.slug}`} ariaLabel={t("Iscriviti a {name}", { name: course.short })}>
               {t("Iscriviti")}</Btn>
           </div>
         </div>

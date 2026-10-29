@@ -1,3 +1,4 @@
+import { navigate } from "../lib/nav";
 import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight, CalendarDays, CheckCircle2, Clock, Globe, MapPin, Presentation, Video } from "lucide-react";
 import { cn } from "../utils/cn";
@@ -265,7 +266,7 @@ export function WorkshopTicker() {
   const when = `${fmtFull(w.start)}${w.time ? ` · ${w.time}` : ""}`;
   const go = (e: React.MouseEvent) => {
     e.preventDefault();
-    if (window.location.hash && window.location.hash !== "#/") window.location.hash = "#/";
+    navigate("/");
     setTimeout(() => document.getElementById("workshop")?.scrollIntoView({ behavior: "smooth", block: "start" }), 120);
   };
   const item = (
@@ -280,7 +281,7 @@ export function WorkshopTicker() {
   );
   return (
     <a
-      href="#/"
+      href="/"
       onClick={go}
       aria-label={t("{kind}: {title}, {when}. Vai alla sezione del workshop", { kind: live ? t("In corso") : t("Workshop gratuito"), title: w.title, when })}
       className="group relative z-0 block h-9 overflow-hidden border-t border-white/10 bg-ink2"
@@ -335,7 +336,7 @@ export function WorkshopPromo() {
               <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
                 <JoinButton w={w} />
                 <ZoomButton w={w} now={now} />
-                <a href="#/corsi" className="link-sweep text-[14px] font-semibold text-flame">{t("Tutti i workshop")}</a>
+                <a href="/corsi" className="link-sweep text-[14px] font-semibold text-flame">{t("Tutti i workshop")}</a>
               </div>
             </div>
           </div>

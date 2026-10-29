@@ -1,3 +1,4 @@
+import { navigate } from "../lib/nav";
 import { Mail, MapPin, Phone, Send, ShieldCheck, Lock, FileCheck } from "lucide-react";
 import { ORG, upcomingCourses } from "../data";
 import { isaqbLinks } from "../links";
@@ -15,7 +16,7 @@ export function Footer() {
       <div className="relative mx-auto max-w-7xl px-5 pb-10 pt-16 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
           <div>
-            <a href="#/" className="inline-block" aria-label={t("Cube Academy — Home")}>
+            <a href="/" className="inline-block" aria-label={t("Cube Academy — Home")}>
               <img src="/img/logo-cube-academy.png" alt={t("Cube Academy")} width={1000} height={173} className="h-10 w-auto" />
             </a>
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-white/68">
@@ -42,13 +43,13 @@ export function Footer() {
             <ul className="mt-4 space-y-2.5 text-sm">
               {upcomingCourses().slice(0, 5).map((c) => (
                 <li key={c.slug}>
-                  <a href={`#/corso/${c.slug}`} className="link-sweep text-white/76 transition-colors hover:text-white">
+                  <a href={`/corso/${c.slug}`} className="link-sweep text-white/76 transition-colors hover:text-white">
                     {c.short}
                   </a>
                 </li>
               ))}
               <li>
-                <a href="#/corsi" className="link-sweep font-medium text-flame">
+                <a href="/corsi" className="link-sweep font-medium text-flame">
                   {t("Tutto il calendario →")}</a>
               </li>
             </ul>
@@ -64,10 +65,10 @@ export function Footer() {
               ].map((l) => (
                 <li key={l.label}>
                   <a
-                    href="#/"
+                    href="/"
                     onClick={(e) => {
                       e.preventDefault();
-                      if (window.location.hash !== "#/") window.location.hash = "#/";
+                      navigate("/");
                       setTimeout(() => document.getElementById(l.section)?.scrollIntoView({ behavior: "smooth" }), 120);
                     }}
                     className="link-sweep text-white/76 transition-colors hover:text-white"
@@ -77,15 +78,15 @@ export function Footer() {
                 </li>
               ))}
               <li>
-                <a href="#/eventi" className="link-sweep text-white/76 transition-colors hover:text-white">
+                <a href="/eventi" className="link-sweep text-white/76 transition-colors hover:text-white">
                   {t("Eventi")}</a>
               </li>
               <li>
-                <a href="#/contatti?oggetto=gruppi" className="link-sweep text-white/76 transition-colors hover:text-white">
+                <a href="/contatti?oggetto=gruppi" className="link-sweep text-white/76 transition-colors hover:text-white">
                   {t("Formazione per team")}</a>
               </li>
               <li>
-                <a href="#/contatti" className="link-sweep text-white/76 transition-colors hover:text-white">
+                <a href="/contatti" className="link-sweep text-white/76 transition-colors hover:text-white">
                   {t("Contatti")}</a>
               </li>
             </ul>
@@ -113,7 +114,7 @@ export function Footer() {
                 </a>
               </li>
               <li>
-                <a href="#/contatti" className="flex items-center gap-2.5 font-semibold text-white transition-colors hover:text-flame">
+                <a href="/contatti" className="flex items-center gap-2.5 font-semibold text-white transition-colors hover:text-flame">
                   <Send className="size-4 shrink-0 text-flame" aria-hidden="true" />
                   {t("Scrivici con il modulo di contatto")}
                 </a>
