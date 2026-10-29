@@ -3,7 +3,7 @@ import { ListFilter, UsersRound } from "lucide-react";
 import { cn } from "../utils/cn";
 import { ConcludedSection, CourseCard } from "../components/CourseCard";
 import { Reveal, Tag } from "../components/ui";
-import { COURSES, FORMAT_META, WORKSHOPS, type CourseFormat, type CourseLevel, type Lang } from "../data";
+import { COURSES, FORMAT_META, WORKSHOPS, pastWorkshops, type CourseFormat, type CourseLevel, type Lang } from "../data";
 import { WorkshopsSection } from "../components/WorkshopCard";
 
 import { t } from "../i18n";
@@ -161,7 +161,7 @@ export function Catalog() {
           </div>
         )}
 
-        {!onlyWorkshops && <ConcludedSection courses={concluded} />}
+        <ConcludedSection courses={onlyWorkshops ? [] : concluded} workshops={showWorkshops ? pastWorkshops() : []} />
 
         {/* banner team */}
         <Reveal className="mt-16">

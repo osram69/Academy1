@@ -454,6 +454,8 @@ export const de: Record<string, string> = {
   "Workshop svolti": "Vergangene Workshops",
   "Tutti i workshop": "Alle Workshops",
   "Prossimo workshop": "Nächster Workshop",
+  "Leggi di più": "Mehr lesen",
+  "Mostra meno": "Weniger anzeigen",
   "Data da definire": "Termin folgt",
   "Tutti gli eventi": "Alle Veranstaltungen",
   "Evento non trovato.": "Veranstaltung nicht gefunden.",

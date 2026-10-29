@@ -6,7 +6,9 @@ import {
   fmtRange,
   getLivePrice,
   type Course,
+  type Workshop,
 } from "../data";
+import { ConcludedWorkshopCard } from "./WorkshopCard";
 import { Btn, EarlyBirdChip, Reveal, SeatsBar, StatusPill, Tag } from "./ui";
 import { PrivateOffer } from "./PrivateOffer";
 
@@ -176,8 +178,13 @@ function ConcludedCard({ course }: { course: Course }) {
 }
 
 /** Sezione "Edizioni concluse": mostra le ultime edizioni erogate. */
-export function ConcludedSection({ courses, limit = 6 }: { courses: Course[]; limit?: number }) {
-  if (!courses.length) return null;
+export function ConcludedSection({ courses, workshops = [], limit = 6 }: { courses: Course[]; workshops?: Workshop[]; limit?: number }) {
+  if (!courses.length && !workshops.length) return null;
+  // edizioni e workshop conclusi insieme, dal più recente
+  const items = [
+    ...courses.map((c) => ({ key: `c${c.slug}`, time: c.start.getTime(), node: <ConcludedCard course={c} /> })),
+    ...workshops.map((w) => ({ key: `w${w.id}`, time: w.start.getTime(), node: <ConcludedWorkshopCard w={w} /> })),
+  ].sort((a, b) => b.time - a.time);
   return (
     <section className="mt-20" aria-labelledby="concluded-title">
       <Reveal>
@@ -189,9 +196,9 @@ export function ConcludedSection({ courses, limit = 6 }: { courses: Course[]; li
         </h2>
       </Reveal>
       <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-        {courses.slice(0, limit).map((c, i) => (
-          <Reveal key={c.slug} delay={(i % 3) * 90}>
-            <ConcludedCard course={c} />
+        {items.slice(0, limit).map((it, i) => (
+          <Reveal key={it.key} delay={(i % 3) * 90}>
+            {it.node}
           </Reveal>
         ))}
       </div>
