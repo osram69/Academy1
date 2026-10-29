@@ -162,7 +162,7 @@ const FORMATS = [
 
 function FormatsSection() {
   return (
-    <section id="formati" className="scroll-mt-24 bg-ink py-[152px] text-white lg:py-[184px]" aria-labelledby="formats-title">
+    <section id="formati" className="scroll-mt-24 bg-ink py-12 text-white lg:py-16" aria-labelledby="formats-title">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div>
