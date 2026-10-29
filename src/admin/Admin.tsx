@@ -7,6 +7,7 @@ import { SettingsPage } from "./Settings";
 import { OrdersPage } from "./Orders";
 import { EventsAdmin } from "./Events";
 import { translateFromItalian } from "./translate";
+import { RichEditor } from "./RichEditor";
 
 /* Pannello di gestione corsi (sostituisce il plugin WordPress "Cube Academy - Gestione Corsi").
    Rotte: #/admin (elenco) · #/admin/corso/new · #/admin/corso/<id>
@@ -676,9 +677,10 @@ function Edit({ id }: { id: string }) {
               ))}
             </div>
             <div className="md:col-span-2">
-              {F(`read_more_${code}`, "Descrizione corso (read more, HTML)", (
-                <textarea className={`${inputCls} font-mono text-[12.5px]`} rows={12} value={String(f[`read_more_${code}`] ?? "")} onChange={(e) => set(`read_more_${code}`, e.target.value)} />
-              ))}
+              {/* fuori da <label>: i pulsanti della barra non devono attivare il primo controllo */}
+              <span className="mb-1 block text-[12px] font-semibold text-ink/70">Descrizione corso (read more)</span>
+              <RichEditor value={String(f[`read_more_${code}`] ?? "")} onChange={(v) => set(`read_more_${code}`, v)} />
+              <span className="mt-1 block text-[11.5px] text-steel">Scheda “Visuale” per scrivere con la barra degli strumenti, “Codice” per modificare l'HTML.</span>
             </div>
           </div>
         ))}
