@@ -484,7 +484,7 @@ function Edit({ id }: { id: string }) {
           <a href="#/admin" className="text-[13px] text-flame hover:underline">← Torna all'elenco</a>
           <h1 className="mt-1 font-display text-2xl font-bold tracking-tight">{isNew ? (isWs ? "Nuovo workshop" : "Nuovo corso") : `${isWs ? "Modifica workshop" : "Modifica corso"} #${id}`}</h1>
         </div>
-        <button className={btnPrimary} disabled={busy}>{busy ? "Salvataggio…" : "Salva corso"}</button>
+        <button className={btnPrimary} disabled={busy}>{busy ? "Salvataggio…" : isWs ? "Salva workshop" : "Salva corso"}</button>
       </div>
       {msg && (
         <p role="status" className={`rounded-lg px-4 py-2 text-[13px] ${failed ? "bg-err/10 text-err" : "bg-mint/10 text-mint"}`}>{msg}</p>
