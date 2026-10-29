@@ -40,14 +40,14 @@ function FilterGroup<T extends string>({
   return (
     <fieldset>
       <legend className="sr-only">{label}</legend>
-      <div className="flex flex-wrap gap-1.5" role="group" aria-label={label}>
+      <div className="flex flex-wrap gap-1" role="group" aria-label={label}>
         {options.map((o) => (
           <button
             key={o.id}
             onClick={() => onChange(o.id)}
             aria-pressed={value === o.id}
             className={cn(
-              "rounded-full px-4 py-2 text-[13px] font-semibold transition-all duration-300",
+              "whitespace-nowrap rounded-full px-3 py-1.5 text-[12px] font-semibold transition-all duration-300",
               value === o.id
                 ? "bg-ink text-white shadow-card"
                 : "border border-ink/12 bg-white text-ink/60 hover:border-ink/40 hover:text-ink"
@@ -128,14 +128,14 @@ export function Catalog() {
 
       {/* filtri */}
       <div className="sticky top-[calc(68px+var(--ribbon-h,0px))] z-30 border-b border-ink/8 bg-paper/95 py-4">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-8 gap-y-3 px-5 lg:px-8">
-          <span className="hidden items-center gap-2 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-steel md:inline-flex">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-5 gap-y-2 px-5 lg:px-8 xl:flex-nowrap">
+          <span className="hidden items-center gap-2 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-steel 2xl:inline-flex">
             <ListFilter className="size-4" aria-hidden="true" />
             {t("Filtra")}</span>
           <FilterGroup label={t("Formato")} options={FORMAT_FILTERS} value={format} onChange={setFormat} />
           <FilterGroup label={t("Livello")} options={LEVEL_FILTERS} value={level} onChange={setLevel} />
           <FilterGroup label={t("Lingua")} options={LANG_FILTERS} value={lang} onChange={setLang} />
-          <p className="ml-auto font-mono text-[11.5px] uppercase tracking-widest text-steel" role="status" aria-live="polite">
+          <p className="ml-auto shrink-0 whitespace-nowrap font-mono text-[11px] uppercase tracking-widest text-steel" role="status" aria-live="polite">
             {level === "Workshop"
               ? `${items.length} ${t("workshop")}`
               : upcomingWs.length
