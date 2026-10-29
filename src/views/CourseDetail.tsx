@@ -30,7 +30,7 @@ import {
   type Course,
 } from "../data";
 
-import { t } from "../i18n";
+import { lang, t } from "../i18n";
 import { RichText } from "../components/RichText";
 import { ExtLink } from "../components/IsaqbLinks";
 import { isaqbLinks } from "../links";
@@ -95,13 +95,15 @@ function PriceRail({ course }: { course: Course }) {
               {t("Iscriviti ora")}</Btn>
           )}
 
-          <button
-            type="button"
+          <a
+            href={`https://public.isaqb.org/curriculum-foundation/curriculum-foundation-${lang === "it" ? "it" : lang === "de" ? "de" : "en"}.pdf`}
+            target="_blank"
+            rel="noopener noreferrer"
             className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full border border-ink/15 px-6 py-3 text-sm font-semibold text-ink/75 transition-colors hover:border-ink hover:text-ink"
-            aria-label={t("Scarica il syllabus ufficiale iSAQB in PDF")}
+            aria-label={t("Scarica il Foundation Level Curriculum iSAQB in PDF")}
           >
             <Download className="size-4" aria-hidden="true" />
-            {t("Syllabus ufficiale (PDF)")}</button>
+            {t("Foundation Level Curriculum")}</a>
 
           <ul className="mt-6 space-y-2.5 border-t border-ink/8 pt-5 text-[12.5px] text-ink/60">
             {[
