@@ -46,7 +46,8 @@ export function Nav({ route }: { route: string }) {
     <header className="fixed inset-x-0 top-0 z-50">
       <div
         className={cn(
-          "border-b transition-colors duration-500",
+          // z-10: il menu delle lingue, che scende sul nastro dei workshop, deve stare sopra al nastro
+          "relative z-10 border-b transition-colors duration-500",
           scrolled ? "border-white/10 bg-ink/95" : "border-white/8 bg-ink/90"
         )}
       >

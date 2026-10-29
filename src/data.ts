@@ -418,7 +418,7 @@ export interface Workshop {
   start: Date;
   time: string; // es. "18:00–19:00"
   place: string;
-  language: string; // nome della lingua (Italiano, English, Français, Deutsch)
+  language: string; // nome della lingua nella lingua del sito (Italiano / Italian / Italien / Italienisch)
   languageCode: "it" | "en" | "fr" | "de";
   description: string;
   image: string | null;
@@ -483,6 +483,17 @@ export function workshopLanguage(raw?: string | null) {
   return WORKSHOP_LANGUAGES.find((l) => l.code === code)!;
 }
 
+/** Nome della lingua nella lingua del sito: "Italiano", "Italian", "Italien", "Italienisch". */
+export function languageLabel(code: "it" | "en" | "fr" | "de"): string {
+  try {
+    const n = new Intl.DisplayNames([lang], { type: "language" }).of(code) ?? "";
+    if (n) return n.charAt(0).toUpperCase() + n.slice(1);
+  } catch {
+    /* Intl.DisplayNames non disponibile: si usa il nome nella lingua stessa */
+  }
+  return WORKSHOP_LANGUAGES.find((l) => l.code === code)!.name;
+}
+
 const toWorkshop = (r: PublicRow): Workshop => {
   const key = lang as "it" | "en" | "fr" | "de";
   const day = (r.data_inizio || "").slice(0, 10);
@@ -497,7 +508,7 @@ const toWorkshop = (r: PublicRow): Workshop => {
     start,
     time: r.orario_it ?? "",
     place: (r[`luogo_${key}` as "luogo_it"] || r.luogo_it || "").trim(),
-    language: workshopLanguage(r.lingua_it).name,
+    language: languageLabel(workshopLanguage(r.lingua_it).code),
     languageCode: workshopLanguage(r.lingua_it).code,
     description: plain((r[`home_subtitle_${key}` as "home_subtitle_it"] || r.home_subtitle_it || "")),
     image: r.immagine_url || null,

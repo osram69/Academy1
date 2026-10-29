@@ -283,7 +283,7 @@ export function WorkshopTicker() {
       href="#/"
       onClick={go}
       aria-label={t("{kind}: {title}, {when}. Vai alla sezione del workshop", { kind: live ? t("In corso") : t("Workshop gratuito"), title: w.title, when })}
-      className="group block h-9 overflow-hidden border-t border-white/10 bg-ink2"
+      className="group relative z-0 block h-9 overflow-hidden border-t border-white/10 bg-ink2"
     >
       <div className="flex h-full items-center overflow-hidden" aria-hidden="true">
         <div style={{ animationDuration: "52s" }} className="flex shrink-0 animate-marquee items-center gap-10 whitespace-nowrap pr-10 group-hover:[animation-play-state:paused] motion-reduce:animate-none">
