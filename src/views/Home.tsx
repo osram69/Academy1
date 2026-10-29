@@ -140,7 +140,7 @@ const FORMATS = [
     claim: t("L'aula viene da te."),
     text: t("Aula virtuale su Zoom con docente accreditato iSAQB®, esercitazioni ed esame simulato nell'ultima giornata."),
     points: [t("24 ore su 3 giornate"), t("Max 12 partecipanti"), t("Zero trasferte")],
-    dark: false,
+    dark: true,
     img: "https://images.pexels.com/photos/4175446/pexels-photo-4175446.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200" as string | null,
   },
   {
@@ -150,7 +150,7 @@ const FORMATS = [
     claim: t("Full immersion, networking vero."),
     text: t("Corso in presenza a Roma, con docente accreditato iSAQB® e gruppi di massimo 12 partecipanti."),
     points: [t("Sede a Roma"), t("Max 12 partecipanti"), t("Docente accreditato iSAQB®")],
-    dark: false,
+    dark: true,
     img: "https://images.pexels.com/photos/1181396/pexels-photo-1181396.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200" as string | null,
   },
   {
