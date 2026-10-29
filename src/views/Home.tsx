@@ -162,7 +162,7 @@ const FORMATS = [
 
 function FormatsSection() {
   return (
-    <section id="formati" className="scroll-mt-[69px]bg-ink py-12 text-white lg:py-16" aria-labelledby="formats-title">
+    <section id="formati" className="scroll-mt-[69px] bg-ink py-12 text-white lg:py-16" aria-labelledby="formats-title">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div>
@@ -287,7 +287,7 @@ function EditionsSection() {
 function FaqSection() {
   const [open, setOpen] = useState(0);
   return (
-    <section id="faq" className="scroll-mt-[69px]bg-paper py-24 lg:py-32" aria-labelledby="faq-title">
+    <section id="faq" className="scroll-mt-[69px] bg-paper py-24 lg:py-32" aria-labelledby="faq-title">
       <div className="mx-auto grid max-w-7xl gap-14 px-5 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
         <div className="lg:sticky lg:top-28 lg:self-start">
           <Reveal>
