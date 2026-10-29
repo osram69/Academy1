@@ -4,6 +4,7 @@ import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { t } from "../i18n";
+import { OPEN_SETTINGS_EVENT } from "../lib/consent";
 
 /**
  * Apre un testo legale (informativa privacy, cookie policy) in un popup invece di cambiare pagina:
@@ -30,6 +31,17 @@ export function LegalLinkModal({ label, title, className, children, onRead }: { 
     setOpen(false);
     trigger.current?.focus();
   };
+
+  // il <dialog> modale sta sopra a tutto (top layer): per mostrare il pannello dei cookie va chiuso prima
+  useEffect(() => {
+    if (!open) return;
+    const onSettings = () => {
+      dialog.current?.close();
+      setOpen(false);
+    };
+    window.addEventListener(OPEN_SETTINGS_EVENT, onSettings);
+    return () => window.removeEventListener(OPEN_SETTINGS_EVENT, onSettings);
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
