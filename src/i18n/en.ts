@@ -214,6 +214,8 @@ export const en: Record<string, string> = {
   "Formato": "Format",
   "Livello": "Level",
   "Lingua": "Language",
+  "appuntamento": "event",
+  "appuntamenti": "events",
   "edizione": "edition",
   "edizioni": "editions",
   "Nessuna edizione con questi filtri": "No edition matches these filters",

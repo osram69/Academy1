@@ -214,6 +214,8 @@ export const de: Record<string, string> = {
   "Formato": "Format",
   "Livello": "Stufe",
   "Lingua": "Sprache",
+  "appuntamento": "Termin",
+  "appuntamenti": "Termine",
   "edizione": "Termin",
   "edizioni": "Termine",
   "Nessuna edizione con questi filtri": "Kein Termin entspricht diesen Filtern",

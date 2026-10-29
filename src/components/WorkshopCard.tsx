@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight, CalendarDays, CheckCircle2, Clock, Globe, MapPin, Presentation, Video } from "lucide-react";
 import { cn } from "../utils/cn";
 import { fmtFull, upcomingWorkshops, zoomOpensAt, zoomState, type Workshop } from "../data";
-import { Reveal, Tag } from "./ui";
+import { Reveal } from "./ui";
 import { t } from "../i18n";
 
 /** Descrizione abbreviata a 3 righe, con "Leggi di più" che espande la card verso il basso. */
@@ -215,34 +215,6 @@ export function ConcludedWorkshopCard({ w }: { w: Workshop }) {
         </ul>
       </div>
     </article>
-  );
-}
-
-/** Sezione "Workshop" del catalogo: solo i prossimi (gratuiti, da prenotare su LinkedIn); i passati vanno nello Storico. */
-export function WorkshopsSection() {
-  const next = upcomingWorkshops();
-  if (!next.length) return null;
-  return (
-    <section className="mb-20" aria-labelledby="workshops-title">
-      <Reveal>
-        <Tag>{t("Workshop")}</Tag>
-      </Reveal>
-      <Reveal delay={80}>
-        <h2 id="workshops-title" className="mt-5 font-display text-[clamp(1.6rem,3vw,2.4rem)] font-bold leading-tight tracking-[-0.02em] text-ink">
-          {t("Workshop")}{" "}<em className="font-serif italic text-flame">{t("gratuiti.")}</em>
-        </h2>
-      </Reveal>
-      <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-ink/60">
-        {t("Presentazioni di circa un'ora per conoscere iSAQB® e l'architettura software. La partecipazione è gratuita e si prenota sull'evento LinkedIn.")}
-      </p>
-      <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {next.map((w, i) => (
-          <Reveal key={w.id} delay={(i % 3) * 90}>
-            <WorkshopCard w={w} />
-          </Reveal>
-        ))}
-      </div>
-    </section>
   );
 }
 

@@ -3,8 +3,8 @@ import { ListFilter, UsersRound } from "lucide-react";
 import { cn } from "../utils/cn";
 import { ConcludedSection, CourseCard } from "../components/CourseCard";
 import { Reveal, Tag } from "../components/ui";
-import { COURSES, FORMAT_META, WORKSHOPS, pastWorkshops, type CourseFormat, type CourseLevel, type Lang } from "../data";
-import { WorkshopsSection } from "../components/WorkshopCard";
+import { COURSES, FORMAT_META, pastWorkshops, upcomingWorkshops, type CourseFormat, type CourseLevel, type Lang } from "../data";
+import { WorkshopCard } from "../components/WorkshopCard";
 
 import { t } from "../i18n";
 import { RichText } from "../components/RichText";
@@ -66,13 +66,9 @@ export function Catalog() {
   const [level, setLevel] = useState<CourseLevel | "all">("all");
   const [lang, setLang] = useState<Lang | "all">("all");
 
-  // i workshop non sono corsi: compaiono in una sezione propria, nascosti se il filtro li esclude
-  const showWorkshops =
-    WORKSHOPS.length > 0 &&
-    (level === "all" || level === "Workshop") &&
-    format === "all" &&
-    (lang === "all" || WORKSHOPS.some((w) => w.languageCode.toUpperCase() === lang));
-  const onlyWorkshops = level === "Workshop";
+  // i workshop (gratuiti) entrano nella stessa griglia dei corsi: non hanno un formato, quindi spariscono se ne scegli uno
+  const workshopsVisible = (level === "all" || level === "Workshop") && format === "all";
+  const matchesLang = (w: { languageCode: string }) => lang === "all" || w.languageCode.toUpperCase() === lang;
 
   const filtered = useMemo(
     () =>
@@ -87,6 +83,17 @@ export function Catalog() {
   const results = useMemo(
     () => filtered.filter((c) => !c.concluded).sort((a, b) => a.start.getTime() - b.start.getTime()),
     [filtered]
+  );
+  const upcomingWs = useMemo(() => (workshopsVisible ? upcomingWorkshops().filter(matchesLang) : []), [workshopsVisible, lang]);
+  const pastWs = useMemo(() => (workshopsVisible ? pastWorkshops().filter(matchesLang) : []), [workshopsVisible, lang]);
+  // corsi e workshop in sequenza, dal più vicino
+  const items = useMemo(
+    () =>
+      [
+        ...results.map((c) => ({ key: `c${c.slug}`, time: c.start.getTime(), node: (i: number) => <CourseCard course={c} index={i} /> })),
+        ...upcomingWs.map((w) => ({ key: `w${w.id}`, time: w.start.getTime(), node: () => <WorkshopCard w={w} /> })),
+      ].sort((a, b) => a.time - b.time),
+    [results, upcomingWs]
   );
   const concluded = useMemo(
     () => filtered.filter((c) => c.concluded).sort((a, b) => b.start.getTime() - a.start.getTime()),
@@ -129,15 +136,18 @@ export function Catalog() {
           <FilterGroup label={t("Livello")} options={LEVEL_FILTERS} value={level} onChange={setLevel} />
           <FilterGroup label={t("Lingua")} options={LANG_FILTERS} value={lang} onChange={setLang} />
           <p className="ml-auto font-mono text-[11.5px] uppercase tracking-widest text-steel" role="status" aria-live="polite">
-            {onlyWorkshops ? `${WORKSHOPS.length} ${t("workshop")}` : `${results.length} ${results.length === 1 ? t("edizione") : t("edizioni")}`}
+            {level === "Workshop"
+              ? `${items.length} ${t("workshop")}`
+              : upcomingWs.length
+                ? `${items.length} ${items.length === 1 ? t("appuntamento") : t("appuntamenti")}`
+                : `${items.length} ${items.length === 1 ? t("edizione") : t("edizioni")}`}
           </p>
         </div>
       </div>
 
       {/* griglia */}
       <main className="mx-auto max-w-7xl px-5 py-16 lg:px-8 lg:py-20">
-        {showWorkshops && <WorkshopsSection />}
-        {onlyWorkshops ? null : results.length === 0 ? (
+        {items.length === 0 ? (
           <div className="rounded-[24px] border border-dashed border-ink/20 p-16 text-center">
             <p className="font-display text-xl font-semibold text-ink">{t("Nessuna edizione con questi filtri")}</p>
             <p className="mt-2 text-sm text-ink/55"><RichText text={t("Prova ad allargare formato o lingua — oppure [scrivici](/contatti?oggetto=gruppi) per un'edizione dedicata.")} /></p>
@@ -153,15 +163,15 @@ export function Catalog() {
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 lg:pb-12">
-            {results.map((c, i) => (
-              <Reveal key={c.slug} delay={(i % 3) * 90}>
-                <CourseCard course={c} index={i} />
+            {items.map((it, i) => (
+              <Reveal key={it.key} delay={(i % 3) * 90}>
+                {it.node(i)}
               </Reveal>
             ))}
           </div>
         )}
 
-        <ConcludedSection courses={onlyWorkshops ? [] : concluded} workshops={showWorkshops ? pastWorkshops() : []} />
+        <ConcludedSection courses={concluded} workshops={pastWs} />
 
         {/* banner team */}
         <Reveal className="mt-16">
