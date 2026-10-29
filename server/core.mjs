@@ -5,6 +5,7 @@ import { createClient } from "@supabase/supabase-js";
 import { MAX_SEATS, computeTotals, earlyPriceEuro } from "../shared/pricing.mjs";
 import { isCapItalia, isCodiceFiscale, isCodiceFiscaleAny, isEmail, isPartitaIva, isVatIdEstero } from "../shared/validators.mjs";
 import { courseCode } from "./course.mjs";
+import { translateFields, translatorProvider } from "./translate.mjs";
 import { bankDetails, createSession, isPaid, methodStatus, paypalVerifyWebhook, stripeClient, stripeWebhookSecret } from "./payments.mjs";
 import { findGlobalCoupon, getSettings, invalidateSettings } from "./settings.mjs";
 import { CONTACT_TOPICS, mailConfigured, mailMissing, sendContactEmails, sendOrderEmails } from "./mail.mjs";
@@ -285,6 +286,18 @@ export async function adminOrders() {
     .order("created_at", { ascending: false }).limit(200);
   if (error) return fail(500, error.message);
   return ok(data);
+}
+
+/** Traduce dall'italiano in en/fr/de i testi inviati dal pannello (workshop ed eventi). Solo admin. */
+export async function apiTranslate(body, ip) {
+  if (rateLimited(`${ip}:translate`, 20, 60000)) return TOO_MANY();
+  const fields = body?.fields;
+  if (!fields || typeof fields !== "object" || Array.isArray(fields) || Object.keys(fields).length > 8) return fail(400, "Richiesta di traduzione non valida.");
+  try {
+    return ok({ translations: await translateFields(fields), provider: translatorProvider() });
+  } catch (e) {
+    return fail(502, e instanceof Error ? e.message : "Traduzione non riuscita.");
+  }
 }
 
 /* ------------------------- modulo di contatto ------------------------ */

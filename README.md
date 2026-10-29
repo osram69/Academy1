@@ -19,7 +19,10 @@ hash (`#/corsi`, `#/admin`, ...) e le API di iscrizione e pagamento sono Route H
    vecchi nomi `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY`).
 4. Supabase → SQL Editor: esegui `supabase/orders.sql` (tabella `iscrizioni`, accessibile solo al server) e poi
    `supabase/migrazione-2.sql` (modalità di fruizione dei corsi e tabella `impostazioni`) e
-   `supabase/migrazione-3.sql` (sconto privati per corso e ambito dei codici sconto).
+   `supabase/migrazione-3.sql` (sconto privati per corso e ambito dei codici sconto),
+   `supabase/migrazione-4.sql` (workshop: immagine, link LinkedIn, archivio immagini),
+   `supabase/migrazione-5.sql` (tabella eventi gestita dal pannello) e
+   `supabase/migrazione-6.sql` (titolo dei workshop nelle altre lingue).
 5. Webhook: Stripe → `https://<dominio>/api/webhook/stripe`, PayPal → `https://<dominio>/api/webhook/paypal`.
    (SumUp non ha webhook firmati: il pagamento è verificato dal server al ritorno dal checkout.)
 6. Per passare in produzione: valorizza le chiavi live e, da `#/admin/impostazioni`, porta il metodo da Sandbox a Live.
@@ -28,6 +31,10 @@ hash (`#/corsi`, `#/admin`, ...) e le API di iscrizione e pagamento sono Route H
    `registrazioni@cubeng.eu`, come nel plugin WordPress). Senza SMTP le iscrizioni funzionano ma le email non partono.
    Lo stesso SMTP serve al **modulo di contatto** (`#/contatti`): il messaggio arriva a `MAIL_STAFF_TO` con
    Reply-To del mittente, e il mittente riceve una copia.
+   **Traduzioni automatiche**: il pulsante «Traduci per le altre lingue» dei workshop e degli eventi usa Claude se
+   imposti `ANTHROPIC_API_KEY` (modello in `TRANSLATE_MODEL`, default `claude-haiku-5-5`); senza chiave ripiega
+   sul servizio gratuito MyMemory (qualità inferiore e limite giornaliero, alzabile con `TRANSLATE_EMAIL`).
+   Il risultato va sempre controllato prima di salvare.
 8. Verifica: `https://<dominio>/api/config` deve rispondere con un JSON (`privateDiscount`, `methods`).
 
 Il server calcola prezzo, sconti e IVA da solo (il browser non decide l'importo), accetta al massimo

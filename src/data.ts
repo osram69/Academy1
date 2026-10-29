@@ -399,6 +399,9 @@ interface PublicRow {
   home_subtitle_en?: string | null;
   home_subtitle_fr?: string | null;
   home_subtitle_de?: string | null;
+  titolo_en?: string | null;
+  titolo_fr?: string | null;
+  titolo_de?: string | null;
 }
 
 /* ----------------------------- workshop ---------------------------- */
@@ -426,7 +429,7 @@ const toWorkshop = (r: PublicRow): Workshop => {
   const endOfDay = new Date(start.getTime() + DAY - 1);
   return {
     id: String(r.id_corso),
-    title: plain(r.titolo),
+    title: plain((r[`titolo_${key}` as "titolo_en"] || r.titolo) as string),
     start,
     time: r.orario_it ?? "",
     place: (r[`luogo_${key}` as "luogo_it"] || r.luogo_it || "").trim(),

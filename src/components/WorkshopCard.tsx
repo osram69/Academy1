@@ -28,7 +28,7 @@ function Cover({ w, past }: { w: Workshop; past?: boolean }) {
   return (
     <div className="relative aspect-[16/9] overflow-hidden bg-ink">
       {w.image ? (
-        <img src={w.image} alt="" loading="lazy" className={cn("size-full object-cover transition-transform duration-700 group-hover:scale-[1.05]", past && "grayscale")} />
+        <img src={w.image} alt="" loading="lazy" className="size-full object-cover transition-transform duration-700 group-hover:scale-[1.05]" />
       ) : (
         <div className="grid size-full place-items-center bg-blueprint-dark text-white/30">
           <Presentation className="size-12" aria-hidden="true" />

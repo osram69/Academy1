@@ -6,6 +6,7 @@ import { MODALITA } from "../data";
 import { SettingsPage } from "./Settings";
 import { OrdersPage } from "./Orders";
 import { EventsAdmin } from "./Events";
+import { translateFromItalian } from "./translate";
 
 /* Pannello di gestione corsi (sostituisce il plugin WordPress "Cube Academy - Gestione Corsi").
    Rotte: #/admin (elenco) · #/admin/corso/new · #/admin/corso/<id>
@@ -333,6 +334,7 @@ function Edit({ id }: { id: string }) {
   const isNew = id === "new" || id === "new-workshop";
   const [f, setF] = useState<Row | null>(id === "new-workshop" ? EMPTY_WS : isNew ? EMPTY : null);
   const [uploading, setUploading] = useState(false);
+  const [translating, setTranslating] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
@@ -371,6 +373,30 @@ function Edit({ id }: { id: string }) {
     if (up.error) setMsg(`Caricamento non riuscito: ${up.error.message} (hai eseguito supabase/migrazione-4.sql?)`);
     else set("immagine_url", supabase.storage.from("workshop").getPublicUrl(path).data.publicUrl);
     setUploading(false);
+  };
+
+  /** Workshop: genera titolo, luogo e descrizione in en/fr/de partendo dall'italiano. */
+  const translateWs = async () => {
+    const OTHERS = ["en", "fr", "de"] as const;
+    const src = { titolo: String(f.titolo ?? ""), luogo: String(f.luogo_it ?? ""), descrizione: String(f.home_subtitle_it ?? "") };
+    const present = OTHERS.some((l) => f[`titolo_${l}`] || f[`luogo_${l}`] || f[`home_subtitle_${l}`]);
+    if (present && !confirm("Alcune traduzioni sono già presenti: vuoi sostituirle con quelle generate?")) return;
+    setTranslating(true);
+    setMsg("");
+    try {
+      const tr = await translateFromItalian(src);
+      const patch: Row = {};
+      for (const l of OTHERS) {
+        if (tr[l].titolo) patch[`titolo_${l}`] = tr[l].titolo;
+        if (tr[l].luogo) patch[`luogo_${l}`] = tr[l].luogo;
+        if (tr[l].descrizione) patch[`home_subtitle_${l}`] = tr[l].descrizione;
+      }
+      setMany(patch);
+      setMsg("Traduzioni generate: controllale nelle schede English, Français e Deutsch, poi premi “Salva workshop”.");
+    } catch (e) {
+      setMsg(`Traduzione non riuscita: ${(e as Error).message}`);
+    }
+    setTranslating(false);
   };
 
   const save = async (e: FormEvent) => {
@@ -414,7 +440,7 @@ function Edit({ id }: { id: string }) {
 
   const card = "rounded-2xl border border-ink/10 bg-white p-6";
   const h2 = "mb-4 font-display text-lg font-bold tracking-tight";
-  const failed = Object.keys(errors).length > 0 || /permess|error|violat|denied/i.test(msg);
+  const failed = Object.keys(errors).length > 0 || /permess|error|violat|denied|non riuscit/i.test(msg);
 
   return (
     <form onSubmit={save} className="space-y-6">
@@ -477,6 +503,12 @@ function Edit({ id }: { id: string }) {
 
           <section className={card}>
             <h2 className={h2}>Contenuti per lingua</h2>
+            <div className="mb-5 flex flex-wrap items-center gap-3">
+              <button type="button" disabled={translating} onClick={translateWs} className={`${btnCls} bg-flame text-white hover:bg-ink disabled:opacity-50`}>
+                {translating ? "Traduzione in corso…" : "Traduci per le altre lingue"}
+              </button>
+              <span className="text-[12.5px] text-steel">Genera titolo, luogo e descrizione in inglese, francese e tedesco partendo dall'italiano. Controlla il risultato prima di salvare.</span>
+            </div>
             <div role="tablist" className="mb-5 flex flex-wrap gap-2">
               {LANGS.map(([code, label]) => (
                 <button type="button" role="tab" aria-selected={lang === code} key={code} onClick={() => setLang(code)}
@@ -487,6 +519,7 @@ function Edit({ id }: { id: string }) {
             </div>
             {LANGS.map(([code]) => (
               <div key={code} hidden={lang !== code} className="grid gap-4">
+                {code !== "it" && F(`titolo_${code}`, `Titolo (${code.toUpperCase()})`, text(`titolo_${code}`, { maxLength: 255 }), "Se vuoto, il sito usa il titolo italiano.")}
                 {F(`luogo_${code}`, "Dove / modalità", text(`luogo_${code}`, { maxLength: 40, placeholder: "Es. Online (LinkedIn Live)" }))}
                 {F(`home_subtitle_${code}`, "Descrizione breve (testo semplice)", (
                   <textarea className={inputCls} rows={4} value={String(f[`home_subtitle_${code}`] ?? "")} onChange={(e) => set(`home_subtitle_${code}`, e.target.value)} />

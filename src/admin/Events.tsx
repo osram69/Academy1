@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { supabase } from "../lib/supabase";
 import { Field, btnCls, btnPrimary, inputCls } from "./Admin";
+import { translateFromItalian } from "./translate";
 
 /* Gestione eventi (pagina #/eventi del sito). Rotte: #/admin/eventi (elenco) · #/admin/evento/new · #/admin/evento/<id>
    Ogni evento è un articolo: titolo, immagine, descrizione nelle 4 lingue, link all'evento, date di inizio e fine. */
@@ -100,6 +101,7 @@ function Edit({ id }: { id: string }) {
   const [uploading, setUploading] = useState(false);
   const [lang, setLang] = useState("it");
   const [multi, setMulti] = useState(false); // evento su più giorni
+  const [translating, setTranslating] = useState(false);
 
   useEffect(() => {
     if (isNew) return;
@@ -131,6 +133,22 @@ function Edit({ id }: { id: string }) {
     if (up.error) setMsg(`Caricamento non riuscito: ${up.error.message} (hai eseguito supabase/migrazione-5.sql?)`);
     else set("immagine_url", supabase.storage.from("eventi").getPublicUrl(path).data.publicUrl);
     setUploading(false);
+  };
+
+  /** Genera la descrizione in inglese, francese e tedesco partendo dall'italiano. */
+  const translate = async () => {
+    const OTHERS = ["en", "fr", "de"] as const;
+    if (OTHERS.some((l) => f[`descrizione_${l}`]) && !confirm("Alcune traduzioni sono già presenti: vuoi sostituirle con quelle generate?")) return;
+    setTranslating(true);
+    setMsg("");
+    try {
+      const tr = await translateFromItalian({ descrizione: String(f.descrizione_it ?? "") });
+      setF((p) => ({ ...(p as Row), ...Object.fromEntries(OTHERS.filter((l) => tr[l].descrizione).map((l) => [`descrizione_${l}`, tr[l].descrizione])) }));
+      setMsg("Traduzioni generate: controllale nelle schede English, Français e Deutsch, poi premi “Salva evento”.");
+    } catch (e) {
+      setMsg(`Traduzione non riuscita: ${(e as Error).message}`);
+    }
+    setTranslating(false);
   };
 
   const save = async (e: FormEvent) => {
@@ -222,6 +240,12 @@ function Edit({ id }: { id: string }) {
 
       <section className={card}>
         <h2 className={h2}>Descrizione</h2>
+        <div className="mb-5 flex flex-wrap items-center gap-3">
+          <button type="button" disabled={translating} onClick={translate} className={`${btnCls} bg-flame text-white hover:bg-ink disabled:opacity-50`}>
+            {translating ? "Traduzione in corso…" : "Traduci per le altre lingue"}
+          </button>
+          <span className="text-[12.5px] text-steel">Genera la descrizione in inglese, francese e tedesco partendo dall'italiano. Controlla il risultato prima di salvare.</span>
+        </div>
         <div role="tablist" className="mb-5 flex flex-wrap gap-2">
           {LANGS.map(([code, label]) => (
             <button type="button" role="tab" aria-selected={lang === code} key={code} onClick={() => setLang(code)}
