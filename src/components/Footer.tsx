@@ -126,24 +126,32 @@ export function Footer() {
                 </a>
               </li>
             </ul>
+            <ul className="mt-6 space-y-2.5 border-t border-white/10 pt-5 text-sm text-white/76">
+              <li>
+                <LegalLinkModal label={t("Privacy")} title={t("Informativa Privacy")} className="transition-colors hover:text-white">
+                  <PrivacyNoticeContent />
+                </LegalLinkModal>
+              </li>
+              <li>
+                <LegalLinkModal label={t("Condizioni generali")} title={TERMS[lang].title} className="transition-colors hover:text-white">
+                  <TermsContent />
+                </LegalLinkModal>
+              </li>
+              <li>
+                <LegalLinkModal label={t("Cookie Policy")} title={t("Cookie Policy")} className="transition-colors hover:text-white">
+                  <CookiePolicyContent />
+                </LegalLinkModal>
+              </li>
+              <li>
+                <button type="button" onClick={openCookieSettings} className="transition-colors hover:text-white">{t("Impostazioni cookie")}</button>
+              </li>
+            </ul>
           </div>
         </div>
 
-        <div className="mt-14 flex flex-col items-start justify-between gap-3 border-t border-white/10 pt-6 font-mono text-[11px] text-white/56 sm:flex-row sm:items-center">
+        <div className="mt-14 border-t border-white/10 pt-6 text-center font-mono text-[11px] text-white/56">
           <p className="leading-relaxed">
             © 2026 {ORG.company} · {t("Sede legale")}: {ORG.legalAddress} · {t("P.IVA")} {ORG.vat} · {t("REA")} {ORG.rea}
-          </p>
-          <p className="flex gap-5">
-            <LegalLinkModal label={t("Privacy")} title={t("Informativa Privacy")} className="transition-colors hover:text-white/70">
-              <PrivacyNoticeContent />
-            </LegalLinkModal>
-            <LegalLinkModal label={t("Condizioni generali")} title={TERMS[lang].title} className="transition-colors hover:text-white/70">
-              <TermsContent />
-            </LegalLinkModal>
-            <LegalLinkModal label={t("Cookie Policy")} title={t("Cookie Policy")} className="transition-colors hover:text-white/70">
-              <CookiePolicyContent />
-            </LegalLinkModal>
-            <button type="button" onClick={openCookieSettings} className="transition-colors hover:text-white/70">{t("Impostazioni cookie")}</button>
           </p>
         </div>
       </div>
