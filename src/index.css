@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+/* Tailwind 4 non mette più la manina sui pulsanti: la ripristiniamo per tutti */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
+}
+
 @theme {
   --color-ink: #131117;
   --color-ink2: #1d1a24;
