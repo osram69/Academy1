@@ -431,6 +431,7 @@ export const de: Record<string, string> = {
   "CAP non valido: 5 cifre": "Ungültige PLZ: 5 Ziffern",
   "Scegli uno dei 4 metodi di pagamento": "Wählen Sie eine der 4 Zahlungsarten",
   "Devi accettare le condizioni per procedere": "Sie müssen die Bedingungen akzeptieren, um fortzufahren",
+  "Per accettare, apri le Condizioni generali e leggile fino in fondo.": "Zum Akzeptieren öffnen Sie die Allgemeinen Bedingungen und lesen Sie sie bis zum Ende.",
   "Scegli prima per chi ti stai iscrivendo": "Wählen Sie zuerst, für wen Sie anmelden",
   "Il codice non vale per questa tipologia: l'abbiamo rimosso.": "Der Code gilt nicht für diese Art: Wir haben ihn entfernt.",
   "Iscrizione guidata · 4 passi · circa 4 minuti": "Geführte Anmeldung · 4 Schritte · ca. 4 Minuten",

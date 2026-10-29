@@ -11,9 +11,15 @@ import { t } from "../i18n";
  * su document.body perché il pulsante sta spesso dentro un <p> o un <label>, dove non possono stare
  * titoli e tabelle.
  */
-export function LegalLinkModal({ label, title, className, children }: { label: string; title: string; className?: string; children: ReactNode }) {
+export function LegalLinkModal({ label, title, className, children, onRead }: { label: string; title: string; className?: string; children: ReactNode; onRead?: () => void }) {
   const id = useId();
   const dialog = useRef<HTMLDialogElement>(null);
+  const body = useRef<HTMLDivElement>(null);
+  // "letto" = testo scorso fino in fondo (o abbastanza corto da non richiedere lo scroll)
+  const checkRead = () => {
+    const el = body.current;
+    if (el && onRead && el.scrollTop + el.clientHeight >= el.scrollHeight - 8) onRead();
+  };
   const trigger = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -28,6 +34,7 @@ export function LegalLinkModal({ label, title, className, children }: { label: s
   useEffect(() => {
     if (!open) return;
     dialog.current?.showModal();
+    checkRead();
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
@@ -55,7 +62,7 @@ export function LegalLinkModal({ label, title, className, children }: { label: s
                 <X className="size-5" aria-hidden="true" />
               </button>
             </div>
-            <div className="max-h-[calc(88vh-72px)] overflow-y-auto px-6 py-5">{children}</div>
+            <div ref={body} onScroll={checkRead} className="max-h-[calc(88vh-72px)] overflow-y-auto px-6 py-5">{children}</div>
           </dialog>,
           document.body,
         )}

@@ -111,18 +111,19 @@ function TextField({
 }
 
 function CheckRow({
-  checked, onChange, title, desc, error, id,
-}: { checked: boolean; onChange: (v: boolean) => void; title: React.ReactNode; desc?: React.ReactNode; error?: string; id: string }) {
+  checked, onChange, title, desc, error, id, disabled,
+}: { checked: boolean; onChange: (v: boolean) => void; title: React.ReactNode; desc?: React.ReactNode; error?: string; id: string; disabled?: boolean }) {
   return (
     <div>
       <label htmlFor={id} className={cn(
-        "flex cursor-pointer items-start gap-3 rounded-xl border p-3.5 transition-colors",
-        error ? "border-err/50 bg-red-50/50" : checked ? "border-mint/40 bg-emerald-50/50" : "border-ink/12 bg-white hover:border-ink/30"
+        "flex items-start gap-3 rounded-xl border p-3.5 transition-colors",
+        disabled ? "cursor-not-allowed border-ink/12 bg-white" : "cursor-pointer",
+        error ? "border-err/50 bg-red-50/50" : checked ? "border-mint/40 bg-emerald-50/50" : !disabled && "border-ink/12 bg-white hover:border-ink/30"
       )}>
-        <input id={id} type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="peer sr-only" aria-invalid={!!error} />
+        <input id={id} type="checkbox" checked={checked} disabled={disabled} onChange={(e) => onChange(e.target.checked)} className="peer sr-only" aria-invalid={!!error} />
         <span className={cn(
           "mt-0.5 grid size-5 shrink-0 place-items-center rounded-md border transition-all",
-          checked ? "border-mint bg-mint text-white" : "border-ink/25 bg-white"
+          checked ? "border-mint bg-mint text-white" : disabled ? "border-ink/15 bg-ink/5" : "border-ink/25 bg-white"
         )} aria-hidden="true">
           {checked && <Check className="size-3.5" />}
         </span>
@@ -489,6 +490,8 @@ function StepPayment({
   config: ApiConfig | null; payError: string; busy: boolean;
 }) {
   const active = PAYMENT_METHODS.find((m) => m.id === method);
+  // l'accettazione si sblocca solo dopo aver letto le Condizioni generali fino in fondo
+  const [termsRead, setTermsRead] = useState(terms);
   return (
     <div className="space-y-5">
       {/* metodi */}
@@ -562,9 +565,11 @@ function StepPayment({
       </fieldset>
 
       {/* condizioni + CTA */}
-      <CheckRow id="terms" checked={terms} onChange={setTerms}
-        title={<>{t("Accetto le")}{" "}<LegalLinkModal label={t("Condizioni generali")} title={TERMS[lang].title} className="link-sweep text-flame"><TermsContent /></LegalLinkModal>{" "}{t("e la")}{" "}<LegalLinkModal label={t("Privacy policy")} title={t("Informativa Privacy")} className="link-sweep text-flame"><PrivacyNoticeContent /></LegalLinkModal> <span className="text-flame">*</span></>}
-        desc={t("Inclusa la politica di rimborso: se il corso non viene erogato per mancanza del numero minimo di partecipanti, la quota è rimborsata.")}
+      <CheckRow id="terms" checked={terms} onChange={setTerms} disabled={!termsRead}
+        title={<>{t("Accetto le")}{" "}<LegalLinkModal label={t("Condizioni generali")} title={TERMS[lang].title} className="link-sweep text-flame" onRead={() => setTermsRead(true)}><TermsContent /></LegalLinkModal>{" "}{t("e la")}{" "}<LegalLinkModal label={t("Privacy policy")} title={t("Informativa Privacy")} className="link-sweep text-flame"><PrivacyNoticeContent /></LegalLinkModal> <span className="text-flame">*</span></>}
+        desc={termsRead
+          ? t("Inclusa la politica di rimborso: se il corso non viene erogato per mancanza del numero minimo di partecipanti, la quota è rimborsata.")
+          : <span className="font-semibold text-flame">{t("Per accettare, apri le Condizioni generali e leggile fino in fondo.")}</span>}
         error={attempted ? errors.terms : undefined} />
 
       <div>

@@ -431,6 +431,7 @@ export const en: Record<string, string> = {
   "CAP non valido: 5 cifre": "Invalid postcode: 5 digits",
   "Scegli uno dei 4 metodi di pagamento": "Choose one of the 4 payment methods",
   "Devi accettare le condizioni per procedere": "You must accept the terms to proceed",
+  "Per accettare, apri le Condizioni generali e leggile fino in fondo.": "To accept, open the General Terms and read them to the end.",
   "Scegli prima per chi ti stai iscrivendo": "First choose who you are registering",
   "Il codice non vale per questa tipologia: l'abbiamo rimosso.": "The code is not valid for this type: we removed it.",
   "Iscrizione guidata · 4 passi · circa 4 minuti": "Guided registration · 4 steps · about 4 minutes",
