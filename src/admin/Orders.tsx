@@ -1,10 +1,17 @@
 import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
+import { Trash2, X } from "lucide-react";
 
+interface Participant {
+  nome: string; cognome: string; email: string; telefono?: string;
+  consensoPrivacy?: boolean; consensoMarketing?: boolean; consensoAudioVideo?: boolean;
+}
+type Billing = Record<string, string | undefined> & { type: string; ragione: string; nome: string; cognome: string };
 interface Order {
   ref: string; id_corso: number; created_at: string; paid_at: string | null; status: string; method: string; test_mode: boolean;
-  seats: number; total_cents: number; coupon: string | null;
-  participants: { nome: string; cognome: string; email: string }[]; billing: { type: string; ragione: string; nome: string; cognome: string };
+  provider_ref: string | null; seats: number; unit_cents: number; subtotal_cents: number; discount_cents: number; vat_cents: number;
+  total_cents: number; coupon: string | null; participants: Participant[]; billing: Billing;
+  course: { titolo: string; livello: string; data_inizio: string | null; data_fine: string | null } | null;
 }
 
 const STATUS: Record<string, { label: string; cls: string }> = {
@@ -15,12 +22,128 @@ const STATUS: Record<string, { label: string; cls: string }> = {
   refunded: { label: "Rimborsato", cls: "bg-ink/8 text-steel" },
 };
 const METHOD: Record<string, string> = { stripe: "Stripe", paypal: "PayPal", sumup: "SumUp", bonifico: "Bonifico" };
+const BILLING_TYPE: Record<string, string> = { privato: "Privato", pro: "Professionista / P.IVA", azienda: "Azienda", estera: "Azienda estera (UE)" };
 const eur2 = (c: number) => (c / 100).toLocaleString("it-IT", { style: "currency", currency: "EUR" });
+const when = (iso: string) => new Date(iso).toLocaleString("it-IT", { dateStyle: "short", timeStyle: "short" });
+const day = (iso: string | null) => (iso ? new Date(iso).toLocaleDateString("it-IT") : "");
+const plain = (html: string) => html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 
-/** Elenco iscrizioni (sola lettura) servito dal server agli amministratori. */
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="mt-5">
+      <h3 className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-steel">{title}</h3>
+      <div className="mt-2">{children}</div>
+    </section>
+  );
+}
+
+function Rows({ rows }: { rows: [string, React.ReactNode][] }) {
+  return (
+    <dl className="grid grid-cols-[150px_1fr] gap-x-4 gap-y-1.5 text-[13px]">
+      {rows.filter(([, v]) => v !== "" && v != null && v !== false).map(([k, v]) => (
+        <div key={k} className="contents"><dt className="text-steel">{k}</dt><dd className="break-words font-medium">{v}</dd></div>
+      ))}
+    </dl>
+  );
+}
+
+function OrderDetail({ o, onClose, onDelete }: { o: Order; onClose: () => void; onDelete: () => void }) {
+  const b = o.billing;
+  const st = STATUS[o.status] ?? { label: o.status, cls: "bg-ink/8 text-steel" };
+  const who = b.ragione || `${b.nome} ${b.cognome}`.trim();
+  const address = [b.via, `${b.cap || ""} ${b.citta || ""}`.trim(), b.paese].filter(Boolean).join(", ");
+  const yn = (v?: boolean) => (v ? "sì" : "no");
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-ink/60 p-4 sm:py-10" onClick={onClose}>
+      <div role="dialog" aria-modal="true" aria-label={`Iscrizione ${o.ref}`} className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-lift" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="font-mono text-[12px] text-steel">Iscrizione</p>
+            <h2 className="font-display text-xl font-bold tracking-tight">{o.ref}</h2>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <span className={`rounded-full px-2.5 py-1 text-[12px] font-semibold ${st.cls}`}>{st.label}</span>
+              {o.test_mode && o.method !== "bonifico" && <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[10.5px] font-bold text-amber-700">prova</span>}
+            </div>
+          </div>
+          <button type="button" onClick={onClose} aria-label="Chiudi" className="grid size-9 place-items-center rounded-full border border-ink/10 hover:bg-sand/60"><X className="size-4" /></button>
+        </div>
+
+        <Section title="Ordine">
+          <Rows rows={[
+            ["Corso", o.course ? `${plain(o.course.titolo)} (#${o.id_corso})` : `#${o.id_corso}`],
+            ["Date", o.course?.data_inizio ? [day(o.course.data_inizio), day(o.course.data_fine)].filter((d, i, a) => d && a.indexOf(d) === i).join(" – ") : ""],
+            ["Data ordine", when(o.created_at)],
+            ["Pagato il", o.paid_at ? when(o.paid_at) : ""],
+            ["Metodo", METHOD[o.method] ?? o.method],
+            ["Rif. provider", o.provider_ref ? <span className="font-mono text-[12px]">{o.provider_ref}</span> : ""],
+          ]} />
+        </Section>
+
+        <Section title="Importi">
+          <Rows rows={[
+            ["Posti", String(o.seats)],
+            ["Prezzo unitario", eur2(o.unit_cents)],
+            ["Imponibile", eur2(o.subtotal_cents - o.discount_cents)],
+            ["Sconto", o.discount_cents > 0 ? `− ${eur2(o.discount_cents)}${o.coupon ? ` (${o.coupon})` : ""}` : ""],
+            ["IVA", eur2(o.vat_cents)],
+            ["Totale", <strong key="t">{eur2(o.total_cents)}</strong>],
+          ]} />
+        </Section>
+
+        <Section title={`Partecipanti (${o.participants.length})`}>
+          <div className="space-y-3">
+            {o.participants.map((p, i) => (
+              <div key={`${p.email}-${i}`} className="rounded-xl border border-ink/10 p-3">
+                <Rows rows={[
+                  ["Nome", `${p.nome} ${p.cognome}`],
+                  ["Email", <a key="e" className="text-flame hover:underline" href={`mailto:${p.email}`}>{p.email}</a>],
+                  ["Telefono", p.telefono || ""],
+                  ["Privacy", yn(p.consensoPrivacy)],
+                  ["Marketing", yn(p.consensoMarketing)],
+                  ["Audio/video", yn(p.consensoAudioVideo)],
+                ]} />
+              </div>
+            ))}
+          </div>
+        </Section>
+
+        <Section title="Dati di fatturazione">
+          <Rows rows={[
+            ["Tipologia", BILLING_TYPE[b.type] ?? b.type],
+            [b.ragione ? "Ragione sociale" : "Nome", who],
+            ["Codice fiscale", b.cf || ""],
+            ["P.IVA", b.piva || ""],
+            ["VAT ID", b.vatId || ""],
+            ["Codice SDI", b.sdi || ""],
+            ["PEC", b.pec || ""],
+            ["Indirizzo", address],
+            ["Lingua email", (b.lang || "it").toUpperCase()],
+          ]} />
+        </Section>
+
+        <div className="mt-6 flex justify-end border-t border-ink/10 pt-4">
+          <button type="button" onClick={onDelete} className="inline-flex items-center gap-2 rounded-full border border-err/30 px-4 py-2 text-[13px] font-semibold text-err hover:bg-err/10">
+            <Trash2 className="size-4" aria-hidden="true" />Elimina iscrizione
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Elenco iscrizioni servito dal server agli amministratori: dettaglio al clic sul riferimento, eliminazione dal cestino. */
 export function OrdersPage({ session }: { session: Session }) {
   const [rows, setRows] = useState<Order[] | null>(null);
   const [err, setErr] = useState("");
+  const [open, setOpen] = useState<Order | null>(null);
+  const auth = { Authorization: `Bearer ${session.access_token}` };
 
   useEffect(() => {
     fetch("/api/admin/orders", { headers: { Authorization: `Bearer ${session.access_token}` } })
@@ -29,25 +152,44 @@ export function OrdersPage({ session }: { session: Session }) {
       .catch((e: Error) => setErr(e.message));
   }, [session.access_token]);
 
+  const remove = async (o: Order) => {
+    const warn = o.status === "paid" ? "\n\nATTENZIONE: l'iscrizione risulta PAGATA." : "";
+    if (!window.confirm(`Eliminare definitivamente l'iscrizione ${o.ref}?${warn}\nL'operazione non si può annullare.`)) return;
+    try {
+      const r = await fetch(`/api/admin/orders?ref=${encodeURIComponent(o.ref)}`, { method: "DELETE", headers: auth });
+      if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || "Eliminazione non riuscita");
+      setRows((cur) => (cur ? cur.filter((x) => x.ref !== o.ref) : cur));
+      setOpen(null);
+      setErr("");
+    } catch (e) {
+      setErr((e as Error).message);
+    }
+  };
+
   return (
     <>
       <h1 className="font-display text-2xl font-bold tracking-tight">Iscrizioni</h1>
-      <p className="mt-1 text-[13px] text-steel">Ultime 200. Gli ordini in sandbox sono marcati “prova”.</p>
+      <p className="mt-1 text-[13px] text-steel">Ultime 200. Gli ordini in sandbox sono marcati “prova”. Clicca sul riferimento per vedere tutti i dati.</p>
       {err && <p role="alert" className="mt-4 rounded-lg bg-err/10 px-4 py-2 text-[13px] text-err">{err}</p>}
       {!rows && !err && <p className="mt-4 text-steel">Caricamento…</p>}
       {rows && (
         <div className="mt-5 overflow-x-auto rounded-2xl border border-ink/10 bg-white">
           <table className="w-full min-w-[900px] text-left text-[13px]">
             <thead className="border-b border-ink/10 bg-sand/40 text-[11.5px] uppercase tracking-wider text-steel">
-              <tr>{["Data", "Rif.", "Corso", "Partecipanti", "Fatturazione", "Metodo", "Stato", "Totale"].map((h) => <th key={h} className="px-4 py-3 font-semibold">{h}</th>)}</tr>
+              <tr>
+                {["Data", "Rif.", "Corso", "Partecipanti", "Fatturazione", "Metodo", "Stato", "Totale"].map((h) => <th key={h} className="px-4 py-3 font-semibold">{h}</th>)}
+                <th className="px-4 py-3"><span className="sr-only">Azioni</span></th>
+              </tr>
             </thead>
             <tbody>
               {rows.map((o) => {
                 const st = STATUS[o.status] ?? { label: o.status, cls: "bg-ink/8 text-steel" };
                 return (
                   <tr key={o.ref} className="border-b border-ink/5 align-top last:border-0">
-                    <td className="whitespace-nowrap px-4 py-3">{new Date(o.created_at).toLocaleString("it-IT", { dateStyle: "short", timeStyle: "short" })}</td>
-                    <td className="px-4 py-3 font-mono text-[12px]">{o.ref}</td>
+                    <td className="whitespace-nowrap px-4 py-3">{when(o.created_at)}</td>
+                    <td className="px-4 py-3 font-mono text-[12px]">
+                      <button type="button" onClick={() => setOpen(o)} className="font-semibold text-flame underline-offset-2 hover:underline" title="Mostra i dati dell'iscrizione">{o.ref}</button>
+                    </td>
                     <td className="px-4 py-3">#{o.id_corso}</td>
                     <td className="px-4 py-3">
                       {o.participants.map((p) => <div key={p.email}>{p.nome} {p.cognome} <span className="text-steel">· {p.email}</span></div>)}
@@ -56,14 +198,20 @@ export function OrdersPage({ session }: { session: Session }) {
                     <td className="px-4 py-3">{METHOD[o.method] ?? o.method}{o.test_mode && o.method !== "bonifico" ? <span className="ml-1.5 rounded bg-amber-100 px-1.5 py-0.5 text-[10.5px] font-bold text-amber-700">prova</span> : null}</td>
                     <td className="px-4 py-3"><span className={`rounded-full px-2.5 py-1 text-[12px] font-semibold ${st.cls}`}>{st.label}</span></td>
                     <td className="px-4 py-3 font-semibold tabular-nums">{eur2(o.total_cents)}</td>
+                    <td className="px-4 py-3 text-right">
+                      <button type="button" onClick={() => remove(o)} aria-label={`Elimina l'iscrizione ${o.ref}`} title="Elimina" className="grid size-8 place-items-center rounded-full text-steel hover:bg-err/10 hover:text-err">
+                        <Trash2 className="size-4" aria-hidden="true" />
+                      </button>
+                    </td>
                   </tr>
                 );
               })}
-              {rows.length === 0 && <tr><td colSpan={8} className="px-4 py-8 text-center text-steel">Nessuna iscrizione.</td></tr>}
+              {rows.length === 0 && <tr><td colSpan={9} className="px-4 py-8 text-center text-steel">Nessuna iscrizione.</td></tr>}
             </tbody>
           </table>
         </div>
       )}
+      {open && <OrderDetail o={open} onClose={() => setOpen(null)} onDelete={() => remove(open)} />}
     </>
   );
 }

@@ -282,10 +282,23 @@ export async function adminStatus() {
 
 export async function adminOrders() {
   const { data, error } = await db.from("iscrizioni")
-    .select("ref,id_corso,created_at,paid_at,status,method,test_mode,seats,total_cents,coupon,participants,billing")
+    .select("ref,id_corso,created_at,paid_at,status,method,provider_ref,test_mode,seats,unit_cents,subtotal_cents,discount_cents,vat_cents,total_cents,coupon,participants,billing")
     .order("created_at", { ascending: false }).limit(200);
   if (error) return fail(500, error.message);
-  return ok(data);
+  // titolo e date del corso, per il dettaglio dell'iscrizione
+  const ids = [...new Set(data.map((o) => o.id_corso))];
+  const { data: courses } = ids.length ? await db.from("corsi").select("id_corso,titolo,livello,data_inizio,data_fine").in("id_corso", ids) : { data: [] };
+  const byId = new Map((courses || []).map((c) => [c.id_corso, c]));
+  return ok(data.map((o) => ({ ...o, course: byId.get(o.id_corso) ?? null })));
+}
+
+export async function adminDeleteOrder(ref) {
+  ref = String(ref || "").trim();
+  if (!ref) return fail(400, "Riferimento mancante.");
+  const { data, error } = await db.from("iscrizioni").delete().eq("ref", ref).select("ref");
+  if (error) return fail(500, error.message);
+  if (!data?.length) return fail(404, "Iscrizione non trovata.");
+  return ok({ ok: true });
 }
 
 /** Traduce dall'italiano in en/fr/de i testi inviati dal pannello (workshop ed eventi). Solo admin. */
