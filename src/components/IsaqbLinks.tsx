@@ -18,7 +18,7 @@ export function IsaqbLinks({ dark = false, className }: { dark?: boolean; classN
   const tone = dark ? "text-ember" : "text-flame";
   return (
     <ul className={cn("flex flex-wrap gap-x-6 gap-y-2.5 text-[14px]", className)}>
-      {[l.cpsaF, l.about, l.certification, l.exams, l.isaqbIt].map((x) => (
+      {[l.cpsaF, l.about, l.certification, l.exams].map((x) => (
         <li key={x.href}>
           <ExtLink href={x.href} className={tone}>{x.label}</ExtLink>
         </li>

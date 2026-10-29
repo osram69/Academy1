@@ -92,7 +92,7 @@ export function Footer() {
             </ul>
             <h3 className="mt-7 font-mono text-[11px] font-medium uppercase tracking-[0.22em] text-white/56">{t("Risorse iSAQB")}</h3>
             <ul className="mt-4 space-y-2.5 text-sm">
-              {[isaqbLinks().cpsaF, isaqbLinks().about, isaqbLinks().certification, isaqbLinks().exams, isaqbLinks().isaqbIt].map((x) => (
+              {[isaqbLinks().cpsaF, isaqbLinks().about, isaqbLinks().certification, isaqbLinks().exams].map((x) => (
                 <li key={x.href}>
                   <ExtLink href={x.href} className="font-normal text-white/76 transition-colors hover:text-white">{x.label}</ExtLink>
                 </li>
