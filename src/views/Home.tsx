@@ -47,7 +47,7 @@ const WHY = [
 
 function CertificationSection() {
   return (
-    <section id="certificazione" className="relative scroll-mt-0 overflow-hidden bg-paper py-24 lg:pb-32 lg:pt-[121px]" aria-labelledby="cert-title">
+    <section id="certificazione" className="relative scroll-mt-0 overflow-hidden bg-paper py-24 lg:scroll-mt-[41px] lg:pb-[88px] lg:pt-[80px]" aria-labelledby="cert-title">
       <IsoCube className="absolute -right-16 top-16 size-64 -rotate-12 text-ink/4" aria-hidden="true" />
       <div className="relative mx-auto grid max-w-7xl gap-14 px-5 lg:grid-cols-[1fr_1.1fr] lg:gap-20 lg:px-8">
         <div className="lg:sticky lg:top-[121px] lg:self-start">
@@ -254,7 +254,7 @@ function FormatsSection() {
 function EditionsSection() {
   const upcoming = upcomingCourses().slice(0, 3);
   return (
-    <section className="relative overflow-hidden bg-paper py-24 lg:py-32" aria-labelledby="editions-title">
+    <section className="relative overflow-hidden bg-paper pb-20 pt-24 lg:pb-[88px] lg:pt-32" aria-labelledby="editions-title">
       <div className="bg-blueprint pointer-events-none absolute inset-0 opacity-50" aria-hidden="true" />
       <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
         <div className="flex flex-wrap items-end justify-between gap-6">
@@ -290,7 +290,7 @@ function EditionsSection() {
 function FaqSection() {
   const [open, setOpen] = useState(0);
   return (
-    <section id="faq" className="scroll-mt-0 bg-paper py-24 lg:pb-32 lg:pt-[121px]" aria-labelledby="faq-title">
+    <section id="faq" className="scroll-mt-0 bg-paper py-24 lg:scroll-mt-[41px] lg:pb-32 lg:pt-[80px]" aria-labelledby="faq-title">
       <div className="mx-auto grid max-w-7xl gap-14 px-5 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
         <div className="lg:sticky lg:top-[121px] lg:self-start">
           <Reveal>

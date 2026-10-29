@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from
 import type { Session } from "@supabase/supabase-js";
 import { supabase, supabaseConfigured } from "../lib/supabase";
 import { CalendarClock, CheckCheck, CircleCheck, CircleHelp, EyeOff, Play, type LucideIcon } from "lucide-react";
-import { MODALITA, workshopTimes } from "../data";
+import { MODALITA, WORKSHOP_LANGUAGES, workshopLanguage, workshopTimes } from "../data";
 import { SettingsPage } from "./Settings";
 import { OrdersPage } from "./Orders";
 import { EventsAdmin } from "./Events";
@@ -494,7 +494,11 @@ function Edit({ id }: { id: string }) {
               {F("data_inizio", "Data", <input type="date" className={inputCls} value={toDate(f.data_inizio)} onChange={(e) => set("data_inizio", e.target.value)} />)}
               {F("ora_inizio", "Ora di inizio (ora italiana)", <input type="time" className={inputCls} value={String(f.ora_inizio ?? "")} onChange={(e) => set("ora_inizio", e.target.value)} />)}
               {F("ora_fine", "Ora di fine", <input type="time" className={inputCls} value={String(f.ora_fine ?? "")} onChange={(e) => set("ora_fine", e.target.value)} />, "Se vuota, il workshop dura 1 ora dall'inizio.")}
-              {F("lingua_it", "Lingua", text("lingua_it", { maxLength: 11, placeholder: "Italiano" }))}
+              {F("lingua_it", "Lingua del workshop", (
+                <select className={inputCls} value={workshopLanguage(String(f.lingua_it ?? "")).name} onChange={(e) => set("lingua_it", e.target.value)}>
+                  {WORKSHOP_LANGUAGES.map((l) => <option key={l.code} value={l.name}>{l.name}</option>)}
+                </select>
+              ), "Compare nella card del workshop e nel richiamo in home.")}
               <div className="md:col-span-2">
                 {F("link_evento", "Link all'evento LinkedIn", text("link_evento", { type: "url", maxLength: 300, placeholder: "https://www.linkedin.com/events/…" }), "Il sito non gestisce iscrizioni: il pulsante “Iscriviti su LinkedIn” porta a questo indirizzo.")}
               </div>

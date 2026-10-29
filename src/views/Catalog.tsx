@@ -71,7 +71,7 @@ export function Catalog() {
     WORKSHOPS.length > 0 &&
     (level === "all" || level === "Workshop") &&
     format === "all" &&
-    (lang === "all" || WORKSHOPS.some((w) => (/^ital/i.test(w.language) ? "IT" : "EN") === lang));
+    (lang === "all" || WORKSHOPS.some((w) => w.languageCode.toUpperCase() === lang));
   const onlyWorkshops = level === "Workshop";
 
   const filtered = useMemo(

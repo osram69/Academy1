@@ -11,7 +11,7 @@ export function ModalitaSection() {
   const cfg = useConfig();
   const upcoming = upcomingCourses();
   return (
-    <section id="modalita" className="scroll-mt-24 bg-paper py-24 lg:py-28" aria-labelledby="modalita-title">
+    <section id="modalita" className="scroll-mt-24 bg-paper pb-24 pt-20 lg:pb-28 lg:pt-20" aria-labelledby="modalita-title">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <Reveal>
           <Tag>{t("Come seguire il corso")}</Tag>

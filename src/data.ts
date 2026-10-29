@@ -418,7 +418,8 @@ export interface Workshop {
   start: Date;
   time: string; // es. "18:00–19:00"
   place: string;
-  language: string;
+  language: string; // nome della lingua (Italiano, English, Français, Deutsch)
+  languageCode: "it" | "en" | "fr" | "de";
   description: string;
   image: string | null;
   eventUrl: string;
@@ -467,6 +468,21 @@ export function zoomState(w: Workshop, now: number): "none" | "locked" | "open" 
 export const zoomOpensAt = (w: Workshop) =>
   w.startsAt ? new Date(w.startsAt.getTime() - 3600000).toLocaleTimeString(locale, { timeZone: "Europe/Rome", hour: "2-digit", minute: "2-digit" }) : "";
 
+/** Le 4 lingue in cui si può tenere un workshop, con il nome nella lingua stessa. */
+export const WORKSHOP_LANGUAGES = [
+  { code: "it", name: "Italiano" },
+  { code: "en", name: "English" },
+  { code: "fr", name: "Français" },
+  { code: "de", name: "Deutsch" },
+] as const;
+
+/** Riconosce la lingua dal testo salvato (es. "Italiano", "english", "Français"); in assenza di indicazione: italiano. */
+export function workshopLanguage(raw?: string | null) {
+  const s = String(raw ?? "").trim().toLowerCase();
+  const code = /^(en|ing)/.test(s) ? "en" : /^(fr)/.test(s) ? "fr" : /^(de|ted|ger)/.test(s) ? "de" : "it";
+  return WORKSHOP_LANGUAGES.find((l) => l.code === code)!;
+}
+
 const toWorkshop = (r: PublicRow): Workshop => {
   const key = lang as "it" | "en" | "fr" | "de";
   const day = (r.data_inizio || "").slice(0, 10);
@@ -481,7 +497,8 @@ const toWorkshop = (r: PublicRow): Workshop => {
     start,
     time: r.orario_it ?? "",
     place: (r[`luogo_${key}` as "luogo_it"] || r.luogo_it || "").trim(),
-    language: r.lingua_it ?? "",
+    language: workshopLanguage(r.lingua_it).name,
+    languageCode: workshopLanguage(r.lingua_it).code,
     description: plain((r[`home_subtitle_${key}` as "home_subtitle_it"] || r.home_subtitle_it || "")),
     image: r.immagine_url || null,
     eventUrl: r.link_evento || "",

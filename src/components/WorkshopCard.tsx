@@ -149,19 +149,16 @@ export function WorkshopCard({ w, past = false }: { w: Workshop; past?: boolean 
               {w.time}
             </li>
           )}
-          {(w.place || w.language) && (
-            <li className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+          {w.place && (
+            <li className="flex items-center gap-2.5">
               <MapPin className="size-4 shrink-0 text-flame" aria-hidden="true" />
               {w.place}
-              {w.language && (
-                <>
-                  <span className="text-steel">·</span>
-                  <Globe className="size-3.5 text-steel" aria-hidden="true" />
-                  {w.language}
-                </>
-              )}
             </li>
           )}
+          <li className="flex items-center gap-2.5">
+            <Globe className="size-4 shrink-0 text-flame" aria-hidden="true" />
+            <span>{t("Lingua")}: <span className="font-semibold text-ink">{w.language}</span></span>
+          </li>
         </ul>
         {w.description && <ClampedText text={w.description} className="mt-4 text-[14px] leading-relaxed text-ink/65" />}
         {!past && (
@@ -204,13 +201,16 @@ export function ConcludedWorkshopCard({ w }: { w: Workshop }) {
             <CalendarDays className="size-4 shrink-0 text-steel" aria-hidden="true" />
             <span className="font-semibold text-ink/75">{fmtFull(w.start)}</span>
           </li>
-          {(w.place || w.language) && (
-            <li className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+          {w.place && (
+            <li className="flex items-center gap-2.5">
               <MapPin className="size-4 shrink-0 text-steel" aria-hidden="true" />
               {w.place}
-              {w.language && (<><span className="text-steel">·</span><Globe className="size-3.5 text-steel" aria-hidden="true" />{w.language}</>)}
             </li>
           )}
+          <li className="flex items-center gap-2.5">
+            <Globe className="size-4 shrink-0 text-steel" aria-hidden="true" />
+            {t("Lingua")}: <span className="font-semibold text-ink/75">{w.language}</span>
+          </li>
         </ul>
       </div>
     </article>
@@ -304,7 +304,7 @@ export function WorkshopPromo() {
   const w = upcomingWorkshops()[0];
   if (!w) return null;
   return (
-    <section id="workshop" className="scroll-mt-[calc(69px+var(--ribbon-h,0px))] bg-paper py-12 lg:py-16" aria-label={t("Prossimo workshop")}>
+    <section id="workshop" className="scroll-mt-[calc(69px+var(--ribbon-h,0px))] bg-paper pb-8 pt-12 lg:pb-8 lg:pt-16" aria-label={t("Prossimo workshop")}>
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <Reveal>
           <div className="grid overflow-hidden rounded-[28px] border border-ink/10 bg-white shadow-card md:grid-cols-[1.2fr_1fr]">
@@ -329,6 +329,7 @@ export function WorkshopPromo() {
                 <span className="inline-flex items-center gap-2 font-semibold text-ink"><CalendarDays className="size-4 text-flame" aria-hidden="true" />{fmtFull(w.start)}</span>
                 {w.time && <span className="inline-flex items-center gap-2"><Clock className="size-4 text-flame" aria-hidden="true" />{w.time}</span>}
                 {w.place && <span className="inline-flex items-center gap-2"><MapPin className="size-4 text-flame" aria-hidden="true" />{w.place}</span>}
+                <span className="inline-flex items-center gap-2"><Globe className="size-4 text-flame" aria-hidden="true" />{w.language}</span>
               </p>
               {w.description && <ClampedText text={w.description} className="mt-4 max-w-xl text-[15px] leading-relaxed text-ink/65" />}
               <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
