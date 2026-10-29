@@ -34,7 +34,7 @@ hash (`#/corsi`, `#/admin`, ...) e le API di iscrizione e pagamento sono Route H
    **Traduzioni automatiche**: il pulsante «Traduci per le altre lingue» dei workshop e degli eventi usa Claude se
    imposti `ANTHROPIC_API_KEY` (modello in `TRANSLATE_MODEL`, default `claude-haiku-5-5`); senza chiave ripiega
    sul servizio gratuito MyMemory (qualità inferiore e limite giornaliero, alzabile con `TRANSLATE_EMAIL`).
-   Il risultato va sempre controllato prima di salvare.
+   Per i testi HTML (descrizione dei corsi) tag e link restano identici e si traduce solo il testo; con il servizio gratuito la qualità è inferiore, con Claude è nettamente migliore. Il risultato va sempre controllato prima di salvare.
 8. Verifica: `https://<dominio>/api/config` deve rispondere con un JSON (`privateDiscount`, `methods`).
 
 Il server calcola prezzo, sconti e IVA da solo (il browser non decide l'importo), accetta al massimo

@@ -387,6 +387,25 @@ function Edit({ id }: { id: string }) {
   };
 
   /** Workshop: genera titolo, luogo e descrizione in en/fr/de partendo dall'italiano. */
+  /** Corso: traduce la descrizione (HTML) dall'italiano; i tag restano uguali, cambia solo il testo visibile. */
+  const translateCourse = async () => {
+    const OTHERS = ["en", "fr", "de"] as const;
+    if (!String(f.read_more_it ?? "").trim()) return setMsg("Scrivi prima la descrizione in italiano (scheda Italiano).");
+    if (OTHERS.some((l) => String(f[`read_more_${l}`] ?? "").trim()) && !confirm("Alcune descrizioni sono già presenti: vuoi sostituirle con quelle tradotte?")) return;
+    setTranslating(true);
+    setMsg("");
+    try {
+      const tr = await translateFromItalian({ descrizione: String(f.read_more_it) }, ["descrizione"]);
+      const patch: Row = {};
+      for (const l of OTHERS) if (tr[l].descrizione) patch[`read_more_${l}`] = tr[l].descrizione;
+      setMany(patch);
+      setMsg("Descrizioni tradotte: controllale nelle schede English, Français e Deutsch, poi premi “Salva corso”.");
+    } catch (e) {
+      setMsg(`Traduzione non riuscita: ${(e as Error).message}`);
+    }
+    setTranslating(false);
+  };
+
   const translateWs = async () => {
     const OTHERS = ["en", "fr", "de"] as const;
     const src = { titolo: String(f.titolo ?? ""), luogo: String(f.luogo_it ?? ""), descrizione: String(f.home_subtitle_it ?? "") };
@@ -653,6 +672,12 @@ function Edit({ id }: { id: string }) {
 
       <section className={card}>
         <h2 className={h2}>Contenuti per lingua</h2>
+        <div className="mb-5 flex flex-wrap items-center gap-3">
+          <button type="button" disabled={translating} onClick={translateCourse} className={`${btnCls} bg-flame text-white hover:bg-ink disabled:opacity-50`}>
+            {translating ? "Traduzione in corso…" : "Traduci per le altre lingue"}
+          </button>
+          <span className="text-[12.5px] text-steel">Traduce la descrizione italiana in inglese, francese e tedesco: la formattazione HTML resta identica, cambia solo il testo. Controlla il risultato prima di salvare.</span>
+        </div>
         <div role="tablist" className="mb-5 flex flex-wrap gap-2">
           {LANGS.map(([code, label]) => (
             <button

@@ -294,7 +294,8 @@ export async function apiTranslate(body, ip) {
   const fields = body?.fields;
   if (!fields || typeof fields !== "object" || Array.isArray(fields) || Object.keys(fields).length > 8) return fail(400, "Richiesta di traduzione non valida.");
   try {
-    return ok({ translations: await translateFields(fields), provider: translatorProvider() });
+    const htmlKeys = Array.isArray(body?.html) ? body.html.filter((k) => typeof k === "string" && k in fields) : [];
+    return ok({ translations: await translateFields(fields, htmlKeys), provider: translatorProvider() });
   } catch (e) {
     return fail(502, e instanceof Error ? e.message : "Traduzione non riuscita.");
   }
