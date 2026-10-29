@@ -13,12 +13,12 @@ import {
 } from "lucide-react";
 import { cn } from "../utils/cn";
 import { Hero } from "../components/Hero";
-import { ConcludedSection, CourseCard } from "../components/CourseCard";
+import { CourseCard } from "../components/CourseCard";
 import { Btn, IsoCube, Reveal, Tag } from "../components/ui";
 import { ModalitaSection } from "../components/ModalitaSection";
 import { ExtLink, IsaqbLinks } from "../components/IsaqbLinks";
 import { WorkshopPromo } from "../components/WorkshopCard";
-import { FAQS, TRAINER, concludedCourses, eur, fmtRange, nextCourse, upcomingCourses } from "../data";
+import { FAQS, TRAINER, eur, fmtRange, nextCourse, upcomingCourses } from "../data";
 
 import { t } from "../i18n";
 import { RichText } from "../components/RichText";
@@ -253,7 +253,6 @@ function FormatsSection() {
 
 function EditionsSection() {
   const upcoming = upcomingCourses().slice(0, 3);
-  const concluded = concludedCourses();
   return (
     <section className="relative overflow-hidden bg-paper py-24 lg:py-32" aria-labelledby="editions-title">
       <div className="bg-blueprint pointer-events-none absolute inset-0 opacity-50" aria-hidden="true" />
@@ -281,7 +280,6 @@ function EditionsSection() {
             </Reveal>
           ))}
         </div>
-        <ConcludedSection courses={concluded} limit={3} />
       </div>
     </section>
   );
