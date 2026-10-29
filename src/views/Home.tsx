@@ -45,10 +45,10 @@ const WHY = [
 
 function CertificationSection() {
   return (
-    <section id="certificazione" className="relative scroll-mt-0 overflow-hidden bg-paper py-24 lg:pb-32 lg:pt-[83px]" aria-labelledby="cert-title">
+    <section id="certificazione" className="relative scroll-mt-0 overflow-hidden bg-paper py-24 lg:pb-32 lg:pt-[121px]" aria-labelledby="cert-title">
       <IsoCube className="absolute -right-16 top-16 size-64 -rotate-12 text-ink/4" aria-hidden="true" />
       <div className="relative mx-auto grid max-w-7xl gap-14 px-5 lg:grid-cols-[1fr_1.1fr] lg:gap-20 lg:px-8">
-        <div className="lg:sticky lg:top-[83px] lg:self-start">
+        <div className="lg:sticky lg:top-[121px] lg:self-start">
           <Reveal>
             <Tag>{t("La certificazione")}</Tag>
           </Reveal>
@@ -287,9 +287,9 @@ function EditionsSection() {
 function FaqSection() {
   const [open, setOpen] = useState(0);
   return (
-    <section id="faq" className="scroll-mt-0 bg-paper py-24 lg:pb-32 lg:pt-[83px]" aria-labelledby="faq-title">
+    <section id="faq" className="scroll-mt-0 bg-paper py-24 lg:pb-32 lg:pt-[121px]" aria-labelledby="faq-title">
       <div className="mx-auto grid max-w-7xl gap-14 px-5 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
-        <div className="lg:sticky lg:top-[83px] lg:self-start">
+        <div className="lg:sticky lg:top-[121px] lg:self-start">
           <Reveal>
             <Tag>{t("Domande frequenti")}</Tag>
           </Reveal>
