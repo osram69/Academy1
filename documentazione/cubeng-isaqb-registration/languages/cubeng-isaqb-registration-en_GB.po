@@ -1,0 +1,750 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Cubeng iSAQB Course Registration\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-22 08:54+0000\n"
+"PO-Revision-Date: 2026-04-22 11:10+0200\n"
+"Last-Translator: Translators <translations@example.com>\n"
+"Language-Team: en_GB\n"
+"Language: en_GB\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.9\n"
+"X-Domain: cubeng-isaqb-registration\n"
+
+#: cubeng-isaqb-registration.php:243
+msgid "%d partecipante"
+msgid_plural "%d partecipanti"
+msgstr[0] "%d attendee"
+msgstr[1] "%d attendees"
+
+#: includes/class-cir-settings.php:359
+msgid "Abilita"
+msgstr "Enable"
+
+#: includes/class-cir-settings.php:85
+msgid "Abilita o disabilita i metodi che vuoi mostrare sul form."
+msgstr "Enable or disable the methods you want to show on the form."
+
+#: templates/form.php:395 templates/form.php:410
+msgid "Acconsento"
+msgstr "I consent"
+
+#: cubeng-isaqb-registration.php:121
+msgid "Aggiungi nuova"
+msgstr "Add new"
+
+#: templates/form.php:38
+msgid "Altro"
+msgstr "Other"
+
+#: includes/class-cir-settings.php:375
+msgid "Ambiti"
+msgstr "Scopes"
+
+#: cubeng-isaqb-registration.php:179
+msgid "Annullata"
+msgstr "Cancelled"
+
+#: includes/class-cir-settings.php:170
+msgid "API key (sk_test_/sk_live_)"
+msgstr "API key (sk_test_/sk_live_)"
+
+#: templates/form.php:328
+msgid "Applica"
+msgstr "Apply"
+
+#: templates/form.php:218
+msgid "Applicazione fatturazione elettronica"
+msgstr "Electronic invoicing option"
+
+#: cubeng-isaqb-registration.php:210
+msgid "Apri checkout"
+msgstr "Open checkout"
+
+#: templates/form.php:36
+msgid "Articolo o stampa"
+msgstr "Article or press"
+
+#: templates/form.php:72 includes/class-cir-form-handler-helpers.php:432 \
+msgid "Bonifico bancario"
+msgstr "Bank transfer"
+
+#: includes/class-cir-assets.php:67
+msgid "Campo obbligatorio"
+msgstr "Required field"
+
+#: templates/form.php:274
+msgid "CAP"
+msgstr "Postcode"
+
+#: includes/class-cir-form-handler-helpers.php:430 includes/class-cir-settings.php:92
+msgid "Carta (Stripe)"
+msgstr "Card (Stripe)"
+
+#: includes/class-cir-form-handler-helpers.php:431 includes/class-cir-settings.php:93
+msgid "Carta (SumUp)"
+msgstr "Card (SumUp)"
+
+#: templates/form.php:67
+msgid "Carta di credito"
+msgstr "Credit card"
+
+#: cubeng-isaqb-registration.php:127
+msgid "Cerca iscrizioni"
+msgstr "Search registrations"
+
+#: templates/form.php:270
+msgid "Città"
+msgstr "City"
+
+#: includes/class-cir-settings.php:119
+msgid "Client ID"
+msgstr "Client ID"
+
+#: includes/class-cir-settings.php:370
+msgid "Codice"
+msgstr "Code"
+
+#: includes/class-cir-discount-service.php:209
+#, php-format
+msgid "Codice applicato: %s (-%s%%)."
+msgstr "Code applied: %s (-%s%%)."
+
+#: templates/form.php:220
+msgid "Codice Destinatario"
+msgstr "Recipient code"
+
+#: templates/form.php:228
+msgid "Codice Destinatario (SDI)"
+msgstr "Recipient code (SDI)"
+
+#: includes/class-cir-discount-service.php:184
+#, php-format
+msgid "Codice Early Bird applicato (-%s%%)."
+msgstr "Early Bird code applied (-%s%%)."
+
+#: includes/class-cir-discount-service.php:195
+msgid "Codice Early Bird non più valido."
+msgstr "Early Bird code no longer valid."
+
+#: templates/form.php:250
+msgid "Codice Fiscale"
+msgstr "Tax code"
+
+#: templates/form.php:325
+msgid "Codice sconto"
+msgstr "Discount code"
+
+#: includes/class-cir-discount-service.php:221 includes/class-cir-form-handler.php:155
+msgid "Codice sconto non valido o scaduto."
+msgstr "Invalid or expired discount code."
+
+#: templates/form.php:162
+msgid "Cognome"
+msgstr "Surname"
+
+#: templates/form.php:196
+msgid "Cognome Referente"
+msgstr "Contact surname"
+
+#: templates/form.php:310
+msgid "Come hai saputo di questo evento?"
+msgstr "How did you hear about this event?"
+
+#: includes/class-cir-form-handler-helpers.php:547 \
+msgid "Completa il pagamento"
+msgstr "Complete the payment"
+
+#: includes/class-cir-form-handler-helpers.php:545 \
+msgid "Completa il pagamento con carta (Stripe)"
+msgstr "Complete the payment by card (Stripe)"
+
+#: includes/class-cir-form-handler-helpers.php:544 \
+msgid "Completa il pagamento con PayPal"
+msgstr "Complete the payment with PayPal"
+
+#: includes/class-cir-form-handler-helpers.php:543 \
+msgid "Completa il pagamento con SumUp"
+msgstr "Complete the payment with SumUp"
+
+#: includes/class-cir-form-handler.php:329
+msgid "Completa il pagamento della registrazione"
+msgstr "Complete your registration payment"
+
+#: includes/class-cir-settings.php:207
+msgid "Configura fino a 6 coupon differenziati per tipologia di fatturazione."
+msgstr "Configure up to 6 coupons for the different billing types."
+
+#: includes/class-cir-settings.php:139
+msgid "Configura le API Stripe."
+msgstr "Configure the Stripe API."
+
+#: includes/class-cir-settings.php:164
+msgid "Configura le API SumUp."
+msgstr "Configure the SumUp API."
+
+#: includes/class-cir-settings.php:112
+msgid "Configura le credenziali PayPal."
+msgstr "Configure the PayPal credentials."
+
+#: includes/class-cir-form-handler-helpers.php:240
+msgid "Consensi"
+msgstr "Consents"
+
+#: includes/class-cir-shortcode.php:27
+#, fuzzy
+msgid "Corso certificazione iSAQB® - Certified Professional for Software Architecture Foundation Level"
+msgstr "iSAQB® Certification Course – Certified Professional for Software Architecture Foundation Level"
+
+#: templates/form.php:51
+#, php-format
+msgid "Corso del %s"
+msgstr "Course on %s"
+
+#: includes/class-cir-settings.php:214
+msgid "Coupon"
+msgstr "Coupons"
+
+#: includes/class-cir-settings.php:205
+msgid "Coupon personalizzati"
+msgstr "Custom coupons"
+
+#. Author of the plugin
+msgid "Cube Engineering S.r.l."
+msgstr "Cube Engineering S.r.l."
+
+#. Name of the plugin
+msgid "Cubeng iSAQB Course Registration"
+msgstr "Cubeng iSAQB Course Registration"
+
+#: cubeng-isaqb-registration.php:151
+msgid "Data"
+msgstr "Date"
+
+#: cubeng-isaqb-registration.php:147
+msgid "Data corso"
+msgstr "Course date"
+
+#: includes/class-cir-settings.php:373
+msgid "Data fine"
+msgstr "End date"
+
+#: includes/class-cir-settings.php:372
+msgid "Data inizio"
+msgstr "Start date"
+
+#: includes/class-cir-form-handler-helpers.php:219
+msgid "Dati fatturazione"
+msgstr "Billing details"
+
+#: templates/form.php:210
+msgid "Dati per la fatturazione"
+msgstr "Billing information"
+
+#: templates/form.php:189
+msgid "Dati personali"
+msgstr "Personal details"
+
+#: includes/class-cir-form-handler-helpers.php:228
+msgid "Dettagli corso"
+msgstr "Course details"
+
+#: includes/class-cir-form-handler-helpers.php:206
+msgid "Dettagli referente"
+msgstr "Contact details"
+
+#: templates/form.php:166 includes/class-cir-form-handler-helpers.php:582
+msgid "Email"
+msgstr "Email"
+
+#: templates/form.php:200
+msgid "Email principale"
+msgstr "Primary email"
+
+#: includes/class-cir-form-handler.php:226
+msgid "Errore PayPal, riprova."
+msgstr "PayPal error, please try again."
+
+#: includes/class-cir-form-handler.php:237
+msgid "Errore Stripe, riprova."
+msgstr "Stripe error, please try again."
+
+#: includes/class-cir-form-handler.php:248
+msgid "Errore SumUp, riprova."
+msgstr "SumUp error, please try again."
+
+#: templates/form.php:416
+msgid "Esegui iscrizione"
+msgstr "Submit registration"
+
+#: includes/class-cir-settings.php:371
+msgid "Etichetta"
+msgstr "Label"
+
+#: cubeng-isaqb-registration.php:178
+msgid "Fallita"
+msgstr "Failed"
+
+#: includes/class-cir-form-handler.php:332
+#, php-format
+msgid "Hai iniziato la registrazione al corso CPSA-F ma il pagamento via %s risulta ancora incompleto."
+msgstr "You started the CPSA-F course registration but the payment via %s is still incomplete."
+
+#: templates/form.php:381
+msgid "Ho letto e accetto le condizioni della Politica sulla Privacy."
+msgstr "I have read and accept the Privacy Policy."
+
+#. URI of the plugin
+msgid "https://academy.cubeng.eu"
+msgstr "https://academy.cubeng.eu"
+
+#. Author URI of the plugin
+msgid "https://www.cubeng.it"
+msgstr "https://www.cubeng.it"
+
+#: includes/class-cir-form-handler-helpers.php:234
+msgid "Importi"
+msgstr "Amounts"
+
+#: templates/form.php:339
+msgid "Importo dello sconto"
+msgstr "Discount amount"
+
+#: includes/class-cir-form-handler.php:185
+msgid "Impossibile salvare la registrazione."
+msgstr "Unable to save the registration."
+
+#: cubeng-isaqb-registration.php:177
+msgid "In attesa"
+msgstr "Pending"
+
+#: templates/form.php:301
+msgid "Indicazioni aggiuntive per la fattura"
+msgstr "Additional billing notes"
+
+#: templates/form.php:262
+msgid "Indirizzo"
+msgstr "Address"
+
+#: templates/form.php:266
+msgid "Indirizzo (riga 2)"
+msgstr "Address (line 2)"
+
+#: templates/form.php:259
+msgid "Indirizzo di fatturazione"
+msgstr "Billing address"
+
+#: templates/form.php:235
+msgid "Indirizzo PEC"
+msgstr "PEC address"
+
+#: templates/form.php:401
+msgid "Informazioni e materiale promozionale"
+msgstr "Promotional information and materials"
+
+#: templates/form.php:152
+msgid "Informazioni partecipanti"
+msgstr "Participant information"
+
+#: templates/form.php:176
+msgid "Informazioni per la fatturazione"
+msgstr "Billing information"
+
+#: templates/form.php:147
+msgid "Inserisci il numero di partecipanti (max 50 per registrazione)."
+msgstr "Enter the number of participants (max 50 per registration)."
+
+#: includes/class-cir-assets.php:68
+msgid "Inserisci un indirizzo email valido"
+msgstr "Enter a valid email address"
+
+#: includes/class-cir-form-handler.php:80
+msgid "Invio già elaborato. Aggiorna la pagina e riprova."
+msgstr "Submission already processed. Refresh the page and try again."
+
+#: includes/class-cir-shortcode.php:26
+msgid "Iscrizione aziendale"
+msgstr "Corporate registration"
+
+#: cubeng-isaqb-registration.php:118 cubeng-isaqb-registration.php:120
+msgid "Iscrizione corso iSAQB CPSA-F"
+msgstr "iSAQB CPSA-F course registration"
+
+#: templates/form.php:111
+msgid "Iscrizione inviata con successo. Riceverai una conferma via email."
+msgstr "Registration sent successfully. You will receive a confirmation email."
+
+#: cubeng-isaqb-registration.php:117 cubeng-isaqb-registration.php:119
+msgid "Iscrizioni corso iSAQB CPSA-F"
+msgstr "iSAQB CPSA-F course registrations"
+
+#: includes/class-cir-settings.php:196
+msgid "Istruzioni"
+msgstr "Instructions"
+
+#: templates/form.php:343
+msgid "IVA"
+msgstr "VAT"
+
+#: templates/form.php:243
+msgid "IVA standard"
+msgstr "Standard VAT"
+
+#: includes/class-cir-discount-service.php:163
+msgid "La tariffa Early Bird è già applicata automaticamente."
+msgstr "The Early Bird rate is already applied automatically."
+
+#: includes/class-cir-settings.php:413
+msgid "Lascia vuoto il codice per disattivare lo slot. La percentuale si applica solo se la tipologia di fatturazione dell’utente è inclusa negli ambiti selezionati."
+msgstr "Leave the code empty to disable the slot. The discount applies only if the user’s billing type is among the selected scopes."
+
+#: templates/form.php:405
+msgid "Leggi i Termini per il materiale promozionale"
+msgstr "Read the terms for promotional materials"
+
+#: templates/form.php:375
+msgid "Leggi i Termini per la Politica sulla Privacy"
+msgstr "Read the Privacy Policy terms"
+
+#: templates/form.php:390
+msgid "Leggi i Termini per registrazioni audio e video e pubblicazioni"
+msgstr "Read the terms for audio/video recordings and publications"
+
+#: templates/form.php:183
+msgid "Libero professionista"
+msgstr "Freelance professional"
+
+#: cubeng-isaqb-registration.php:150
+msgid "Link pagamento"
+msgstr "Payment link"
+
+#: includes/class-cir-settings.php:171
+msgid "Merchant code"
+msgstr "Merchant code"
+
+#: includes/class-cir-settings.php:83
+msgid "Metodi disponibili"
+msgstr "Available methods"
+
+#: includes/class-cir-form-handler.php:213
+msgid "Metodo di pagamento non disponibile."
+msgstr "Payment method unavailable."
+
+#: includes/class-cir-settings.php:118
+msgid "Modalità"
+msgstr "Mode"
+
+#: cubeng-isaqb-registration.php:124
+msgid "Modifica iscrizione"
+msgstr "Edit registration"
+
+#: templates/form.php:103
+#, php-format
+msgid "Modulo registrazione al corso %s."
+msgstr "Registration form for the %s course."
+
+#: cubeng-isaqb-registration.php:171
+msgid "N/D"
+msgstr "N/A"
+
+#: cubeng-isaqb-registration.php:215
+msgid "Nessun ID registrazione DB"
+msgstr "No DB registration ID"
+
+#: cubeng-isaqb-registration.php:198
+msgid "Nessun link"
+msgstr "No link"
+
+#: includes/class-cir-form-handler-helpers.php:277
+msgid "Nessun partecipante specificato."
+msgstr "No participant specified."
+
+#: cubeng-isaqb-registration.php:238
+msgid "Nessun partecipante trovato"
+msgstr "No participants found"
+
+#: templates/form.php:32
+msgid "Newsletter"
+msgstr "Newsletter"
+
+#: templates/form.php:158 includes/class-cir-form-handler-helpers.php:581
+msgid "Nome"
+msgstr "First name"
+
+#: templates/form.php:192
+msgid "Nome Referente"
+msgstr "Contact first name"
+
+#: templates/form.php:396 templates/form.php:411
+msgid "Non Acconsento"
+msgstr "I do not consent"
+
+#: templates/form.php:222
+msgid "Non applicabile"
+msgstr "Not applicable"
+
+#: cubeng-isaqb-registration.php:167
+msgid "Non specificata"
+msgstr "Not provided"
+
+#: includes/class-cir-form-handler.php:72
+msgid "Nonce non valido."
+msgstr "Invalid nonce."
+
+#: templates/form.php:300
+msgid "Note per la fatturazione"
+msgstr "Billing notes"
+
+#: templates/form.php:143
+msgid "Numero persone da iscrivere"
+msgstr "Number of people to register"
+
+#: cubeng-isaqb-registration.php:122 cubeng-isaqb-registration.php:123
+msgid "Nuova iscrizione"
+msgstr "New registration"
+
+#: includes/class-cir-form-handler-helpers.php:289
+#, php-format
+msgid "Nuova iscrizione iSAQB – %s"
+msgstr "New iSAQB registration – %s"
+
+#: templates/form.php:291
+msgid "Paese"
+msgstr "Country"
+
+#: includes/class-cir-form-handler-helpers.php:550
+msgid "Paga ora"
+msgstr "Pay now"
+
+#: cubeng-isaqb-registration.php:149
+msgid "Pagamento"
+msgstr "Payment"
+
+#: cubeng-isaqb-registration.php:203
+msgid "Pagamento completato"
+msgstr "Payment completed"
+
+#: cubeng-isaqb-registration.php:176
+msgid "Pagata"
+msgstr "Paid"
+
+#: templates/form.php:155
+msgid "Partecipante 1"
+msgstr "Participant 1"
+
+#: cubeng-isaqb-registration.php:148
+msgid "Partecipanti"
+msgstr "Participants"
+
+#: templates/form.php:254
+msgid "Partita IVA / VAT"
+msgstr "VAT number"
+
+#: templates/form.php:35
+msgid "Partner / Sponsor"
+msgstr "Partner / Sponsor"
+
+#: templates/form.php:33
+msgid "Passaparola"
+msgstr "Word of mouth"
+
+#: includes/class-cir-settings.php:91 includes/class-cir-settings.php:110
+msgid "PayPal"
+msgstr "PayPal"
+
+#: includes/class-cir-settings.php:374
+msgid "Percentuale"
+msgstr "Percentage"
+
+#: templates/form.php:145
+msgid "Persone"
+msgstr "People"
+
+#: templates/form.php:371
+msgid "Politica sulla Privacy"
+msgstr "Privacy Policy"
+
+#: templates/form.php:307
+msgid "Privacy, pagamento e riepilogo"
+msgstr "Privacy, payment and summary"
+
+#: templates/form.php:182
+msgid "Privato"
+msgstr "Private individual"
+
+#: templates/form.php:278
+msgid "Provincia"
+msgstr "Province"
+
+#: templates/form.php:287
+msgid "Provincia / Stato"
+msgstr "Province / State"
+
+#: includes/class-cir-settings.php:145
+msgid "Publishable key"
+msgstr "Publishable key"
+
+#: templates/form.php:335
+msgid "Quota d’iscrizione"
+msgstr "Registration fee"
+
+#: templates/form.php:213
+msgid "Ragione sociale / Intestatario"
+msgstr "Company / Billing entity"
+
+#: includes/class-cir-form-handler.php:284
+msgid "Referente"
+msgstr "Contact person"
+
+#: cubeng-isaqb-registration.php:145
+msgid "Registrante"
+msgstr "Registrant"
+
+#: templates/form.php:386
+msgid "Registrazioni audio/video e pubblicazioni"
+msgstr "Audio/video recordings and publications"
+
+#. Description of the plugin
+msgid "Replica il modulo Joomla per l'iscrizione aziendale agli esami iSAQB sul sito WordPress con pagamenti PayPal, Stripe e bonifico."
+msgstr "Replicates the Joomla corporate registration form for iSAQB exams on WordPress with PayPal, Stripe and bank transfer payments."
+
+#: templates/form.php:351
+msgid "Ricalcolo del totale in corso…"
+msgstr "Recalculating total…"
+
+#: templates/form.php:37
+msgid "Ricerca Google / motori di ricerca"
+msgstr "Google search / search engines"
+
+#: includes/class-cir-form-handler.php:253
+msgid "Riceverai le istruzioni di pagamento via email."
+msgstr "You will receive the payment instructions by email."
+
+#: includes/class-cir-form-handler-helpers.php:200
+msgid "Sconto"
+msgstr "Discount"
+
+#: includes/class-cir-form-handler-helpers.php:551
+msgid "Se il pulsante non funziona copia e incolla il link nel browser:"
+msgstr "If the button does not work, copy and paste the link into your browser:"
+
+#: includes/class-cir-form-handler.php:336
+msgid "Se il pulsante non funziona copia e incolla il link seguente nel browser:"
+msgstr "If the button does not work, copy and paste the following link into your browser:"
+
+#: includes/class-cir-settings.php:120
+msgid "Secret"
+msgstr "Secret"
+
+#: includes/class-cir-settings.php:146
+msgid "Secret key"
+msgstr "Secret key"
+
+#: templates/form.php:293
+msgid "Seleziona la nazione"
+msgstr "Select a country"
+
+#: templates/form.php:280
+msgid "Seleziona la Provincia"
+msgstr "Select the province"
+
+#: templates/form.php:180
+msgid "Seleziona la tipologia del soggetto intestatario"
+msgstr "Select the billing entity type"
+
+#: templates/form.php:312
+msgid "Seleziona un’opzione"
+msgstr "Select an option"
+
+#: templates/form.php:34
+msgid "Sito web ITA-STQB / Cube Academy"
+msgstr "ITA-STQB / Cube Academy website"
+
+#: templates/form.php:31
+msgid "Social media"
+msgstr "Social media"
+
+#: templates/form.php:184
+msgid "Società / Azienda"
+msgstr "Company / Business"
+
+#: cubeng-isaqb-registration.php:146
+msgid "Società / Ente"
+msgstr "Company / Organisation"
+
+#: templates/form.php:185
+msgid "Società estera"
+msgstr "Foreign company"
+
+#: includes/class-cir-form-handler-helpers.php:290 \
+msgid "Soggetto non specificato"
+msgstr "Entity not specified"
+
+#: templates/form.php:320
+msgid "Specificare"
+msgstr "Specify"
+
+#: templates/form.php:244
+msgid "Split payment"
+msgstr "Split payment"
+
+#: templates/form.php:62 includes/class-cir-settings.php:137
+msgid "Stripe"
+msgstr "Stripe"
+
+#: includes/class-cir-settings.php:162
+msgid "SumUp"
+msgstr "SumUp"
+
+#: cubeng-isaqb-registration.php:225
+msgid "Tabella partecipanti non disponibile"
+msgstr "Participants table not available"
+
+#: includes/class-cir-discount-service.php:128
+#, php-format
+msgid "Tariffa Early Bird attiva (%s a partecipante)."
+msgstr "Early Bird rate active (%s per attendee)."
+
+#: includes/class-cir-form-handler-helpers.php:583
+msgid "Telefono"
+msgstr "Phone"
+
+#: templates/form.php:205
+msgid "Telefono cellulare"
+msgstr "Mobile phone"
+
+#: includes/class-cir-settings.php:189
+msgid "Testo mostrato all’utente con le istruzioni di pagamento via bonifico."
+msgstr "Text shown to the user with the bank transfer payment instructions."
+
+#: templates/form.php:241
+msgid "Tipologia applicazione IVA"
+msgstr "VAT application type"
+
+#: templates/form.php:178
+msgid "Tipologia soggetto"
+msgstr "Entity type"
+
+#: templates/form.php:347
+msgid "Totale lordo"
+msgstr "Gross total"
+
+#: cubeng-isaqb-registration.php:126
+msgid "Tutte le iscrizioni"
+msgstr "All registrations"
+
+#: includes/class-cir-form-handler.php:337
+msgid "Una volta concluso il pagamento riceverai la conferma definitiva via email."
+msgstr "Once the payment is complete you will receive a final confirmation email."
+
+#: includes/class-cir-settings.php:121
+msgid "Valuta (ISO)"
+msgstr "Currency (ISO)"
+
+#: cubeng-isaqb-registration.php:125
+msgid "Visualizza iscrizione"
+msgstr "View registration"
+

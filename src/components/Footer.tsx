@@ -129,8 +129,8 @@ export function Footer() {
         </div>
 
         <div className="mt-14 flex flex-col items-start justify-between gap-3 border-t border-white/10 pt-6 font-mono text-[11px] text-white/56 sm:flex-row sm:items-center">
-          <p>
-            © 2026 {ORG.company}{ORG.vat ? ` · ${ORG.vat}` : ""}
+          <p className="leading-relaxed">
+            © 2026 {ORG.company} · {t("Sede legale")}: {ORG.legalAddress} · {t("P.IVA")} {ORG.vat} · {t("REA")} {ORG.rea}
           </p>
           <p className="flex gap-5">
             <LegalLinkModal label={t("Privacy")} title={t("Informativa Privacy")} className="transition-colors hover:text-white/70">
@@ -145,12 +145,6 @@ export function Footer() {
             <button type="button" onClick={openCookieSettings} className="transition-colors hover:text-white/70">{t("Impostazioni cookie")}</button>
           </p>
         </div>
-      </div>
-
-      {/* watermark */}
-      <div className="pointer-events-none relative select-none overflow-hidden" aria-hidden="true">
-        <p className="text-outline -mb-[0.23em] text-center font-display text-[24vw] font-bold leading-none tracking-tight">
-          {t("CUBE")}</p>
       </div>
     </footer>
   );

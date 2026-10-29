@@ -640,7 +640,9 @@ export const FAQS = [
 export const ORG = {
   name: t("Cube Academy"),
   company: "Cube Engineering S.r.l.",
-  vat: "",
+  vat: "12870461006",
+  rea: "RM-1406493",
+  legalAddress: "Via San Martino Della Battaglia, 31 - 00185 Roma",
   email: "academy@cubeng.eu",
   phone: "+39 06 92.92.87.80",
   address: t("Via Venti Settembre, 118 - 00187 Roma"),
