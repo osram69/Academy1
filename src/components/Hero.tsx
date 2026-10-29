@@ -72,7 +72,7 @@ export function Hero() {
       />
       <IsoCube className="absolute -left-10 bottom-24 size-52 rotate-12 text-white/6 animate-spin-slow" aria-hidden="true" />
 
-      <div className="relative mx-auto grid max-w-7xl gap-14 px-5 pb-20 pt-36 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:px-8 lg:pb-28 lg:pt-44">
+      <div className="relative mx-auto grid max-w-7xl gap-14 px-5 pb-20 pt-36 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:px-8 lg:pb-28 lg:pt-[120px]">
         {/* colonna testo */}
         <div>
           <Reveal>
