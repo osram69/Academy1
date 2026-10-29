@@ -1,5 +1,5 @@
 import { supabase, supabaseConfigured } from "./lib/supabase";
-import { lang, locale, t } from "./i18n";
+import { lang, locale } from "./i18n";
 
 /** Evento (articolo) della pagina #/eventi, gestito dal pannello #/admin/eventi. */
 export interface EventItem {
@@ -41,30 +41,29 @@ const fromRow = (r: EventRow): EventItem => {
   };
 };
 
-/** Eventi pubblicati: prima quelli in arrivo (o senza data), poi i passati dal più recente. */
+/** Articoli pubblicati: prima gli eventi in arrivo, poi quelli senza data, poi i passati dal più recente. */
 export async function fetchEvents(): Promise<EventItem[]> {
   if (!supabaseConfigured) throw new Error("Supabase non configurato");
   const { data, error } = await supabase.from("eventi").select("*");
   if (error) throw error;
   const items = (data as EventRow[]).map(fromRow);
   const today = new Date().toISOString().slice(0, 10);
-  const upcoming = items.filter((e) => !e.end || e.end >= today).sort((a, b) => (a.start ?? "9999").localeCompare(b.start ?? "9999"));
+  const upcoming = items.filter((e) => e.end && e.end >= today).sort((a, b) => (a.start ?? "").localeCompare(b.start ?? ""));
+  const undated = items.filter((e) => !e.end);
   const past = items.filter((e) => e.end && e.end < today).sort((a, b) => (b.end ?? "").localeCompare(a.end ?? ""));
-  return [...upcoming, ...past];
+  return [...upcoming, ...undated, ...past];
 }
 
 /** Elenco di riserva, usato solo finché la tabella eventi non esiste ancora (migrazione-5.sql non eseguita). */
 export const FALLBACK_EVENTS: EventItem[] = [
-  { id: "istf-2025", title: "Italian Software Testing Forum 2025", start: "2025-05-19", end: "2025-05-21", place: "Milano", url: "", image: "https://academy.cubeng.eu/wp-content/uploads/2025/03/IMG_20250521_101701-scaled.jpg", text: "Cube Academy ha partecipato all'Italian Software Testing Forum 2025 in qualità di partner accreditato iSAQB®." },
-  { id: "gathering-2024", title: "iSAQB® Software Architecture Gathering 2024", start: "2024-11-11", end: "2024-11-14", place: "Berlino", url: "https://conferences.isaqb.org/software-architecture-gathering/", image: "https://academy.cubeng.eu/wp-content/uploads/2024/07/Berlino-1024x440.jpg", text: "La conferenza internazionale iSAQB® Software Architecture Gathering si è tenuta a Berlino." },
-  { id: "presentazione-roma", title: "Evento di presentazione iSAQB a Roma", start: null, end: null, place: "Roma", url: "", image: "https://academy.cubeng.eu/wp-content/uploads/2024/07/pexels-davifnr-2064827-1024x683.jpg", text: "Evento di presentazione del board internazionale iSAQB per l'architettura software a Roma." },
+  { id: "che-cos-e-isaqb", title: "Che cos'è iSAQB®", start: null, end: null, place: "", url: "https://www.isaqb.org/about/association/", image: "/img/hero-structure.jpg", text: "iSAQB® (International Software Architecture Qualification Board) è un'associazione internazionale senza scopo di lucro che promuove l'architettura software come disciplina. Cube Academy è Training Provider accreditato iSAQB® dal 2024." },
+  { id: "istf-2025", title: "Cube Academy allo Italian Software Testing Forum 2025", start: "2025-05-21", end: "2025-05-21", place: "Assago (Milano)", url: "https://www.soiel.it/eventi/stf-2025-milano/", image: "https://academy.cubeng.eu/wp-content/uploads/2025/03/IMG_20250521_101701-scaled.jpg", text: "Il 21 maggio 2025 Cube Academy ha partecipato all'Italian Software Testing Forum nello stand iSAQB®." },
+  { id: "gathering-2024", title: "Cube Academy al Software Architecture Gathering 2024 di Berlino", start: "2024-11-11", end: "2024-11-14", place: "Berlino", url: "https://www.software-architecture-gathering.com/", image: "https://academy.cubeng.eu/wp-content/uploads/2024/07/Berlino-1024x440.jpg", text: "Dall'11 al 14 novembre 2024 Cube Academy ha partecipato come sponsor al Software Architecture Gathering di Berlino." },
 ];
 
-export const isPast =(e: EventItem) => !!e.end && e.end < new Date().toISOString().slice(0, 10);
-
-/** "11–14 novembre 2024", "19 maggio 2025", "28 ott – 2 nov 2024" oppure "Data da definire". */
+/** "11–14 novembre 2024", "19 maggio 2025", "28 ott – 2 nov 2024"; stringa vuota per gli articoli senza data. */
 export function fmtEventDates(start: string | null, end: string | null): string {
-  if (!start) return t("Data da definire");
+  if (!start) return "";
   const a = new Date(`${start}T12:00:00`);
   const b = new Date(`${end || start}T12:00:00`);
   const f = (d: Date, o: Intl.DateTimeFormatOptions) => d.toLocaleDateString(locale, o);

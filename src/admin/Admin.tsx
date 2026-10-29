@@ -495,7 +495,7 @@ function Edit({ id }: { id: string }) {
               {F("ora_fine", "Ora di fine", <input type="time" className={inputCls} value={String(f.ora_fine ?? "")} onChange={(e) => set("ora_fine", e.target.value)} />, "Se vuota, il workshop dura 1 ora dall'inizio.")}
               {F("lingua_it", "Lingua", text("lingua_it", { maxLength: 11, placeholder: "Italiano" }))}
               <div className="md:col-span-2">
-                {F("link_evento", "Link all'evento LinkedIn", text("link_evento", { type: "url", maxLength: 300, placeholder: "https://www.linkedin.com/events/…" }), "Il sito non gestisce iscrizioni: il pulsante “Partecipa su LinkedIn” porta a questo indirizzo.")}
+                {F("link_evento", "Link all'evento LinkedIn", text("link_evento", { type: "url", maxLength: 300, placeholder: "https://www.linkedin.com/events/…" }), "Il sito non gestisce iscrizioni: il pulsante “Iscriviti su LinkedIn” porta a questo indirizzo.")}
               </div>
               <div className="md:col-span-2">
                 {F("link_zoom", "Link alla sessione Zoom", text("link_zoom", { type: "url", maxLength: 400, placeholder: "https://…zoom.us/j/…" }), "Il pulsante “Partecipa su Zoom” compare disattivato e si attiva da 1 ora prima dell'ora di inizio (nel giorno del workshop) fino alla fine; durante il workshop la card mostra “In corso”. Richiede l'ora di inizio.")}

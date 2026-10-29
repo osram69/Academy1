@@ -11,7 +11,7 @@ type Row = Record<string, string | number | boolean | null>;
 const LANGS: [string, string][] = [["it", "Italiano"], ["en", "English"], ["fr", "Français"], ["de", "Deutsch"]];
 const go = (hash: string) => { window.location.hash = hash; };
 const toDate = (v: unknown) => String(v ?? "").slice(0, 10);
-const fmt = (v: unknown) => (v ? new Date(`${toDate(v)}T12:00:00`).toLocaleDateString("it-IT", { day: "numeric", month: "short", year: "numeric" }) : "da definire");
+const fmt = (v: unknown) => (v ? new Date(`${toDate(v)}T12:00:00`).toLocaleDateString("it-IT", { day: "numeric", month: "short", year: "numeric" }) : "—");
 
 const EMPTY: Row = { titolo: "", pubblicato: true, data_inizio: null, data_fine: null, luogo: "", link_evento: "", immagine_url: "" };
 
@@ -206,7 +206,7 @@ function Edit({ id }: { id: string }) {
         <h2 className={h2}>Articolo</h2>
         <div className="grid gap-4 md:grid-cols-2">
           <div className="md:col-span-2">{F("titolo", "Titolo", text("titolo", { maxLength: 200, required: true }))}</div>
-          {F("data_inizio", "Data di inizio", <input type="date" className={inputCls} value={toDate(f.data_inizio)} onChange={(e) => set("data_inizio", e.target.value)} />, "Lasciala vuota se la data non è ancora definita.")}
+          {F("data_inizio", "Data di inizio", <input type="date" className={inputCls} value={toDate(f.data_inizio)} onChange={(e) => set("data_inizio", e.target.value)} />, "Lasciala vuota per un articolo senza data: sul sito non comparirà nessuna data.")}
           {F("data_fine", "Data di fine", <input type="date" className={inputCls} disabled={oneDay} value={oneDay ? toDate(f.data_inizio) : toDate(f.data_fine)} min={toDate(f.data_inizio)} onChange={(e) => set("data_fine", e.target.value)} />)}
           <label className="flex items-center gap-2 text-[14px] md:col-span-2">
             <input type="checkbox" className="size-4 accent-flame" checked={oneDay} onChange={(e) => { setMulti(!e.target.checked); if (!e.target.checked && !f.data_fine) set("data_fine", toDate(f.data_inizio)); }} />

@@ -34,13 +34,13 @@ function JoinButton({ w, className }: { w: Workshop; className?: string }) {
       href={w.eventUrl}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={t("Partecipa su LinkedIn a {name}", { name: w.title })}
+      aria-label={t("Iscriviti su LinkedIn a {name}", { name: w.title })}
       className={cn(
         "inline-flex items-center gap-2 rounded-full bg-flame px-5 py-2.5 font-display text-[13.5px] font-semibold text-white shadow-flame transition-all duration-300 hover:bg-ink",
         className
       )}
     >
-      {t("Partecipa su LinkedIn")}
+      {t("Iscriviti su LinkedIn")}
       <ArrowUpRight className="size-4" aria-hidden="true" />
     </a>
   );

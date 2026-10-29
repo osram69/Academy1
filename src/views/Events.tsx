@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { ArrowLeft, CalendarDays, MapPin } from "lucide-react";
 import { t } from "../i18n";
-import { FALLBACK_EVENTS, fetchEvents, fmtEventDates, isPast, type EventItem } from "../events";
+import { FALLBACK_EVENTS, fetchEvents, fmtEventDates, type EventItem } from "../events";
 import { ExtLink } from "../components/IsaqbLinks";
 import { Reveal, Tag } from "../components/ui";
 import { cn } from "../utils/cn";
@@ -64,11 +64,11 @@ export function Events() {
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {items.map((e, i) => (
               <Reveal key={e.id} delay={(i % 3) * 90}>
-                <article className={cn("group relative flex h-full flex-col overflow-hidden rounded-[22px] border border-ink/10 bg-white shadow-card transition-all duration-500 hover:-translate-y-1.5 hover:shadow-lift", isPast(e) && "opacity-90")}>
-                  {e.image && <img src={e.image} alt="" loading="lazy" className={cn("aspect-[16/9] w-full object-cover", isPast(e) && "grayscale")} />}
+                <article className={cn("group relative flex h-full flex-col overflow-hidden rounded-[22px] border border-ink/10 bg-white shadow-card transition-all duration-500 hover:-translate-y-1.5 hover:shadow-lift")}>
+                  {e.image && <img src={e.image} alt="" loading="lazy" className="aspect-[16/9] w-full object-cover" />}
                   <div className="flex flex-1 flex-col p-6">
                     <p className="flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[11px] font-medium uppercase tracking-widest text-steel">
-                      <span className="inline-flex items-center gap-1.5"><CalendarDays className="size-3.5" aria-hidden="true" />{fmtEventDates(e.start, e.end)}</span>
+                      {e.start && <span className="inline-flex items-center gap-1.5"><CalendarDays className="size-3.5" aria-hidden="true" />{fmtEventDates(e.start, e.end)}</span>}
                       {e.place && <span className="inline-flex items-center gap-1.5"><MapPin className="size-3.5" aria-hidden="true" />{e.place}</span>}
                     </p>
                     <h2 className="mt-3 font-display text-xl font-bold tracking-tight text-ink">
@@ -107,7 +107,7 @@ export function EventDetail({ id }: { id: string }) {
             {e.image && <img src={e.image} alt="" className="aspect-[16/8] w-full object-cover" />}
             <div className="p-6 sm:p-9">
               <p className="flex flex-wrap items-center gap-x-5 gap-y-1 text-[14px] text-ink/70">
-                <span className="inline-flex items-center gap-2 font-semibold text-ink"><CalendarDays className="size-4 text-flame" aria-hidden="true" />{fmtEventDates(e.start, e.end)}</span>
+                {e.start && <span className="inline-flex items-center gap-2 font-semibold text-ink"><CalendarDays className="size-4 text-flame" aria-hidden="true" />{fmtEventDates(e.start, e.end)}</span>}
                 {e.place && <span className="inline-flex items-center gap-2"><MapPin className="size-4 text-flame" aria-hidden="true" />{e.place}</span>}
               </p>
               <div className="mt-5 space-y-4 text-[15.5px] leading-relaxed text-ink/75">
