@@ -3,7 +3,7 @@ import { ArrowLeft, CalendarDays, MapPin } from "lucide-react";
 import { t } from "../i18n";
 import { FALLBACK_EVENTS, fetchEvents, fmtEventDates, isPast, type EventItem } from "../events";
 import { ExtLink } from "../components/IsaqbLinks";
-import { Reveal } from "../components/ui";
+import { Reveal, Tag } from "../components/ui";
 import { cn } from "../utils/cn";
 
 /** Carica gli eventi pubblicati; finché la tabella non esiste usa l'elenco di riserva. */
@@ -17,13 +17,28 @@ function useEvents() {
   return items;
 }
 
-function Header({ title, intro }: { title: string; intro?: string }) {
+/** Intestazione come quella del Catalogo corsi: etichetta con quadrato rosso, titolo con accento corsivo, introduzione. */
+function Header({ title, intro }: { title: React.ReactNode; intro?: string }) {
   return (
-    <header className="relative overflow-hidden bg-ink pb-12 pt-32 text-white lg:pt-36">
+    <header className="relative overflow-hidden bg-ink pb-14 pt-32 text-white lg:pt-36">
       <div className="bg-blueprint-dark absolute inset-0" aria-hidden="true" />
+      <div
+        className="absolute -left-40 top-0 size-[480px] rounded-full opacity-25"
+        style={{ background: "radial-gradient(circle, #e8321e 0%, transparent 65%)" }}
+        aria-hidden="true"
+      />
       <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
-        <h1 className="max-w-4xl font-display text-[clamp(1.9rem,4.5vw,3rem)] font-bold leading-[1.05] tracking-[-0.025em]">{title}</h1>
-        {intro && <p className="mt-4 max-w-2xl text-[16px] leading-relaxed text-white/70">{intro}</p>}
+        <Reveal>
+          <Tag dark>{t("Eventi")}</Tag>
+        </Reveal>
+        <Reveal delay={80}>
+          <h1 className="mt-4 max-w-3xl font-display text-[clamp(1.9rem,4.5vw,3.2rem)] font-bold leading-[1.05] tracking-[-0.025em]">{title}</h1>
+        </Reveal>
+        {intro && (
+          <Reveal delay={160}>
+            <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-white/68">{intro}</p>
+          </Reveal>
+        )}
       </div>
     </header>
   );
@@ -36,7 +51,10 @@ export function Events() {
   const items = useEvents();
   return (
     <div className="bg-paper">
-      <Header title={t("Eventi")} intro={t("Gli appuntamenti di Cube Academy e della community iSAQB®.")} />
+      <Header
+        title={<>{t("Dove")}{" "}<em className="font-serif italic text-flame">{t("ci incontri.")}</em></>}
+        intro={t("Gli appuntamenti di Cube Academy e della community iSAQB®.")}
+      />
       <main className="mx-auto max-w-7xl px-5 py-12 lg:px-8 lg:py-16">
         {items === null ? (
           <p className="text-steel">{t("Caricamento…")}</p>

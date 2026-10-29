@@ -465,6 +465,8 @@ export const en: Record<string, string> = {
   "Il link Zoom si attiva 1 ora prima dell'inizio": "The Zoom link opens 1 hour before the start",
   "Mostra meno": "Show less",
   "Data da definire": "Date to be announced",
+  "Dove": "Where you can",
+  "ci incontri.": "meet us.",
   "Tutti gli eventi": "All events",
   "Evento non trovato.": "Event not found.",
   "Nessun evento in programma al momento.": "No events scheduled at the moment.",
