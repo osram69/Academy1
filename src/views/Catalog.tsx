@@ -120,7 +120,7 @@ export function Catalog() {
       </header>
 
       {/* filtri */}
-      <div className="sticky top-[68px] z-30 border-b border-ink/8 bg-paper/95 py-4">
+      <div className="sticky top-[calc(68px+var(--ribbon-h,0px))] z-30 border-b border-ink/8 bg-paper/95 py-4">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-8 gap-y-3 px-5 lg:px-8">
           <span className="hidden items-center gap-2 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-steel md:inline-flex">
             <ListFilter className="size-4" aria-hidden="true" />

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from
 import type { Session } from "@supabase/supabase-js";
 import { supabase, supabaseConfigured } from "../lib/supabase";
 import { CalendarClock, CheckCheck, CircleCheck, CircleHelp, EyeOff, Play, type LucideIcon } from "lucide-react";
-import { MODALITA } from "../data";
+import { MODALITA, workshopTimes } from "../data";
 import { SettingsPage } from "./Settings";
 import { OrdersPage } from "./Orders";
 import { EventsAdmin } from "./Events";
@@ -49,7 +49,7 @@ const DATES = ["data_inizio", "data_fine"];
 const BOOLS = ["in_evidenza", "iscrizioni_aperte", "sconto_privati"];
 // testo NOT NULL nel DB: vuoto = stringa vuota (gli altri testi vuoti diventano NULL)
 const TEXT_REQUIRED = ["titolo", "livello", ...LANGS.flatMap(([l]) => [`link_readmore_${l}`, `link_booking_${l}`, `home_subtitle_${l}`])];
-const URLS = [...LANGS.flatMap(([l]) => [`link_readmore_${l}`, `link_booking_${l}`]), "link_evento", "immagine_url"];
+const URLS = [...LANGS.flatMap(([l]) => [`link_readmore_${l}`, `link_booking_${l}`]), "link_evento", "link_zoom", "immagine_url"];
 const LIMITS: Record<string, number> = { livello: 10, titolo: 255 };
 
 const SCOPES: [string, string][] = [["privato", "Privati"], ["pro", "Liberi professionisti"], ["azienda", "Aziende italiane"], ["estera", "Aziende estere"]];
@@ -327,7 +327,7 @@ function List() {
 const EMPTY: Row = { titolo: "", livello: "Foundation", modalita: "intensivo", sconto_privati: true, stato: 0, in_evidenza: false, iscrizioni_aperte: false };
 
 /** Il workshop è una presentazione gratuita di circa un'ora: la prenotazione avviene sull'evento LinkedIn. */
-const EMPTY_WS: Row = { titolo: "", livello: "Workshop", stato: 0, in_evidenza: false, iscrizioni_aperte: false, luogo_it: "Online", lingua_it: "Italiano" };
+const EMPTY_WS: Row = { titolo: "", livello: "Workshop", ora_inizio: "", ora_fine: "", link_zoom: "", stato: 0, in_evidenza: false, iscrizioni_aperte: false, luogo_it: "Online", lingua_it: "Italiano" };
 const WS_STATI = [0, 5, 2];
 
 function Edit({ id }: { id: string }) {
@@ -347,7 +347,17 @@ function Edit({ id }: { id: string }) {
       .select("*")
       .eq("id_corso", Number(id))
       .single()
-      .then(({ data, error }) => (error ? setMsg(error.message) : setF(data as Row)));
+      .then(({ data, error }) => {
+        if (error) return setMsg(error.message);
+        const r = data as Row;
+        // workshop salvati prima degli orari strutturati: ricava inizio e fine dal testo (es. "18:00–19:00")
+        if (r.livello === "Workshop" && !r.ora_inizio && r.orario_it) {
+          const tm = workshopTimes({ orario_it: String(r.orario_it) });
+          r.ora_inizio = tm.from || null;
+          r.ora_fine = tm.to || null;
+        }
+        setF(r);
+      });
   }, [id, isNew]);
 
   if (!f) return <p className="text-steel">{msg || "Caricamento…"}</p>;
@@ -408,6 +418,11 @@ function Edit({ id }: { id: string }) {
     if (isWs) {
       if (!data.data_inizio) errs.data_inizio = "indica la data del workshop";
       if (!data.link_evento) errs.link_evento = "inserisci il link all'evento LinkedIn";
+      const from = String(data.ora_inizio ?? "");
+      const to = String(data.ora_fine ?? "");
+      if (data.link_zoom && !from) errs.ora_inizio = "per il link Zoom serve l'ora di inizio";
+      if (from && to && to <= from) errs.ora_fine = "l'ora di fine deve essere successiva all'inizio";
+      if (from) data.orario_it = to ? `${from}–${to}` : from; // testo mostrato sul sito
       data.data_fine = data.data_inizio; // evento di un'ora: un solo giorno
       data.iscrizioni_aperte = false;
     }
@@ -476,10 +491,14 @@ function Edit({ id }: { id: string }) {
                 </select>
               ), "“In Programma” lo mostra come prossimo workshop (anche in home); dopo la data passa da solo tra i workshop svolti.")}
               {F("data_inizio", "Data", <input type="date" className={inputCls} value={toDate(f.data_inizio)} onChange={(e) => set("data_inizio", e.target.value)} />)}
-              {F("orario_it", "Orario", text("orario_it", { maxLength: 60, placeholder: "Es. 18:00–19:00" }))}
+              {F("ora_inizio", "Ora di inizio (ora italiana)", <input type="time" className={inputCls} value={String(f.ora_inizio ?? "")} onChange={(e) => set("ora_inizio", e.target.value)} />)}
+              {F("ora_fine", "Ora di fine", <input type="time" className={inputCls} value={String(f.ora_fine ?? "")} onChange={(e) => set("ora_fine", e.target.value)} />, "Se vuota, il workshop dura 1 ora dall'inizio.")}
               {F("lingua_it", "Lingua", text("lingua_it", { maxLength: 11, placeholder: "Italiano" }))}
               <div className="md:col-span-2">
-                {F("link_evento", "Link all'evento LinkedIn", text("link_evento", { type: "url", maxLength: 300, placeholder: "https://www.linkedin.com/events/…" }), "Il sito non gestisce iscrizioni: il pulsante “Partecipa” porta a questo indirizzo.")}
+                {F("link_evento", "Link all'evento LinkedIn", text("link_evento", { type: "url", maxLength: 300, placeholder: "https://www.linkedin.com/events/…" }), "Il sito non gestisce iscrizioni: il pulsante “Partecipa su LinkedIn” porta a questo indirizzo.")}
+              </div>
+              <div className="md:col-span-2">
+                {F("link_zoom", "Link alla sessione Zoom", text("link_zoom", { type: "url", maxLength: 400, placeholder: "https://…zoom.us/j/…" }), "Il pulsante “Partecipa su Zoom” compare disattivato e si attiva da 1 ora prima dell'ora di inizio (nel giorno del workshop) fino alla fine; durante il workshop la card mostra “In corso”. Richiede l'ora di inizio.")}
               </div>
             </div>
           </section>

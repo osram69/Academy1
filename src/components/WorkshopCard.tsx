@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowUpRight, CalendarDays, CheckCircle2, Clock, Globe, MapPin, Presentation } from "lucide-react";
+import { ArrowUpRight, CalendarDays, CheckCircle2, Clock, Globe, MapPin, Presentation, Video } from "lucide-react";
 import { cn } from "../utils/cn";
-import { fmtFull, upcomingWorkshops, type Workshop } from "../data";
+import { fmtFull, upcomingWorkshops, zoomOpensAt, zoomState, type Workshop } from "../data";
 import { Reveal, Tag } from "./ui";
 import { t } from "../i18n";
 
@@ -46,7 +46,64 @@ function JoinButton({ w, className }: { w: Workshop; className?: string }) {
   );
 }
 
-function Cover({ w, past }: { w: Workshop; past?: boolean }) {
+/** Orologio che si aggiorna ogni 30 secondi: serve ad attivare il pulsante Zoom e il segnale "In corso" senza ricaricare la pagina. */
+function useNow() {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const i = setInterval(() => setNow(Date.now()), 30000);
+    return () => clearInterval(i);
+  }, []);
+  return now;
+}
+
+const isLive = (w: Workshop, now: number) => !!w.startsAt && !!w.endsAt && now >= w.startsAt.getTime() && now < w.endsAt.getTime();
+
+/** Segnale "In corso" con punto lampeggiante. */
+function LiveBadge({ className }: { className?: string }) {
+  return (
+    <span className={cn("inline-flex items-center gap-1.5 rounded-full bg-err px-3 py-1.5 font-mono text-[10.5px] font-semibold uppercase tracking-[0.16em] text-white", className)}>
+      <span className="size-2 animate-pulse rounded-full bg-white" aria-hidden="true" />
+      {t("In corso")}
+    </span>
+  );
+}
+
+/** Pulsante verso la sessione Zoom: grigio e disabilitato finché non manca 1 ora all'inizio, poi attivo fino alla fine. */
+function ZoomButton({ w, now }: { w: Workshop; now: number }) {
+  const s = zoomState(w, now);
+  if (s === "none" || s === "ended") return null;
+  if (s === "locked") {
+    const today = (w.startsAt?.getTime() ?? 0) - now < 86400000;
+    return (
+      <span
+        aria-disabled="true"
+        title={t("Il link Zoom si attiva 1 ora prima dell'inizio")}
+        className="inline-flex cursor-not-allowed items-center gap-2 rounded-full border border-ink/15 bg-ink/5 px-5 py-2.5 font-display text-[13.5px] font-semibold text-ink/45"
+      >
+        <Video className="size-4" aria-hidden="true" />
+        {today ? t("Zoom dalle {time}", { time: zoomOpensAt(w) }) : t("Zoom: si attiva 1 ora prima")}
+      </span>
+    );
+  }
+  return (
+    <a
+      href={w.zoomUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={t("Partecipa su Zoom a {name}", { name: w.title })}
+      className={cn(
+        "inline-flex items-center gap-2 rounded-full px-5 py-2.5 font-display text-[13.5px] font-semibold text-white transition-colors hover:bg-ink",
+        s === "live" ? "bg-mint" : "bg-[#0b5cff]"
+      )}
+    >
+      <Video className="size-4" aria-hidden="true" />
+      {t("Partecipa su Zoom")}
+      <ArrowUpRight className="size-4" aria-hidden="true" />
+    </a>
+  );
+}
+
+function Cover({ w, past, live }: { w: Workshop; past?: boolean; live?: boolean }) {
   return (
     <div className="relative aspect-[16/9] overflow-hidden bg-ink">
       {w.image ? (
@@ -63,6 +120,8 @@ function Cover({ w, past }: { w: Workshop; past?: boolean }) {
           <span className="inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 font-mono text-[10.5px] font-semibold uppercase tracking-[0.16em] text-ink">
             <CheckCircle2 className="size-3.5 text-mint" aria-hidden="true" />{t("Svolto")}
           </span>
+        ) : live ? (
+          <LiveBadge />
         ) : (
           <span className="rounded-full bg-mint px-3 py-1.5 font-mono text-[10.5px] font-semibold uppercase tracking-[0.16em] text-white">{t("Gratuito")}</span>
         )}
@@ -73,9 +132,10 @@ function Cover({ w, past }: { w: Workshop; past?: boolean }) {
 
 /** Card del workshop: niente prezzi né iscrizione, ma data, orario, descrizione e link all'evento. */
 export function WorkshopCard({ w, past = false }: { w: Workshop; past?: boolean }) {
+  const now = useNow();
   return (
     <article className="group relative flex h-full flex-col overflow-hidden rounded-[22px] border border-ink/10 bg-white shadow-card transition-all duration-500 hover:-translate-y-1.5 hover:shadow-lift">
-      <Cover w={w} past={past} />
+      <Cover w={w} past={past} live={isLive(w, now)} />
       <div className="flex flex-1 flex-col p-6">
         <h3 className="font-display text-[21px] font-bold leading-snug tracking-tight text-ink">{w.title}</h3>
         <ul className="mt-4 space-y-2 text-[13.5px] text-ink/70">
@@ -105,8 +165,9 @@ export function WorkshopCard({ w, past = false }: { w: Workshop; past?: boolean 
         </ul>
         {w.description && <ClampedText text={w.description} className="mt-4 text-[14px] leading-relaxed text-ink/65" />}
         {!past && (
-          <div className="mt-auto pt-6">
+          <div className="mt-auto flex flex-wrap items-center gap-2.5 pt-6">
             <JoinButton w={w} />
+            <ZoomButton w={w} now={now} />
           </div>
         )}
       </div>
@@ -184,12 +245,66 @@ export function WorkshopsSection() {
   );
 }
 
+/**
+ * Nastro scorrevole sotto la barra menu, visibile in tutte le pagine quando c'è un workshop gratuito in programma.
+ * Un clic porta alla sezione del workshop nella home. Imposta --ribbon-h così i punti "sticky" e le ancore
+ * della pagina si spostano sotto il nastro.
+ */
+export function WorkshopTicker() {
+  const now = useNow();
+  const w = upcomingWorkshops()[0];
+  useEffect(() => {
+    if (!w) return;
+    document.documentElement.style.setProperty("--ribbon-h", "36px");
+    return () => {
+      document.documentElement.style.removeProperty("--ribbon-h");
+    };
+  }, [w]);
+  if (!w) return null;
+  const live = isLive(w, now);
+  const when = `${fmtFull(w.start)}${w.time ? ` · ${w.time}` : ""}`;
+  const go = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (window.location.hash && window.location.hash !== "#/") window.location.hash = "#/";
+    setTimeout(() => document.getElementById("workshop")?.scrollIntoView({ behavior: "smooth", block: "start" }), 120);
+  };
+  const item = (
+    <span className="flex items-center gap-10 font-mono text-[11.5px] font-semibold uppercase tracking-[0.2em]">
+      <span className="flex items-center gap-2.5">
+        {live && <span className="size-2 animate-pulse rounded-full bg-white" aria-hidden="true" />}
+        {live ? t("In corso") : t("Workshop gratuito")} — {w.title} — {when}
+        <span className="underline underline-offset-4">{t("Scopri di più")}</span>
+      </span>
+      <span className="inline-block size-[7px] rotate-45 bg-white/70" aria-hidden="true" />
+    </span>
+  );
+  return (
+    <a
+      href="#/"
+      onClick={go}
+      aria-label={t("{kind}: {title}, {when}. Vai alla sezione del workshop", { kind: live ? t("In corso") : t("Workshop gratuito"), title: w.title, when })}
+      className="group block h-9 overflow-hidden bg-flame text-white"
+    >
+      <div className="flex h-full items-center overflow-hidden" aria-hidden="true">
+        <div className="flex shrink-0 animate-marquee items-center gap-10 whitespace-nowrap pr-10 group-hover:[animation-play-state:paused] motion-reduce:animate-none">
+          {[0, 1].map((copy) => (
+            <div key={copy} className="flex items-center gap-10">
+              {[0, 1, 2].map((n) => <span key={n} className="flex items-center gap-10">{item}</span>)}
+            </div>
+          ))}
+        </div>
+      </div>
+    </a>
+  );
+}
+
 /** Richiamo in home al prossimo workshop: compare solo se ne è stato previsto uno. */
 export function WorkshopPromo() {
+  const now = useNow();
   const w = upcomingWorkshops()[0];
   if (!w) return null;
   return (
-    <section className="bg-paper py-12 lg:py-16" aria-label={t("Prossimo workshop")}>
+    <section id="workshop" className="scroll-mt-[calc(69px+var(--ribbon-h,0px))] bg-paper py-12 lg:py-16" aria-label={t("Prossimo workshop")}>
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <Reveal>
           <div className="grid overflow-hidden rounded-[28px] border border-ink/10 bg-white shadow-card md:grid-cols-[1fr_1.1fr]">
@@ -205,6 +320,7 @@ export function WorkshopPromo() {
             <div className="p-7 lg:p-10">
               <div className="flex flex-wrap items-center gap-2.5">
                 <span className="rounded-full bg-mint px-3 py-1.5 font-mono text-[10.5px] font-semibold uppercase tracking-[0.16em] text-white">{t("Workshop gratuito")}</span>
+                {isLive(w, now) && <LiveBadge />}
                 <span className="font-mono text-[11px] font-medium uppercase tracking-widest text-steel">{t("Prossimo workshop")}</span>
               </div>
               <h2 className="mt-4 font-display text-[clamp(1.5rem,2.8vw,2.1rem)] font-bold leading-tight tracking-[-0.02em] text-ink">{w.title}</h2>
@@ -216,6 +332,7 @@ export function WorkshopPromo() {
               {w.description && <ClampedText text={w.description} className="mt-4 max-w-xl text-[15px] leading-relaxed text-ink/65" />}
               <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
                 <JoinButton w={w} />
+                <ZoomButton w={w} now={now} />
                 <a href="#/corsi" className="link-sweep text-[14px] font-semibold text-flame">{t("Tutti i workshop")}</a>
               </div>
             </div>

@@ -766,7 +766,8 @@ function scrollToSteps(smooth = false) {
   const bar = document.getElementById("enroll-bar");
   const barH = bar && bar.offsetParent !== null ? bar.offsetHeight : 0; // sulla versione mobile la barra di avanzamento resta fissa sotto il menu
   const gap = barH ? barH + 20 : 76; // su desktop 2 cm sotto il menu, la stessa distanza del riquadro ordine
-  const top = target.getBoundingClientRect().top + window.scrollY - (68 + gap);
+  const ribbon = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--ribbon-h")) || 0; // nastro workshop sotto il menu
+  const top = target.getBoundingClientRect().top + window.scrollY - (68 + ribbon + gap);
   window.scrollTo({ top: Math.max(0, top), behavior: smooth ? "smooth" : "instant" });
 }
 
@@ -964,7 +965,7 @@ export function Enroll({ course }: { course: Course }) {
       </header>
 
       {/* barra mobile sticky: progresso + totale */}
-      <div id="enroll-bar" className="sticky top-[68px] z-30 border-b border-ink/10 bg-paper/92 lg:hidden">
+      <div id="enroll-bar" className="sticky top-[calc(68px+var(--ribbon-h,0px))] z-30 border-b border-ink/10 bg-paper/92 lg:hidden">
         <div className="flex items-center justify-between gap-3 px-5 py-3">
           <p className="font-mono text-[11px] font-semibold uppercase tracking-widest text-ink/70">
             {t("Passo")}{" "}{step + 1}<span className="text-ink/35">/4</span> — {STEPS[step]}
@@ -1047,7 +1048,7 @@ export function Enroll({ course }: { course: Course }) {
 
         {/* rail desktop */}
         <div className="hidden lg:block">
-          <div className="sticky top-[144px]">
+          <div className="sticky top-[calc(144px+var(--ribbon-h,0px))]">
             <OrderRail course={course} count={count} coupon={coupon} billingType={billing.type} privatePct={privatePct} step={step} goTo={goTo} maxStep={maxStep} />
           </div>
         </div>

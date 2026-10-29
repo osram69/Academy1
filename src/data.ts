@@ -402,6 +402,9 @@ interface PublicRow {
   titolo_en?: string | null;
   titolo_fr?: string | null;
   titolo_de?: string | null;
+  ora_inizio?: string | null;
+  ora_fine?: string | null;
+  link_zoom?: string | null;
 }
 
 /* ----------------------------- workshop ---------------------------- */
@@ -418,14 +421,57 @@ export interface Workshop {
   description: string;
   image: string | null;
   eventUrl: string;
+  zoomUrl: string;
+  startsAt: Date | null; // istante di inizio (ora italiana), null se l'orario non è indicato
+  endsAt: Date | null;
   concluded: boolean;
 }
 
 export let WORKSHOPS: Workshop[] = [];
 
+/** Istante corrispondente a "AAAA-MM-GG HH:MM" nell'ora italiana, a prescindere dal fuso del visitatore. */
+function romeInstant(day: string, hhmm: string): Date {
+  const [y, mo, d] = day.split("-").map(Number);
+  const [h, mi] = hhmm.split(":").map(Number);
+  const guess = Date.UTC(y, mo - 1, d, h, mi);
+  const p = Object.fromEntries(
+    new Intl.DateTimeFormat("en-US", { timeZone: "Europe/Rome", hourCycle: "h23", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })
+      .formatToParts(new Date(guess))
+      .map((x) => [x.type, x.value])
+  );
+  const asRome = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute);
+  return new Date(guess - (asRome - guess));
+}
+
+/** Orario "HH:MM" dal campo dedicato oppure dal testo libero (es. "18:00–19:00"). */
+export function workshopTimes(r: { ora_inizio?: string | null; ora_fine?: string | null; orario_it?: string | null }): { from: string; to: string } {
+  const norm = (v?: string | null) => {
+    const m = /(\d{1,2})[:.](\d{2})/.exec(v ?? "");
+    return m ? `${m[1].padStart(2, "0")}:${m[2]}` : "";
+  };
+  const free = String(r.orario_it ?? "").match(/(\d{1,2})[:.](\d{2})/g) ?? [];
+  return { from: norm(r.ora_inizio) || norm(free[0]), to: norm(r.ora_fine) || norm(free[1]) };
+}
+
+/** Fascia in cui il pulsante Zoom è attivo: da 1 ora prima dell'inizio alla fine del workshop. */
+export function zoomState(w: Workshop, now: number): "none" | "locked" | "open" | "live" | "ended" {
+  if (!w.zoomUrl || !w.startsAt || !w.endsAt) return "none";
+  if (now >= w.endsAt.getTime()) return "ended";
+  if (now >= w.startsAt.getTime()) return "live";
+  return now >= w.startsAt.getTime() - 3600000 ? "open" : "locked";
+}
+
+/** Ora (italiana) in cui si attiva il pulsante Zoom, es. "17:00". */
+export const zoomOpensAt = (w: Workshop) =>
+  w.startsAt ? new Date(w.startsAt.getTime() - 3600000).toLocaleTimeString(locale, { timeZone: "Europe/Rome", hour: "2-digit", minute: "2-digit" }) : "";
+
 const toWorkshop = (r: PublicRow): Workshop => {
   const key = lang as "it" | "en" | "fr" | "de";
-  const start = new Date(`${(r.data_inizio || "").slice(0, 10)}T00:00:00`);
+  const day = (r.data_inizio || "").slice(0, 10);
+  const start = new Date(`${day}T00:00:00`);
+  const times = workshopTimes(r);
+  const startsAt = times.from ? romeInstant(day, times.from) : null;
+  const endsAt = startsAt ? (times.to ? romeInstant(day, times.to) : new Date(startsAt.getTime() + 3600000)) : null;
   const endOfDay = new Date(start.getTime() + DAY - 1);
   return {
     id: String(r.id_corso),
@@ -437,7 +483,11 @@ const toWorkshop = (r: PublicRow): Workshop => {
     description: plain((r[`home_subtitle_${key}` as "home_subtitle_it"] || r.home_subtitle_it || "")),
     image: r.immagine_url || null,
     eventUrl: r.link_evento || "",
-    concluded: r.stato === 5 || endOfDay.getTime() < Date.now(),
+    zoomUrl: r.link_zoom || "",
+    startsAt,
+    endsAt,
+    // concluso a fine workshop se l'orario è noto, altrimenti a fine giornata
+    concluded: r.stato === 5 || (endsAt ?? endOfDay).getTime() < Date.now(),
   };
 };
 

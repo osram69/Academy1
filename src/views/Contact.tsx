@@ -160,7 +160,7 @@ export function Contact() {
           </form>
         )}
 
-        <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start" aria-label={t("Contatti")}>
+        <aside className="space-y-4 lg:sticky lg:top-[calc(96px+var(--ribbon-h,0px))] lg:self-start" aria-label={t("Contatti")}>
           <div className="rounded-3xl border border-ink/10 bg-white p-6 shadow-card">
             <h2 className="font-display text-lg font-bold tracking-tight text-ink">{ORG.company}</h2>
             <ul className="mt-4 space-y-3.5 text-[14px] text-ink/75">

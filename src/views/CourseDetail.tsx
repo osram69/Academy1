@@ -42,7 +42,7 @@ function PriceRail({ course }: { course: Course }) {
   const priv = privatePrice(course, cfg);
   const waitlist = course.status === "waitlist";
   return (
-    <aside className="lg:sticky lg:top-24" aria-label={t("Riepilogo iscrizione")}>
+    <aside className="lg:sticky lg:top-[calc(96px+var(--ribbon-h,0px))]" aria-label={t("Riepilogo iscrizione")}>
       <div className="overflow-hidden rounded-[24px] border border-ink/10 bg-white shadow-lift">
         <div className="bg-ink p-6 text-white">
           <div className="flex items-center justify-between">

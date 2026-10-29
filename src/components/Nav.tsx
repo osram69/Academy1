@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { cn } from "../utils/cn";
 import { nextCourse, fmtRange } from "../data";
+import { WorkshopTicker } from "./WorkshopCard";
 
 import { LANGS, lang, setLang, t } from "../i18n";
 const LINKS = [
@@ -140,10 +141,12 @@ export function Nav({ route }: { route: string }) {
         </div>
       </div>
 
+      <WorkshopTicker />
+
       {/* mobile menu */}
       <div
         className={cn(
-          "fixed inset-0 top-[68px] z-40 flex flex-col bg-ink px-6 pb-10 pt-6 transition-all duration-500 lg:hidden",
+          "fixed inset-0 top-[calc(68px+var(--ribbon-h,0px))] z-40 flex flex-col bg-ink px-6 pb-10 pt-6 transition-all duration-500 lg:hidden",
           open ? "pointer-events-auto opacity-100" : "pointer-events-none -translate-y-3 opacity-0"
         )}
         aria-hidden={!open}
