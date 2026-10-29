@@ -139,31 +139,37 @@ export function WorkshopCard({ w, past = false }: { w: Workshop; past?: boolean 
       <Cover w={w} past={past} live={isLive(w, now)} />
       <div className="flex flex-1 flex-col p-6">
         <h3 className="font-display text-[21px] font-bold leading-snug tracking-tight text-ink">{w.title}</h3>
-        <ul className="mt-4 space-y-2 text-[13.5px] text-ink/70">
-          <li className="flex items-center gap-2.5">
+        <ul className="mt-3 space-y-2 text-[13.5px] text-ink/70">
+          <li className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
             <CalendarDays className="size-4 shrink-0 text-flame" aria-hidden="true" />
             <span className="font-semibold text-ink">{fmtFull(w.start)}</span>
+            {w.time && (
+              <>
+                <span className="text-steel">·</span>
+                <span className="inline-flex items-center gap-1.5">
+                  <Clock className="size-3.5 text-steel" aria-hidden="true" />
+                  {w.time}
+                </span>
+              </>
+            )}
           </li>
-          {w.time && (
-            <li className="flex items-center gap-2.5">
-              <Clock className="size-4 shrink-0 text-flame" aria-hidden="true" />
-              {w.time}
-            </li>
-          )}
-          {w.place && (
-            <li className="flex items-center gap-2.5">
-              <MapPin className="size-4 shrink-0 text-flame" aria-hidden="true" />
-              {w.place}
-            </li>
-          )}
-          <li className="flex items-center gap-2.5">
-            <Globe className="size-4 shrink-0 text-flame" aria-hidden="true" />
-            <span>{t("Lingua")}: <span className="font-semibold text-ink">{w.language}</span></span>
+          <li className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+            {w.place && (
+              <>
+                <MapPin className="size-4 shrink-0 text-flame" aria-hidden="true" />
+                {w.place}
+                <span className="text-steel">·</span>
+              </>
+            )}
+            <span className="inline-flex items-center gap-1.5">
+              <Globe className="size-3.5 text-steel" aria-hidden="true" />
+              {w.language}
+            </span>
           </li>
         </ul>
-        {w.description && <ClampedText text={w.description} className="mt-4 text-[14px] leading-relaxed text-ink/65" />}
+        {w.description && <ClampedText text={w.description} className="mt-3 text-[14px] leading-relaxed text-ink/65" />}
         {!past && (
-          <div className="mt-auto flex flex-wrap items-center gap-2.5 pt-6">
+          <div className="mt-auto flex flex-wrap items-center gap-2.5 pt-5">
             <JoinButton w={w} />
             <ZoomButton w={w} now={now} />
           </div>

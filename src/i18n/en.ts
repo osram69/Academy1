@@ -543,6 +543,7 @@ export const en: Record<string, string> = {
   "Copiato": "Copied",
   "Copia": "Copy",
   "Corso": "Course",
+  "Early bird attivo": "Early bird active",
   "persona": "person",
   "persone": "people",
   "Metodo": "Method",

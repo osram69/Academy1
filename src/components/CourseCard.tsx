@@ -1,4 +1,4 @@
-import { ArrowUpRight, CalendarDays, CheckCircle2, Clock, Globe, MapPin } from "lucide-react";
+import { ArrowUpRight, CalendarDays, CheckCircle2, Clock, Flame, Globe, MapPin } from "lucide-react";
 import { cn } from "../utils/cn";
 import {
   FORMAT_META,
@@ -50,6 +50,12 @@ export function CourseCard({ course, index = 0 }: { course: Course; index?: numb
           <span className="rounded-full bg-ink/75 px-3 py-1.5 font-mono text-[10.5px] font-semibold uppercase tracking-[0.16em] text-white">
             {fmt.label}
           </span>
+          {price.active && (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-flame px-3 py-1.5 font-mono text-[10.5px] font-semibold uppercase tracking-[0.16em] text-white">
+              <Flame className="size-3" aria-hidden="true" />
+              {t("Early bird attivo")}
+            </span>
+          )}
           {course.level !== "Foundation" && (
             <span className="rounded-full bg-white/90 px-3 py-1.5 font-mono text-[10.5px] font-semibold uppercase tracking-[0.16em] text-ink">
               {course.level}
