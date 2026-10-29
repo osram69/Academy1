@@ -50,10 +50,17 @@ strutturati (Course, Event, ItemList, BreadcrumbList, Organization), letti dal d
 risponde 404. I vecchi indirizzi con hash (`/#/corso/12`) e gli indirizzi brevi (`/corso/12`) si portano al nuovo.
 Il dominio si imposta con `SITE_URL` (default `https://academy.cubeng.eu`).
 
+I vecchi indirizzi del sito WordPress (`/corsi-it/`, `/en/...`, `/de/...`, `/fr/...`, moduli di iscrizione, articoli sugli eventi)
+hanno un redirect permanente verso la pagina equivalente: l'elenco è in `next.config.ts` (`redirects()`).
+
 ## Lingue (IT · EN · FR · DE)
 
-Il sito pubblico è tradotto in quattro lingue; il pannello `/admin` resta in italiano. La lingua si sceglie
-dal selettore in alto (si ricorda nel browser; al primo accesso segue la lingua del browser).
+Il sito pubblico è tradotto in quattro lingue; il pannello `/admin` resta in italiano. Ogni lingua ha i suoi indirizzi:
+l'italiano è senza prefisso (`/corsi`), le altre stanno sotto `/en`, `/fr`, `/de` (`/en/corsi`). La lingua si sceglie
+dal selettore in alto, che apre la stessa pagina nella lingua scelta; non c'è un cambio automatico in base al browser,
+così ogni indirizzo mostra sempre la stessa lingua. Titoli, descrizioni, canonical, `hreflang` e sitemap sono generati
+per ogni lingua dal server (`src/lib/page-seo.ts`, testi in `src/lib/seo-text.ts`). I link interni nel codice si scrivono
+senza prefisso: li completa `navigate()` e, nel DOM, `installLangLinks()` in `src/lib/nav.ts`.
 I testi stanno in `src/i18n/{en,fr,de}.ts`: la chiave è il testo italiano usato nel codice con `t("...")`.
 Un testo senza traduzione compare in italiano. Luogo e lingua dei corsi vengono dalle colonne
 `luogo_xx`/`lingua_xx` del database, già modificabili dal pannello.

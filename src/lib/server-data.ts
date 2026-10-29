@@ -69,15 +69,26 @@ export async function getCourses(): Promise<SeoCourse[] | null> {
 }
 
 export interface SeoEvent {
-  id: string; slug: string; title: string; start: string | null; end: string | null; place: string; url: string; image: string | null; text: string;
+  id: string; slug: string; title: string; start: string | null; end: string | null; place: string; url: string; image: string | null;
+  /** descrizione in italiano */
+  text: string;
+  /** descrizione per lingua, con ripiego sull'italiano */
+  texts: Record<"it" | "en" | "fr" | "de", string>;
 }
-interface EventRow { id: number; titolo: string; data_inizio: string | null; data_fine: string | null; luogo: string | null; link_evento: string | null; immagine_url: string | null; descrizione_it: string | null }
+interface EventRow {
+  id: number; titolo: string; data_inizio: string | null; data_fine: string | null; luogo: string | null; link_evento: string | null; immagine_url: string | null;
+  descrizione_it: string | null; descrizione_en?: string | null; descrizione_fr?: string | null; descrizione_de?: string | null;
+}
 
 export async function getEvents(): Promise<SeoEvent[] | null> {
   const rows = await rest<EventRow>("eventi", "select=*");
   if (!rows) return null;
-  return rows.map((r) => ({
-    id: String(r.id), slug: eventSlug(r.id, r.titolo), title: r.titolo, start: r.data_inizio, end: r.data_fine || r.data_inizio,
-    place: r.luogo || "", url: r.link_evento || "", image: r.immagine_url, text: (r.descrizione_it || "").trim(),
-  }));
+  return rows.map((r) => {
+    const it = (r.descrizione_it || "").trim();
+    return {
+      id: String(r.id), slug: eventSlug(r.id, r.titolo), title: r.titolo, start: r.data_inizio, end: r.data_fine || r.data_inizio,
+      place: r.luogo || "", url: r.link_evento || "", image: r.immagine_url, text: it,
+      texts: { it, en: (r.descrizione_en || "").trim() || it, fr: (r.descrizione_fr || "").trim() || it, de: (r.descrizione_de || "").trim() || it },
+    };
+  });
 }

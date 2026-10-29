@@ -1,4 +1,4 @@
-import { lang, t } from "../i18n";
+import { LANGS, lang, stripLang, t, withLang, type Lang } from "../i18n";
 import { SITE_URL } from "./site";
 
 const DEFAULT_TITLE = "Cube Academy — Certificazione iSAQB® CPSA-F";
@@ -22,6 +22,22 @@ function canonical(href: string) {
     document.head.appendChild(el);
   }
   el.href = href;
+}
+
+/** Versioni nelle altre lingue della pagina corrente (hreflang), assenti per le pagine fuori indice. */
+function alternates(noindex?: boolean) {
+  document.head.querySelectorAll("link[rel='alternate'][hreflang]").forEach((el) => el.remove());
+  if (noindex) return;
+  const base = stripLang(window.location.pathname);
+  const add = (hreflang: string, l: Lang) => {
+    const el = document.createElement("link");
+    el.rel = "alternate";
+    el.hreflang = hreflang;
+    el.href = `${SITE_URL}${withLang(base, l) === "/" ? "" : withLang(base, l)}`;
+    document.head.appendChild(el);
+  };
+  LANGS.forEach((l) => add(l.code, l.code));
+  add("x-default", "it");
 }
 
 export interface SeoInput {
@@ -56,4 +72,5 @@ export function applySeo({ title, description, noindex }: SeoInput) {
   meta("name", "twitter:title", full);
   meta("name", "twitter:description", desc);
   canonical(`${SITE_URL}${window.location.pathname === "/" ? "" : window.location.pathname}`);
+  alternates(noindex);
 }

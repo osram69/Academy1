@@ -13,14 +13,14 @@ import { CookieConsent } from "./components/CookieConsent";
 import { Analytics } from "./components/Analytics";
 import { Admin } from "./admin/Admin";
 import { bySlug } from "./data";
-import { t } from "./i18n";
+import { lang, langFromPath, stripLang, t } from "./i18n";
 import { applySeo, type SeoInput } from "./lib/seo";
-import { NAV_EVENT, fromLegacy, installLinkInterceptor, navigate } from "./lib/nav";
+import { NAV_EVENT, fromLegacy, installLangLinks, installLinkInterceptor, navigate } from "./lib/nav";
 
 type Route = { page: "home" } | { page: "admin" } | { page: "catalog" } | { page: "course"; slug: string } | { page: "enroll"; slug: string } | { page: "esito"; ref: string; status: string } | { page: "contact" } | { page: "events" } | { page: "event"; id: string } | { page: "legal"; kind: "privacy" | "cookie" | "terms" };
 
 export function parseRoute(path: string): Route {
-  const parts = path.split("?")[0].split("/").filter(Boolean);
+  const parts = stripLang(path.split("?")[0]).split("/").filter(Boolean);
   if (parts[0] === "admin") return { page: "admin" };
   if (parts[0] === "corsi") return { page: "catalog" };
   if (parts[0] === "contatti") return { page: "contact" };
@@ -63,10 +63,15 @@ export default function App() {
   // vecchi indirizzi con hash (#/corso/12): si portano al percorso corrispondente
   const [loc, setLoc] = useState(() => window.location.pathname + window.location.search);
   const route = parseRoute(loc);
-  const path = loc.split("?")[0];
+  const path = stripLang(loc.split("?")[0]);
 
   useEffect(() => {
     const onChange = () => {
+      // "indietro" tra due lingue: i testi sono già tradotti all'avvio, quindi si ricarica la pagina nella lingua giusta
+      if (langFromPath(window.location.pathname) !== lang) {
+        window.location.reload();
+        return;
+      }
       const next = window.location.pathname + window.location.search;
       setLoc((prev) => {
         if (prev.split("?")[0] !== next.split("?")[0]) window.scrollTo({ top: 0 });
@@ -80,12 +85,14 @@ export default function App() {
     window.addEventListener(NAV_EVENT, onChange);
     window.addEventListener("popstate", onChange);
     const stop = installLinkInterceptor();
+    const stopLangLinks = installLangLinks();
     legacy();
     return () => {
       window.removeEventListener("hashchange", legacy);
       window.removeEventListener(NAV_EVENT, onChange);
       window.removeEventListener("popstate", onChange);
       stop();
+      stopLangLinks();
     };
   }, []);
 

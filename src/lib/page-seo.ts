@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { SITE, SITE_URL } from "./site";
 import { getCourses, getEvents, type SeoCourse, type SeoEvent } from "./server-data";
 import { leadingId } from "./slug";
+import { LANG_CODES, LOCALE, OG_LOCALE, tx, type L, type TextKey } from "./seo-text";
 
-/** Per ogni percorso del sito: metadati, dati strutturati e testo per i crawler, calcolati sul server. */
+/** Per ogni percorso del sito: metadati, dati strutturati e testo per i crawler, calcolati sul server.
+ *  L'italiano è senza prefisso (/corsi); inglese, francese e tedesco stanno sotto /en, /fr, /de. */
 
 export type Resolved =
   | { kind: "ok"; path: string; canonical: string; meta: Metadata; jsonLd: object[]; shell: ShellContent }
@@ -16,117 +18,129 @@ export interface ShellContent {
   links: { href: string; label: string }[];
 }
 
-const MONTHS = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
-const dmy = (iso: string) => {
-  const [y, m, d] = iso.split("-").map(Number);
-  return { y, m, d };
-};
-/** "10–12 novembre 2026", "30 ottobre – 2 novembre 2026", "5 marzo 2026" */
-export function dateRangeIt(a: string, b: string): string {
+/** "10–12 novembre 2026", "30 ottobre – 2 novembre 2026", "5 marzo 2026" (mesi nella lingua richiesta) */
+export function dateRange(l: L, a: string, b: string): string {
+  const dmy = (iso: string) => {
+    const [y, m, d] = iso.split("-").map(Number);
+    return { y, m, d };
+  };
+  const month = (m: number) => new Date(Date.UTC(2026, m - 1, 1)).toLocaleDateString(LOCALE[l], { month: "long", timeZone: "UTC" });
+  const day = (d: number) => (l === "de" ? `${d}.` : `${d}`);
   const s = dmy(a), e = dmy(b || a);
-  if (a === b || !b) return `${s.d} ${MONTHS[s.m - 1]} ${s.y}`;
-  if (s.y === e.y && s.m === e.m) return `${s.d}–${e.d} ${MONTHS[e.m - 1]} ${e.y}`;
-  if (s.y === e.y) return `${s.d} ${MONTHS[s.m - 1]} – ${e.d} ${MONTHS[e.m - 1]} ${e.y}`;
-  return `${s.d} ${MONTHS[s.m - 1]} ${s.y} – ${e.d} ${MONTHS[e.m - 1]} ${e.y}`;
+  if (a === b || !b) return `${day(s.d)} ${month(s.m)} ${s.y}`;
+  if (s.y === e.y && s.m === e.m) return `${l === "de" ? `${s.d}.` : s.d}–${day(e.d)} ${month(e.m)} ${e.y}`;
+  if (s.y === e.y) return `${day(s.d)} ${month(s.m)} – ${day(e.d)} ${month(e.m)} ${e.y}`;
+  return `${day(s.d)} ${month(s.m)} ${s.y} – ${day(e.d)} ${month(e.m)} ${e.y}`;
 }
 
-const eur = (n: number) => n.toLocaleString("it-IT", { maximumFractionDigits: 0 });
-const abs = (p: string) => `${SITE_URL}${p === "/" ? "" : p}`;
 const clip = (s: string, n = 158) => (s.length <= n ? s : `${s.slice(0, n - 1).replace(/\s+\S*$/, "")}…`);
 
-function base(path: string, title: string | null, description: string, opts: { noindex?: boolean; image?: string; type?: "website" | "article" } = {}): Metadata {
-  const image = opts.image || SITE.image;
-  const full = title ? `${title} | ${SITE.name}` : SITE.title;
-  return {
-    ...(title ? { title } : {}),
-    description,
-    alternates: { canonical: path },
-    robots: opts.noindex ? { index: false, follow: false } : undefined,
-    openGraph: { type: opts.type ?? "website", url: path, siteName: SITE.name, title: full, description, locale: "it_IT", images: [{ url: image }] },
-    twitter: { card: "summary_large_image", title: full, description, images: [image] },
-  };
-}
+/** Indirizzo assoluto di un percorso senza prefisso, nella lingua richiesta. */
+const url = (path: string, l: L) => `${SITE_URL}${prefixed(path, l)}`;
+const prefixed = (path: string, l: L) => (l === "it" ? (path === "/" ? "" : path) : `/${l}${path === "/" ? "" : path}`);
 
-const crumbs = (items: [string, string][]) => ({
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  itemListElement: items.map(([name, path], i) => ({ "@type": "ListItem", position: i + 1, name, item: abs(path) })),
+/** Chiavi e indirizzi hreflang di una pagina: la stessa pagina in ogni lingua. */
+const languagesOf = (path: string) => ({
+  ...Object.fromEntries(LANG_CODES.map((l) => [l, url(path, l) || SITE_URL])),
+  "x-default": url(path, "it") || SITE_URL,
 });
 
-const MAIN_LINKS = [
-  { href: "/corsi", label: "Catalogo corsi iSAQB® CPSA-F" },
-  { href: "/eventi", label: "Eventi" },
-  { href: "/contatti", label: "Contatti" },
-  { href: "/privacy", label: "Informativa privacy" },
-  { href: "/condizioni", label: "Condizioni generali" },
-];
+export const LANG_SEGMENTS = ["en", "fr", "de"];
 
-const courseDescription = (c: SeoCourse) =>
-  clip(
-    `Corso iSAQB® CPSA Foundation Level ${c.online ? "online (aula virtuale live)" : c.residential ? "residenziale" : `in aula a ${c.location}`}, ${dateRangeIt(c.start, c.end)}.` +
-      `${c.price ? ` Da € ${eur(c.earlyBirdPrice && c.earlyBirdPrice < c.price ? c.earlyBirdPrice : c.price)} + IVA.` : ""} Docente accreditato iSAQB®, gruppi fino a 12 partecipanti, Cube Academy Training Provider accreditato.`
-  );
-
-function courseJsonLd(c: SeoCourse, path: string) {
-  const price = c.earlyBirdPrice && c.price && c.earlyBirdPrice < c.price ? c.earlyBirdPrice : c.price;
-  return {
-    "@context": "https://schema.org",
-    "@type": "Course",
-    "@id": `${abs(path)}#course`,
-    name: c.title,
-    description: courseDescription(c),
-    url: abs(path),
-    inLanguage: c.language,
-    educationalLevel: c.level,
-    provider: { "@id": `${SITE_URL}/#organization` },
-    offers: price != null ? { "@type": "Offer", price, priceCurrency: "EUR", category: "Paid", url: abs(path), availability: c.open && (c.seatsLeft == null || c.seatsLeft > 0) ? "https://schema.org/InStock" : "https://schema.org/SoldOut" } : undefined,
-    hasCourseInstance: {
-      "@type": "CourseInstance",
-      courseMode: c.online ? "Online" : "Onsite",
-      startDate: c.start,
-      endDate: c.end,
-      courseSchedule: c.schedule ? { "@type": "Schedule", description: c.schedule } : undefined,
-      location: c.online ? { "@type": "VirtualLocation", url: abs(path) } : { "@type": "Place", name: c.location, address: c.location },
-      instructor: { "@type": "Person", name: "Docente accreditato iSAQB®" },
-    },
-  };
-}
-
-function courseLinks(courses: SeoCourse[]) {
-  return courses.filter((c) => !c.concluded).map((c) => ({ href: `/corso/${c.slug}`, label: `${c.title} — ${dateRangeIt(c.start, c.end)}` }));
-}
-
-export async function resolvePath(segments: string[]): Promise<Resolved> {
+export async function resolvePath(all: string[]): Promise<Resolved> {
+  const L: L = LANG_SEGMENTS.includes(all[0]) ? (all[0] as L) : "it";
+  const segments = L === "it" ? all : all.slice(1);
   const [a, b, c] = segments;
-  const path = `/${segments.join("/")}`;
+  const path = `/${segments.join("/")}`; // percorso senza prefisso di lingua
+  const P = (p: string) => prefixed(p, L) || "/"; // …con il prefisso, per i link interni
+  const T = (k: TextKey, vars?: Record<string, string | number>) => tx(k, L, vars);
+  const eur = (n: number) => n.toLocaleString(LOCALE[L], { maximumFractionDigits: 0 });
+
+  function base(p: string, title: string | null, description: string, opts: { noindex?: boolean; image?: string; type?: "website" | "article" } = {}): Metadata {
+    const image = opts.image || SITE.image;
+    const full = title ? `${title} | ${SITE.name}` : T("homeTitle");
+    const here = url(p, L) || SITE_URL;
+    return {
+      title: title ?? { absolute: T("homeTitle") },
+      description,
+      alternates: { canonical: here, ...(opts.noindex ? {} : { languages: languagesOf(p) }) },
+      robots: opts.noindex ? { index: false, follow: false } : undefined,
+      openGraph: { type: opts.type ?? "website", url: here, siteName: SITE.name, title: full, description, locale: OG_LOCALE[L], images: [{ url: image }] },
+      twitter: { card: "summary_large_image", title: full, description, images: [image] },
+    };
+  }
+
+  const crumbs = (items: [string, string][]) => ({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: items.map(([name, p], i) => ({ "@type": "ListItem", position: i + 1, name, item: url(p, L) || SITE_URL })),
+  });
+
+  const MAIN_LINKS = [
+    { href: P("/corsi"), label: T("catalogLink") },
+    { href: P("/eventi"), label: T("events") },
+    { href: P("/contatti"), label: T("contacts") },
+    { href: P("/privacy"), label: T("privacy") },
+    { href: P("/condizioni"), label: T("terms") },
+  ];
+
+  const courseDescription = (x: SeoCourse) => {
+    const mode = x.online ? T("modeOnline") : x.residential ? T("modeResidential") : T("modeClassroom", { loc: x.location });
+    const price = x.price ? ` ${T("priceFrom", { p: eur(x.earlyBirdPrice && x.earlyBirdPrice < x.price ? x.earlyBirdPrice : x.price) })}` : "";
+    return clip(`${T("courseKind")} ${mode}, ${dateRange(L, x.start, x.end)}.${price} ${T("courseTail")}`);
+  };
+
+  function courseJsonLd(x: SeoCourse, p: string) {
+    const price = x.earlyBirdPrice && x.price && x.earlyBirdPrice < x.price ? x.earlyBirdPrice : x.price;
+    const here = url(p, L);
+    return {
+      "@context": "https://schema.org",
+      "@type": "Course",
+      "@id": `${here}#course`,
+      name: x.title,
+      description: courseDescription(x),
+      url: here,
+      inLanguage: x.language,
+      educationalLevel: x.level,
+      provider: { "@id": `${SITE_URL}/#organization` },
+      offers: price != null ? { "@type": "Offer", price, priceCurrency: "EUR", category: "Paid", url: here, availability: x.open && (x.seatsLeft == null || x.seatsLeft > 0) ? "https://schema.org/InStock" : "https://schema.org/SoldOut" } : undefined,
+      hasCourseInstance: {
+        "@type": "CourseInstance",
+        courseMode: x.online ? "Online" : "Onsite",
+        startDate: x.start,
+        endDate: x.end,
+        courseSchedule: x.schedule ? { "@type": "Schedule", description: x.schedule } : undefined,
+        location: x.online ? { "@type": "VirtualLocation", url: here } : { "@type": "Place", name: x.location, address: x.location },
+        instructor: { "@type": "Person", name: T("instructor") },
+      },
+    };
+  }
+
+  const courseLinks = (courses: SeoCourse[]) =>
+    courses.filter((x) => !x.concluded).map((x) => ({ href: P(`/corso/${x.slug}`), label: `${x.title} — ${dateRange(L, x.start, x.end)}` }));
 
   if (!a) {
     const courses = (await getCourses())?.filter((x) => !x.concluded) ?? [];
     return {
-      kind: "ok", path: "/", canonical: "/",
-      meta: { alternates: { canonical: "/" } },
+      kind: "ok", path: P("/"), canonical: P("/"),
+      meta: base("/", null, T("homeDesc")),
       jsonLd: courses.length
-        ? [{ "@context": "https://schema.org", "@type": "ItemList", name: "Prossime edizioni dei corsi iSAQB® CPSA-F", itemListElement: courses.map((x, i) => ({ "@type": "ListItem", position: i + 1, url: abs(`/corso/${x.slug}`), name: x.title })) }]
+        ? [{ "@context": "https://schema.org", "@type": "ItemList", name: T("nextEditions"), itemListElement: courses.map((x, i) => ({ "@type": "ListItem", position: i + 1, url: url(`/corso/${x.slug}`, L), name: x.title })) }]
         : [],
-      shell: {
-        h1: "Cube Academy — Corsi di certificazione iSAQB® CPSA-F",
-        intro: "Cube Academy è Training Provider accreditato iSAQB® dal 2024. Corsi CPSA-Foundation online e in aula a Roma per diventare architetto del software certificato, con docenti accreditati e gruppi fino a 12 partecipanti.",
-        links: [...courseLinks(courses), ...MAIN_LINKS],
-      },
+      shell: { h1: T("homeH1"), intro: T("homeIntro"), links: [...courseLinks(courses), ...MAIN_LINKS] },
     };
   }
 
   if (!b && a === "corsi") {
     const courses = (await getCourses())?.filter((x) => !x.concluded) ?? [];
-    const description = "Calendario 2026 dei corsi iSAQB® CPSA-F Foundation: edizioni online e in aula a Roma, date, prezzi e iscrizione. Docenti accreditati, gruppi fino a 12 partecipanti.";
     return {
-      kind: "ok", path, canonical: "/corsi",
-      meta: base("/corsi", "Catalogo corsi iSAQB® CPSA-F 2026 — date e prezzi", description),
+      kind: "ok", path: P(path), canonical: P("/corsi"),
+      meta: base("/corsi", T("catalogTitle"), T("catalogDesc")),
       jsonLd: [
-        crumbs([["Home", "/"], ["Catalogo corsi", "/corsi"]]),
-        { "@context": "https://schema.org", "@type": "ItemList", name: "Catalogo corsi iSAQB® CPSA-F", itemListElement: courses.map((x, i) => ({ "@type": "ListItem", position: i + 1, url: abs(`/corso/${x.slug}`), name: x.title })) },
+        crumbs([[T("home"), "/"], [T("catalogCrumb"), "/corsi"]]),
+        { "@context": "https://schema.org", "@type": "ItemList", name: T("catalogLink"), itemListElement: courses.map((x, i) => ({ "@type": "ListItem", position: i + 1, url: url(`/corso/${x.slug}`, L), name: x.title })) },
       ],
-      shell: { h1: "Catalogo corsi iSAQB® CPSA-F", intro: description, links: courseLinks(courses) },
+      shell: { h1: T("catalogLink"), intro: T("catalogDesc"), links: courseLinks(courses) },
     };
   }
 
@@ -135,30 +149,29 @@ export async function resolvePath(segments: string[]): Promise<Resolved> {
     const id = leadingId(b);
     const course = courses?.find((x) => x.id === id);
     if (courses && (!course || course.concluded)) return { kind: "notfound" };
-    if (!course) return { kind: "ok", path, canonical: path, meta: { robots: { index: false } }, jsonLd: [], shell: { h1: "Corso iSAQB® CPSA-F", intro: "", links: MAIN_LINKS } };
-    if (course.slug !== b) return { kind: "redirect", to: `/corso/${course.slug}` };
+    if (!course) return { kind: "ok", path: P(path), canonical: P(path), meta: { robots: { index: false } }, jsonLd: [], shell: { h1: T("courseFallback"), intro: "", links: MAIN_LINKS } };
+    if (course.slug !== b) return { kind: "redirect", to: P(`/corso/${course.slug}`) };
     const p = `/corso/${course.slug}`;
     const description = courseDescription(course);
     return {
-      kind: "ok", path: p, canonical: p,
-      meta: base(p, `${course.title} — ${dateRangeIt(course.start, course.end)}`, description),
-      jsonLd: [crumbs([["Home", "/"], ["Catalogo corsi", "/corsi"], [course.title, p]]), courseJsonLd(course, p)],
+      kind: "ok", path: P(p), canonical: P(p),
+      meta: base(p, `${course.title} — ${dateRange(L, course.start, course.end)}`, description),
+      jsonLd: [crumbs([[T("home"), "/"], [T("catalogCrumb"), "/corsi"], [course.title, p]]), courseJsonLd(course, p)],
       shell: {
-        h1: `${course.title} — ${dateRangeIt(course.start, course.end)}`,
-        intro: `${description}${course.schedule ? ` Orario: ${course.schedule}.` : ""}`,
-        links: [{ href: `/iscriviti/${course.slug}`, label: "Iscriviti a questa edizione" }, ...MAIN_LINKS],
+        h1: `${course.title} — ${dateRange(L, course.start, course.end)}`,
+        intro: `${description}${course.schedule ? ` ${T("schedule", { s: course.schedule })}` : ""}`,
+        links: [{ href: P(`/iscriviti/${course.slug}`), label: T("enroll") }, ...MAIN_LINKS],
       },
     };
   }
 
   if (!b && a === "eventi") {
     const events = (await getEvents()) ?? [];
-    const description = "Gli appuntamenti di Cube Academy e della community iSAQB®: conferenze, forum e incontri sull'architettura del software.";
     return {
-      kind: "ok", path, canonical: "/eventi",
-      meta: base("/eventi", "Eventi iSAQB® e architettura software", description),
-      jsonLd: [crumbs([["Home", "/"], ["Eventi", "/eventi"]])],
-      shell: { h1: "Eventi", intro: description, links: events.map((e) => ({ href: `/eventi/${e.slug}`, label: e.title })) },
+      kind: "ok", path: P(path), canonical: P("/eventi"),
+      meta: base("/eventi", T("eventsTitle"), T("eventsDesc")),
+      jsonLd: [crumbs([[T("home"), "/"], [T("events"), "/eventi"]])],
+      shell: { h1: T("events"), intro: T("eventsDesc"), links: events.map((e) => ({ href: P(`/eventi/${e.slug}`), label: e.title })) },
     };
   }
 
@@ -167,49 +180,50 @@ export async function resolvePath(segments: string[]): Promise<Resolved> {
     const id = leadingId(b);
     const ev: SeoEvent | undefined = events?.find((x) => x.slug === b || x.id === b || (id != null && x.id === String(id)));
     if (events && !ev) return { kind: "notfound" };
-    if (!ev) return { kind: "ok", path, canonical: path, meta: { robots: { index: false } }, jsonLd: [], shell: { h1: "Evento", intro: "", links: MAIN_LINKS } };
-    if (ev.slug !== b) return { kind: "redirect", to: `/eventi/${ev.slug}` };
+    if (!ev) return { kind: "ok", path: P(path), canonical: P(path), meta: { robots: { index: false } }, jsonLd: [], shell: { h1: T("eventFallback"), intro: "", links: MAIN_LINKS } };
+    if (ev.slug !== b) return { kind: "redirect", to: P(`/eventi/${ev.slug}`) };
     const p = `/eventi/${ev.slug}`;
-    const description = clip(ev.text.split(/\n\s*\n/)[0] || `${ev.title}${ev.place ? ` — ${ev.place}` : ""}`);
+    const text = ev.texts[L];
+    const description = clip(text.split(/\n\s*\n/)[0] || `${ev.title}${ev.place ? ` — ${ev.place}` : ""}`);
     return {
-      kind: "ok", path: p, canonical: p,
+      kind: "ok", path: P(p), canonical: P(p),
       meta: base(p, ev.title, description, { image: ev.image || undefined, type: "article" }),
       jsonLd: [
-        crumbs([["Home", "/"], ["Eventi", "/eventi"], [ev.title, p]]),
+        crumbs([[T("home"), "/"], [T("events"), "/eventi"], [ev.title, p]]),
         {
           "@context": "https://schema.org", "@type": "Event", name: ev.title, description,
           startDate: ev.start ?? undefined, endDate: ev.end ?? undefined,
           eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode", eventStatus: "https://schema.org/EventScheduled",
           location: ev.place ? { "@type": "Place", name: ev.place, address: ev.place } : undefined,
-          image: ev.image ? [ev.image.startsWith("http") ? ev.image : abs(ev.image)] : undefined,
-          url: abs(p), organizer: { "@id": `${SITE_URL}/#organization` },
+          image: ev.image ? [ev.image.startsWith("http") ? ev.image : `${SITE_URL}${ev.image}`] : undefined,
+          url: url(p, L), organizer: { "@id": `${SITE_URL}/#organization` },
         },
       ],
-      shell: { h1: ev.title, intro: ev.text || description, links: [{ href: "/eventi", label: "Tutti gli eventi" }, ...MAIN_LINKS] },
+      shell: { h1: ev.title, intro: text || description, links: [{ href: P("/eventi"), label: T("allEvents") }, ...MAIN_LINKS] },
     };
   }
 
-  const STATIC: Record<string, { title: string; description: string; h1: string }> = {
-    contatti: { title: "Contatti", h1: "Contatti", description: "Contatta Cube Academy per informazioni su corsi iSAQB® CPSA-F, liste d'attesa, edizioni dedicate per aziende e team. Sede a Roma." },
-    privacy: { title: "Informativa privacy", h1: "Informativa privacy", description: "Informativa sul trattamento dei dati personali di Cube Academy, Cube Engineering S.r.l." },
-    condizioni: { title: "Condizioni generali di vendita", h1: "Condizioni generali", description: "Condizioni generali di iscrizione ai corsi di Cube Academy: pagamenti, rimborsi, annullamento e modalità di erogazione." },
-    "cookie-policy": { title: "Cookie policy", h1: "Cookie policy", description: "Informazioni sui cookie utilizzati da Cube Academy e su come gestire le preferenze." },
+  const STATIC: Record<string, { title: TextKey; h1: TextKey; description: TextKey }> = {
+    contatti: { title: "contacts", h1: "contacts", description: "contactsDesc" },
+    privacy: { title: "privacy", h1: "privacy", description: "privacyDesc" },
+    condizioni: { title: "termsTitle", h1: "terms", description: "termsDesc" },
+    "cookie-policy": { title: "cookies", h1: "cookies", description: "cookiesDesc" },
   };
   if (!b && a in STATIC) {
     const s = STATIC[a];
     return {
-      kind: "ok", path, canonical: path,
-      meta: base(path, s.title, s.description),
-      jsonLd: [crumbs([["Home", "/"], [s.title, path]]), ...(a === "contatti" ? [{ "@context": "https://schema.org", "@type": "ContactPage", name: s.title, url: abs(path), about: { "@id": `${SITE_URL}/#organization` } }] : [])],
-      shell: { h1: s.h1, intro: s.description, links: MAIN_LINKS },
+      kind: "ok", path: P(path), canonical: P(path),
+      meta: base(path, T(s.title), T(s.description)),
+      jsonLd: [crumbs([[T("home"), "/"], [T(s.title), path]]), ...(a === "contatti" ? [{ "@context": "https://schema.org", "@type": "ContactPage", name: T(s.title), url: url(path, L), about: { "@id": `${SITE_URL}/#organization` } }] : [])],
+      shell: { h1: T(s.h1), intro: T(s.description), links: MAIN_LINKS },
     };
   }
 
   // pagine operative: non vanno in indice
-  const hidden = (title: string): Resolved => ({ kind: "ok", path, canonical: path, meta: base(path, title, SITE.description, { noindex: true }), jsonLd: [], shell: { h1: title, intro: "", links: [{ href: "/", label: "Home" }] } });
-  if (a === "iscriviti" && b && !c) return hidden("Iscrizione");
-  if (a === "esito" && b) return hidden("Esito dell'iscrizione");
-  if (a === "admin") return hidden("Gestione");
+  const hidden = (title: string): Resolved => ({ kind: "ok", path: P(path), canonical: P(path), meta: base(path, title, T("homeDesc"), { noindex: true }), jsonLd: [], shell: { h1: title, intro: "", links: [{ href: P("/"), label: T("home") }] } });
+  if (a === "iscriviti" && b && !c) return hidden(T("enrollment"));
+  if (a === "esito" && b) return hidden(T("outcome"));
+  if (a === "admin") return L === "it" ? hidden("Gestione") : { kind: "notfound" };
 
   return { kind: "notfound" };
 }
