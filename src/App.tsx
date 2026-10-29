@@ -13,6 +13,8 @@ import { CookieConsent } from "./components/CookieConsent";
 import { Analytics } from "./components/Analytics";
 import { Admin } from "./admin/Admin";
 import { bySlug } from "./data";
+import { t } from "./i18n";
+import { applySeo, type SeoInput } from "./lib/seo";
 
 type Route = { page: "home" } | { page: "admin" } | { page: "catalog" } | { page: "course"; slug: string } | { page: "enroll"; slug: string } | { page: "esito"; ref: string; status: string } | { page: "contact" } | { page: "events" } | { page: "event"; id: string } | { page: "legal"; kind: "privacy" | "cookie" | "terms" };
 
@@ -32,6 +34,30 @@ function parseRoute(hash: string): Route {
   return { page: "home" };
 }
 
+function seoFor(route: Route): SeoInput {
+  switch (route.page) {
+    case "catalog":
+      return { title: t("Catalogo corsi"), description: t("Calendario dei corsi iSAQB® CPSA-F: edizioni online e in aula a Roma, prezzi e iscrizione.") };
+    case "course": {
+      const c = bySlug(route.slug);
+      return c && !c.concluded ? { title: c.title, description: c.tagline || c.description, course: c } : {};
+    }
+    case "enroll":
+    case "esito":
+    case "admin":
+      return { noindex: true, title: route.page === "admin" ? "Admin" : t("Iscrizione") };
+    case "contact":
+      return { title: t("Contatti") };
+    case "events":
+    case "event":
+      return { title: t("Eventi") };
+    case "legal":
+      return { title: route.kind === "privacy" ? t("Privacy") : route.kind === "cookie" ? t("Cookie Policy") : t("Condizioni generali") };
+    default:
+      return {};
+  }
+}
+
 export default function App() {
   const [hash, setHash] = useState(() => window.location.hash || "#/");
   const [route, setRoute] = useState<Route>(() => parseRoute(window.location.hash || "#/"));
@@ -46,6 +72,8 @@ export default function App() {
     window.addEventListener("hashchange", onChange);
     return () => window.removeEventListener("hashchange", onChange);
   }, []);
+
+  useEffect(() => applySeo(seoFor(route)), [route]);
 
   let page: React.ReactNode;
   switch (route.page) {

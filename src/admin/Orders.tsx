@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
-import { Trash2, X } from "lucide-react";
+import { Pencil, Trash2, X } from "lucide-react";
 
 interface Participant {
   nome: string; cognome: string; email: string; telefono?: string;
@@ -47,7 +47,38 @@ function Rows({ rows }: { rows: [string, React.ReactNode][] }) {
   );
 }
 
-function OrderDetail({ o, onClose, onDelete }: { o: Order; onClose: () => void; onDelete: () => void }) {
+const BILLING_FIELDS: [string, string][] = [
+  ["ragione", "Ragione sociale"], ["nome", "Nome"], ["cognome", "Cognome"], ["cf", "Codice fiscale"], ["piva", "P.IVA"], ["vatId", "VAT ID"],
+  ["sdi", "Codice SDI"], ["pec", "PEC"], ["via", "Via"], ["cap", "CAP"], ["citta", "Città"], ["paese", "Paese"],
+];
+
+function Field({ label, value, onChange, type = "text" }: { label: string; value: string; onChange: (v: string) => void; type?: string }) {
+  return (
+    <label className="block text-[12px] text-steel">
+      {label}
+      <input type={type} value={value} onChange={(e) => onChange(e.target.value)} className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2 text-[13px] font-medium text-ink outline-none focus:border-flame" />
+    </label>
+  );
+}
+
+function OrderDetail({ o, startEditing, onClose, onDelete, onSave }: {
+  o: Order; startEditing: boolean; onClose: () => void; onDelete: () => void;
+  onSave: (participants: Participant[], billing: Billing) => Promise<string | null>;
+}) {
+  const [editing, setEditing] = useState(startEditing);
+  const [parts, setParts] = useState<Participant[]>(o.participants);
+  const [bill, setBill] = useState<Billing>(o.billing);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const setPart = (i: number, patch: Partial<Participant>) => setParts((cur) => cur.map((p, j) => (j === i ? { ...p, ...patch } : p)));
+  const save = async () => {
+    setSaving(true);
+    setError("");
+    const msg = await onSave(parts, bill);
+    setSaving(false);
+    if (msg) setError(msg);
+    else setEditing(false);
+  };
   const b = o.billing;
   const st = STATUS[o.status] ?? { label: o.status, cls: "bg-ink/8 text-steel" };
   const who = b.ragione || `${b.nome} ${b.cognome}`.trim();
@@ -97,6 +128,47 @@ function OrderDetail({ o, onClose, onDelete }: { o: Order; onClose: () => void; 
           ]} />
         </Section>
 
+        {editing ? (
+          <>
+            <Section title={`Partecipanti (${parts.length})`}>
+              <div className="space-y-3">
+                {parts.map((p, i) => (
+                  <div key={i} className="grid gap-3 rounded-xl border border-ink/10 p-3 sm:grid-cols-2">
+                    <Field label="Nome" value={p.nome} onChange={(v) => setPart(i, { nome: v })} />
+                    <Field label="Cognome" value={p.cognome} onChange={(v) => setPart(i, { cognome: v })} />
+                    <Field label="Email" type="email" value={p.email} onChange={(v) => setPart(i, { email: v })} />
+                    <Field label="Telefono" value={p.telefono || ""} onChange={(v) => setPart(i, { telefono: v })} />
+                    <div className="flex flex-wrap gap-x-5 gap-y-1 text-[12.5px] sm:col-span-2">
+                      {([["consensoPrivacy", "Privacy"], ["consensoMarketing", "Marketing"], ["consensoAudioVideo", "Audio/video"]] as const).map(([k, l]) => (
+                        <label key={k} className="inline-flex items-center gap-1.5"><input type="checkbox" checked={!!p[k]} onChange={(e) => setPart(i, { [k]: e.target.checked })} />{l}</label>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Section>
+            <Section title="Dati di fatturazione">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <label className="block text-[12px] text-steel">
+                  Tipologia
+                  <select value={bill.type} onChange={(e) => setBill({ ...bill, type: e.target.value })} className="mt-1 w-full rounded-lg border border-ink/15 bg-white px-3 py-2 text-[13px] font-medium text-ink outline-none focus:border-flame">
+                    {Object.entries(BILLING_TYPE).map(([k, l]) => <option key={k} value={k}>{l}</option>)}
+                  </select>
+                </label>
+                <label className="block text-[12px] text-steel">
+                  Lingua email
+                  <select value={bill.lang || "it"} onChange={(e) => setBill({ ...bill, lang: e.target.value })} className="mt-1 w-full rounded-lg border border-ink/15 bg-white px-3 py-2 text-[13px] font-medium text-ink outline-none focus:border-flame">
+                    {["it", "en", "fr", "de"].map((l) => <option key={l} value={l}>{l.toUpperCase()}</option>)}
+                  </select>
+                </label>
+                {BILLING_FIELDS.map(([k, l]) => <Field key={k} label={l} value={bill[k] || ""} onChange={(v) => setBill({ ...bill, [k]: v })} />)}
+              </div>
+            </Section>
+            <p className="mt-3 text-[12px] text-steel">Si correggono solo i dati anagrafici e di fatturazione: importi, stato e pagamento non cambiano.</p>
+            {error && <p role="alert" className="mt-3 rounded-lg bg-err/10 px-4 py-2 text-[13px] text-err">{error}</p>}
+          </>
+        ) : (
+          <>
         <Section title={`Partecipanti (${o.participants.length})`}>
           <div className="space-y-3">
             {o.participants.map((p, i) => (
@@ -128,10 +200,23 @@ function OrderDetail({ o, onClose, onDelete }: { o: Order; onClose: () => void; 
           ]} />
         </Section>
 
-        <div className="mt-6 flex justify-end border-t border-ink/10 pt-4">
+          </>
+        )}
+
+        <div className="mt-6 flex items-center justify-between gap-3 border-t border-ink/10 pt-4">
           <button type="button" onClick={onDelete} className="inline-flex items-center gap-2 rounded-full border border-err/30 px-4 py-2 text-[13px] font-semibold text-err hover:bg-err/10">
             <Trash2 className="size-4" aria-hidden="true" />Elimina iscrizione
           </button>
+          {editing ? (
+            <div className="flex gap-2">
+              <button type="button" onClick={() => { setParts(o.participants); setBill(o.billing); setError(""); setEditing(false); }} className="rounded-full border border-ink/15 px-4 py-2 text-[13px] font-semibold hover:bg-sand/60">Annulla</button>
+              <button type="button" onClick={save} disabled={saving} className="rounded-full bg-ink px-5 py-2 text-[13px] font-semibold text-white hover:bg-flame disabled:opacity-60">{saving ? "Salvataggio…" : "Salva modifiche"}</button>
+            </div>
+          ) : (
+            <button type="button" onClick={() => setEditing(true)} className="inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2 text-[13px] font-semibold text-white hover:bg-flame">
+              <Pencil className="size-4" aria-hidden="true" />Modifica dati
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -142,7 +227,7 @@ function OrderDetail({ o, onClose, onDelete }: { o: Order; onClose: () => void; 
 export function OrdersPage({ session }: { session: Session }) {
   const [rows, setRows] = useState<Order[] | null>(null);
   const [err, setErr] = useState("");
-  const [open, setOpen] = useState<Order | null>(null);
+  const [open, setOpen] = useState<{ ref: string; edit: boolean } | null>(null);
   const auth = { Authorization: `Bearer ${session.access_token}` };
 
   useEffect(() => {
@@ -166,6 +251,19 @@ export function OrdersPage({ session }: { session: Session }) {
     }
   };
 
+  const save = async (o: Order, participants: Participant[], billing: Billing): Promise<string | null> => {
+    try {
+      const r = await fetch(`/api/admin/orders?ref=${encodeURIComponent(o.ref)}`, { method: "PATCH", headers: { ...auth, "Content-Type": "application/json" }, body: JSON.stringify({ participants, billing }) });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) return j.error || "Salvataggio non riuscito";
+      setRows((cur) => (cur ? cur.map((x) => (x.ref === o.ref ? { ...x, participants: j.participants, billing: j.billing } : x)) : cur));
+      return null;
+    } catch {
+      return "Server non raggiungibile";
+    }
+  };
+  const current = open ? rows?.find((x) => x.ref === open.ref) ?? null : null;
+
   return (
     <>
       <h1 className="font-display text-2xl font-bold tracking-tight">Iscrizioni</h1>
@@ -188,7 +286,7 @@ export function OrdersPage({ session }: { session: Session }) {
                   <tr key={o.ref} className="border-b border-ink/5 align-top last:border-0">
                     <td className="whitespace-nowrap px-4 py-3">{when(o.created_at)}</td>
                     <td className="px-4 py-3 font-mono text-[12px]">
-                      <button type="button" onClick={() => setOpen(o)} className="font-semibold text-flame underline-offset-2 hover:underline" title="Mostra i dati dell'iscrizione">{o.ref}</button>
+                      <button type="button" onClick={() => setOpen({ ref: o.ref, edit: false })} className="font-semibold text-flame underline-offset-2 hover:underline" title="Mostra i dati dell'iscrizione">{o.ref}</button>
                     </td>
                     <td className="px-4 py-3">#{o.id_corso}</td>
                     <td className="px-4 py-3">
@@ -198,8 +296,11 @@ export function OrdersPage({ session }: { session: Session }) {
                     <td className="px-4 py-3">{METHOD[o.method] ?? o.method}{o.test_mode && o.method !== "bonifico" ? <span className="ml-1.5 rounded bg-amber-100 px-1.5 py-0.5 text-[10.5px] font-bold text-amber-700">prova</span> : null}</td>
                     <td className="px-4 py-3"><span className={`rounded-full px-2.5 py-1 text-[12px] font-semibold ${st.cls}`}>{st.label}</span></td>
                     <td className="px-4 py-3 font-semibold tabular-nums">{eur2(o.total_cents)}</td>
-                    <td className="px-4 py-3 text-right">
-                      <button type="button" onClick={() => remove(o)} aria-label={`Elimina l'iscrizione ${o.ref}`} title="Elimina" className="grid size-8 place-items-center rounded-full text-steel hover:bg-err/10 hover:text-err">
+                    <td className="whitespace-nowrap px-4 py-3 text-right">
+                      <button type="button" onClick={() => setOpen({ ref: o.ref, edit: true })} aria-label={`Modifica l'iscrizione ${o.ref}`} title="Modifica" className="inline-grid size-8 place-items-center rounded-full text-steel hover:bg-ink/8 hover:text-ink">
+                        <Pencil className="size-4" aria-hidden="true" />
+                      </button>
+                      <button type="button" onClick={() => remove(o)} aria-label={`Elimina l'iscrizione ${o.ref}`} title="Elimina" className="inline-grid size-8 place-items-center rounded-full text-steel hover:bg-err/10 hover:text-err">
                         <Trash2 className="size-4" aria-hidden="true" />
                       </button>
                     </td>
@@ -211,7 +312,7 @@ export function OrdersPage({ session }: { session: Session }) {
           </table>
         </div>
       )}
-      {open && <OrderDetail o={open} onClose={() => setOpen(null)} onDelete={() => remove(open)} />}
+      {open && current && <OrderDetail key={`${current.ref}-${open.edit}`} o={current} startEditing={open.edit} onClose={() => setOpen(null)} onDelete={() => remove(current)} onSave={(p, b) => save(current, p, b)} />}
     </>
   );
 }

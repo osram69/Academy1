@@ -147,6 +147,8 @@ export const fr: Record<string, string> = {
   "Privacy": "Confidentialité",
   "Informativa Privacy": "Politique de confidentialité",
   "Impostazioni cookie": "Paramètres des cookies",
+  "Calendario dei corsi iSAQB® CPSA-F: edizioni online e in aula a Roma, prezzi e iscrizione.": "Calendrier des cours iSAQB® CPSA-F : éditions en ligne et en présentiel à Rome, tarifs et inscription.",
+  "Iscrizione": "Inscription",
   "Sede legale": "Siège social",
   "P.IVA": "N° TVA",
   "REA": "REA",

@@ -292,6 +292,35 @@ export async function adminOrders() {
   return ok(data.map((o) => ({ ...o, course: byId.get(o.id_corso) ?? null })));
 }
 
+/** Corregge partecipanti e dati di fatturazione di un'iscrizione (importi, stato e pagamento non si toccano da qui). */
+export async function adminUpdateOrder(ref, body) {
+  ref = String(ref || "").trim();
+  if (!ref) return fail(400, "Riferimento mancante.");
+  const { data: cur, error: e0 } = await db.from("iscrizioni").select("participants,billing").eq("ref", ref).maybeSingle();
+  if (e0) return fail(500, e0.message);
+  if (!cur) return fail(404, "Iscrizione non trovata.");
+
+  const parts = Array.isArray(body?.participants) ? body.participants : null;
+  if (!parts || parts.length !== cur.participants.length) return fail(400, "Numero di partecipanti non valido.");
+  const participants = parts.map((p, i) => ({
+    ...cur.participants[i],
+    nome: str(p.nome, 80), cognome: str(p.cognome, 80), email: str(p.email, 120), telefono: str(p.telefono, 40),
+    consensoPrivacy: p.consensoPrivacy === true, consensoMarketing: p.consensoMarketing === true, consensoAudioVideo: p.consensoAudioVideo === true,
+  }));
+  if (participants.some((p) => !p.nome || !p.cognome || !isEmail(p.email))) return fail(400, "Nome, cognome ed email dei partecipanti sono obbligatori.");
+
+  const bl = body?.billing || {};
+  const billing = { ...cur.billing };
+  for (const k of ["nome", "cognome", "ragione", "cf", "piva", "sdi", "pec", "via", "cap", "citta", "paese", "vatId"]) if (k in bl) billing[k] = str(bl[k], 120);
+  if (["privato", "pro", "azienda", "estera"].includes(bl.type)) billing.type = bl.type;
+  if (["it", "en", "fr", "de"].includes(bl.lang)) billing.lang = bl.lang;
+  if (billing.pec && !isEmail(billing.pec)) return fail(400, "PEC non valida.");
+
+  const { error } = await db.from("iscrizioni").update({ participants, billing }).eq("ref", ref);
+  if (error) return fail(500, error.message);
+  return ok({ participants, billing });
+}
+
 export async function adminDeleteOrder(ref) {
   ref = String(ref || "").trim();
   if (!ref) return fail(400, "Riferimento mancante.");
