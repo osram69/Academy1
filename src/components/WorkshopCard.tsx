@@ -252,7 +252,7 @@ export function WorkshopsSection() {
  */
 export function WorkshopTicker() {
   const now = useNow();
-  const w = upcomingWorkshops()[0];
+  const w = upcomingWorkshops().find((x) => x.ribbon); // solo se "attiva nastro" è spuntato nel pannello
   useEffect(() => {
     if (!w) return;
     document.documentElement.style.setProperty("--ribbon-h", "36px");

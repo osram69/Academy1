@@ -405,6 +405,7 @@ interface PublicRow {
   ora_inizio?: string | null;
   ora_fine?: string | null;
   link_zoom?: string | null;
+  in_evidenza?: boolean | null; // per i workshop: "attiva nastro"
 }
 
 /* ----------------------------- workshop ---------------------------- */
@@ -422,6 +423,7 @@ export interface Workshop {
   image: string | null;
   eventUrl: string;
   zoomUrl: string;
+  ribbon: boolean; // "attiva nastro": annunciato dal nastro sotto il menu
   startsAt: Date | null; // istante di inizio (ora italiana), null se l'orario non è indicato
   endsAt: Date | null;
   concluded: boolean;
@@ -484,6 +486,7 @@ const toWorkshop = (r: PublicRow): Workshop => {
     image: r.immagine_url || null,
     eventUrl: r.link_evento || "",
     zoomUrl: r.link_zoom || "",
+    ribbon: r.in_evidenza === true,
     startsAt,
     endsAt,
     // concluso a fine workshop se l'orario è noto, altrimenti a fine giornata

@@ -327,7 +327,7 @@ function List() {
 const EMPTY: Row = { titolo: "", livello: "Foundation", modalita: "intensivo", sconto_privati: true, stato: 0, in_evidenza: false, iscrizioni_aperte: false };
 
 /** Il workshop è una presentazione gratuita di circa un'ora: la prenotazione avviene sull'evento LinkedIn. */
-const EMPTY_WS: Row = { titolo: "", livello: "Workshop", ora_inizio: "", ora_fine: "", link_zoom: "", stato: 0, in_evidenza: false, iscrizioni_aperte: false, luogo_it: "Online", lingua_it: "Italiano" };
+const EMPTY_WS: Row = { titolo: "", livello: "Workshop", ora_inizio: "", ora_fine: "", link_zoom: "", stato: 0, in_evidenza: true, iscrizioni_aperte: false, luogo_it: "Online", lingua_it: "Italiano" };
 const WS_STATI = [0, 5, 2];
 
 function Edit({ id }: { id: string }) {
@@ -499,6 +499,10 @@ function Edit({ id }: { id: string }) {
               </div>
               <div className="md:col-span-2">
                 {F("link_zoom", "Link alla sessione Zoom", text("link_zoom", { type: "url", maxLength: 400, placeholder: "https://…zoom.us/j/…" }), "Il pulsante “Partecipa su Zoom” compare disattivato e si attiva da 1 ora prima dell'ora di inizio (nel giorno del workshop) fino alla fine; durante il workshop la card mostra “In corso”. Richiede l'ora di inizio.")}
+              </div>
+              <div className="md:col-span-2">
+                {check("in_evidenza", "Attiva nastro: mostra il nastro scorrevole sotto il menu, in tutte le pagine, finché il workshop non è concluso")}
+                <p className="mt-1 text-[11.5px] text-steel">Se è spuntato su più workshop in programma, il nastro annuncia il più vicino. Senza spunta il nastro non compare (la sezione in home e la card restano).</p>
               </div>
             </div>
           </section>
