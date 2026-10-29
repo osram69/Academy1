@@ -162,30 +162,6 @@ export function Hero() {
         </Reveal>
       </div>
 
-      {/* marquee */}
-      <div className="relative border-t border-white/10 bg-ink2/70 py-4" aria-hidden="true">
-        <div className="flex overflow-hidden">
-          <div className="animate-marquee flex shrink-0 items-center gap-10 whitespace-nowrap pr-10">
-            {[0, 1].map((copy) => (
-              <div key={copy} className="flex items-center gap-10">
-                {[
-                  "iSAQB® Accredited Training Provider",
-                  "CPSA-Foundation Level",
-                  t("Esame iSAQB® a parte (280 € + IVA)"),
-                  t("Corsi in IT · EN · FR"),
-                  t("Rimborso se il corso non parte"),
-                  t("Fatturazione elettronica SDI"),
-                ].map((t) => (
-                  <span key={t} className="flex items-center gap-10 font-mono text-[11.5px] uppercase tracking-[0.24em] text-white/60">
-                    {t}
-                    <span className="inline-block size-[7px] rotate-45 bg-flame" aria-hidden="true" />
-                  </span>
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
     </section>
   );
 }

@@ -269,13 +269,13 @@ export function WorkshopTicker() {
     setTimeout(() => document.getElementById("workshop")?.scrollIntoView({ behavior: "smooth", block: "start" }), 120);
   };
   const item = (
-    <span className="flex items-center gap-10 font-mono text-[11.5px] font-semibold uppercase tracking-[0.2em]">
+    <span className="flex items-center gap-10 font-mono text-[11.5px] uppercase tracking-[0.24em] text-white/60 transition-colors group-hover:text-white/85">
       <span className="flex items-center gap-2.5">
-        {live && <span className="size-2 animate-pulse rounded-full bg-white" aria-hidden="true" />}
-        {live ? t("In corso") : t("Workshop gratuito")} — {w.title} — {when}
-        <span className="underline underline-offset-4">{t("Scopri di più")}</span>
+        {live && <span className="size-2 animate-pulse rounded-full bg-flame" aria-hidden="true" />}
+        <span className="font-semibold text-white/85">{live ? t("In corso") : t("Workshop gratuito")}</span> — {w.title} — {when}
+        <span className="text-ember underline underline-offset-4">{t("Scopri di più")}</span>
       </span>
-      <span className="inline-block size-[7px] rotate-45 bg-white/70" aria-hidden="true" />
+      <span className="inline-block size-[7px] rotate-45 bg-flame" aria-hidden="true" />
     </span>
   );
   return (
@@ -283,7 +283,7 @@ export function WorkshopTicker() {
       href="#/"
       onClick={go}
       aria-label={t("{kind}: {title}, {when}. Vai alla sezione del workshop", { kind: live ? t("In corso") : t("Workshop gratuito"), title: w.title, when })}
-      className="group block h-9 overflow-hidden bg-flame text-white"
+      className="group block h-9 overflow-hidden border-t border-white/10 bg-ink2"
     >
       <div className="flex h-full items-center overflow-hidden" aria-hidden="true">
         <div className="flex shrink-0 animate-marquee items-center gap-10 whitespace-nowrap pr-10 group-hover:[animation-play-state:paused] motion-reduce:animate-none">
@@ -307,12 +307,12 @@ export function WorkshopPromo() {
     <section id="workshop" className="scroll-mt-[calc(69px+var(--ribbon-h,0px))] bg-paper py-12 lg:py-16" aria-label={t("Prossimo workshop")}>
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <Reveal>
-          <div className="grid overflow-hidden rounded-[28px] border border-ink/10 bg-white shadow-card md:grid-cols-[1fr_1.1fr]">
-            <div className="relative min-h-56 bg-ink md:min-h-full">
+          <div className="overflow-hidden rounded-[28px] border border-ink/10 bg-white shadow-card">
+            <div className="bg-ink">
               {w.image ? (
-                <img src={w.image} alt="" loading="lazy" className="absolute inset-0 size-full object-cover" />
+                <img src={w.image} alt="" loading="lazy" className="block h-auto max-h-[460px] w-full object-cover" />
               ) : (
-                <div className="bg-blueprint-dark absolute inset-0 grid place-items-center text-white/30">
+                <div className="bg-blueprint-dark grid h-40 place-items-center text-white/30">
                   <Presentation className="size-14" aria-hidden="true" />
                 </div>
               )}
