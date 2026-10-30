@@ -86,6 +86,15 @@ body {
   transform: translateY(0);
 }
 
+/* ---------- ombra leggera ai bordi dei blocchi scuri a tutta larghezza (passaggio scuro → chiaro) ---------- */
+:where(section, header, footer).bg-ink {
+  position: relative;
+  z-index: 1;
+  box-shadow:
+    0 16px 26px -18px color-mix(in srgb, var(--color-ink) 55%, transparent),
+    0 -16px 26px -18px color-mix(in srgb, var(--color-ink) 55%, transparent);
+}
+
 /* ---------- blueprint grids ---------- */
 .bg-blueprint-dark {
   background-image:
