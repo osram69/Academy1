@@ -85,11 +85,10 @@ export function Hero() {
 
           <Reveal delay={90}>
             <h1 className="mt-7 text-balance font-display text-[clamp(2.1rem,3.7vw,3.4rem)] font-bold leading-[1.02] tracking-[-0.03em]">
-              {t("Le buone architetture software")}{" "}
-              {t("non nascono")}{" "}
-              <em className="font-serif font-normal italic tracking-[-0.01em] text-flame">{t("per caso.")}</em>
+              {t("L'architettura software")}<br />
+              <em className="font-serif font-normal italic tracking-[-0.01em] text-flame">{t("si disegna.")}</em>
               <br />
-              <span className="text-white/60">{t("Le creano")}{" "}{t("architetti certificati.")}</span>
+              <span className="text-white/60">{t("L'architetto software")}<br />{t("si certifica.")}</span>
             </h1>
           </Reveal>
 
