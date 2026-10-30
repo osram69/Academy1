@@ -27,6 +27,11 @@ export function installLinkInterceptor() {
     const internal = href.startsWith("#/") || (href.startsWith("/") && !href.startsWith("//") && !SERVER_PATHS.test(href) && !/\.[a-z0-9]{2,5}($|[?#])/i.test(href));
     if (!internal) return;
     e.preventDefault();
+    // già su quella pagina (logo o "Home" dalla home): non c'è nulla da caricare, si torna in cima
+    if (withLang(fromLegacy(href)) === window.location.pathname + window.location.search) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
     navigate(href);
   };
   document.addEventListener("click", onClick);
