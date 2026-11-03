@@ -1,4 +1,4 @@
-import { ShieldCheck, ArrowDownRight, Timer, CalendarDays, MapPin } from "lucide-react";
+import { ShieldCheck, ArrowDownRight, Timer, CalendarDays, MapPin, Globe } from "lucide-react";
 import { featuredCourse, fmtRange, getLivePrice, eur, STATS } from "../data";
 import { Btn, EarlyBirdChip, IsoCube, Reveal, SeatsBar, useNow } from "./ui";
 import { PrivateOffer } from "./PrivateOffer";
@@ -41,6 +41,10 @@ function FloatingCourseCard() {
         <p className="flex items-center gap-2">
           <MapPin className="size-3.5 text-flame" aria-hidden="true" />
           {course.location}
+        </p>
+        <p className="flex items-center gap-2">
+          <Globe className="size-3.5 text-flame" aria-hidden="true" />
+          {course.language === "IT" ? t("Italiano") : t("English")}
         </p>
       </div>
       <div className="mt-4">
@@ -145,7 +149,7 @@ export function Hero() {
               </div>
             </div>
             {/* card flottante */}
-            <div className="absolute -bottom-10 -left-16 w-[330px]">
+            <div className="absolute -bottom-10 -left-16 w-[375px]">
               <FloatingCourseCard />
             </div>
             <ArrowDownRight
