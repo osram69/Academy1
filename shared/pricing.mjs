@@ -3,8 +3,9 @@
 // Regole (come da richiesta Cube Academy):
 //  - Early Bird: sconto fisso = listino - prezzo early bird (se la finestra è attiva).
 //  - Privati (persona fisica, senza P.IVA): privatePct% sul PREZZO DI LISTINO, in aggiunta all'early bird.
-//  - Codici sconto: couponPct% sul prezzo già scontato early bird (come nel plugin WordPress).
-//  - Privato e codice non si sommano: vale la combinazione più conveniente per il cliente.
+//  - Codici sconto: couponPct% sul PREZZO DI LISTINO, in aggiunta all'early bird (come lo sconto privati).
+//  - Privato e codice non si sommano: se c'è un codice sconto valido ha la precedenza sullo sconto privati,
+//    anche quando quest'ultimo sarebbe più alto.
 export const MAX_SEATS = 12; // limite iSAQB: 12 partecipanti per corso con un solo docente
 export const VAT = 0.22;
 
@@ -19,13 +20,14 @@ export function computeTotals({ listEuro, earlyEuro, seats, billingType, private
 
   // A) sconto privati sul listino + early bird
   const privDiscount = billingType === "privato" && privatePct > 0 ? earlyDiscount + Math.round(gross * privatePct) : 0;
-  // B) codice sconto sul prezzo early bird
-  const couponDiscount = couponPct > 0 ? earlyDiscount + Math.round(early * seats * couponPct) : 0;
+  // B) codice sconto sul listino + early bird
+  const couponDiscount = couponPct > 0 ? earlyDiscount + Math.round(gross * couponPct) : 0;
 
   let discount = earlyDiscount;
   let applied = null;
-  if (privDiscount > discount && privDiscount >= couponDiscount) { discount = privDiscount; applied = "PRIVATO"; }
-  else if (couponDiscount > discount) { discount = couponDiscount; applied = couponCode; }
+  // il codice sconto ha la precedenza sullo sconto privati
+  if (couponPct > 0) { discount = couponDiscount; applied = couponCode; }
+  else if (privDiscount > discount) { discount = privDiscount; applied = "PRIVATO"; }
   discount = Math.min(discount, gross);
 
   const net = gross - discount;

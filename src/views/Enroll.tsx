@@ -288,7 +288,7 @@ function StepConfigure({ course, count, setCount, maxSeats, billingType, setBill
         </div>
         {errors.type && <p className="field-error mt-3" role="alert">{errors.type}</p>}
         <p className="field-note">{t("Il prezzo nel riepilogo si adatta alla tua scelta.")}</p>
-        {billingType === "privato" && privatePct > 0 && (
+        {billingType === "privato" && privatePct > 0 && !couponProps.coupon && (
           <p className="mt-3 rounded-xl border border-mint/35 bg-emerald-50 px-4 py-3 text-[13.5px] font-medium text-mint" role="status">
             {t("Sconto privati −{pct}% sul listino", { pct: privatePct })}{" "}{t("applicato al riepilogo ordine.")}
           </p>
