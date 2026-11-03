@@ -321,7 +321,7 @@ export const de: Record<string, string> = {
   "Inserisci il codice": "Code eingeben",
   "Applica codice sconto": "Rabattcode anwenden",
   "Applica": "Anwenden",
-  "Gli sconti si cumulano con l'early bird.": "Rabatte gelten zusätzlich zum Frühbucherrabatt.",
+  "Il codice sconto sostituisce l'early bird e non si somma ad altri sconti.": "Ein Rabattcode ersetzt den Frühbucherrabatt und lässt sich nicht mit anderen Rabatten kombinieren.",
   "· Livello": "· Stufe",
   "Cambia edizione o corso →": "Termin oder Kurs wechseln →",
   "posti disponibili": "Plätze verfügbar",

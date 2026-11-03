@@ -321,7 +321,7 @@ export const en: Record<string, string> = {
   "Inserisci il codice": "Enter the code",
   "Applica codice sconto": "Apply discount code",
   "Applica": "Apply",
-  "Gli sconti si cumulano con l'early bird.": "Discounts add to the early bird.",
+  "Il codice sconto sostituisce l'early bird e non si somma ad altri sconti.": "A discount code replaces the early bird and cannot be combined with other discounts.",
   "· Livello": "· Level",
   "Cambia edizione o corso →": "Change edition or course →",
   "posti disponibili": "seats available",

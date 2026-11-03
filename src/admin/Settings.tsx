@@ -160,7 +160,7 @@ export function SettingsPage({ session }: { session: Session }) {
         <h2 className={h2}>Sconto privati</h2>
         <p className={hint}>
           Si applica in automatico a chi si iscrive come <strong>privato</strong> (persona fisica senza P.IVA), in percentuale sul <strong>prezzo di listino</strong>,
-          in aggiunta all'early bird quando attivo. Non si somma a un codice sconto: se il cliente inserisce un codice valido, vale il codice (la sua percentuale è calcolata sul prezzo di listino).
+          in aggiunta all'early bird quando attivo. Non si somma a un codice sconto: se il cliente inserisce un codice valido, vale il codice: la sua percentuale è calcolata sul prezzo di listino e l'early bird non si applica.
         </p>
         <div className="flex flex-wrap items-center gap-6">
           <label className="flex items-center gap-2 text-[14px]">

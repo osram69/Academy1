@@ -183,7 +183,7 @@ function CouponBox({ coupon, setCoupon, couponInput, setCouponInput, couponError
               {t("Applica")}</Btn>
           </div>
           {couponError && <p className="field-error" role="alert">{couponError}</p>}
-          <p className="field-note">{t("Gli sconti si cumulano con l'early bird.")}</p>
+          <p className="field-note">{t("Il codice sconto sostituisce l'early bird e non si somma ad altri sconti.")}</p>
         </>
       )}
     </div>
@@ -630,7 +630,7 @@ function OrderRail({ course, count, coupon, billingType, privatePct, step, goTo,
 }) {
   const { price, t: tot } = orderTotals(course, count, coupon, billingType, privatePct);
   const sub = tot.subtotal_cents / 100;
-  const ebSave = price.active ? (course.price - price.unit) * count : 0;
+  const ebSave = tot.early_active ? (course.price - price.unit) * count : 0; // con un codice sconto l'early bird non si applica
   const extraSave = tot.discount_cents / 100 - ebSave; // sconto privati o codice
   const net = (tot.subtotal_cents - tot.discount_cents) / 100;
   const vat = tot.vat_cents / 100;
@@ -643,7 +643,7 @@ function OrderRail({ course, count, coupon, billingType, privatePct, step, goTo,
           <p className="flex items-center gap-2 font-mono text-[10.5px] font-semibold uppercase tracking-[0.2em] text-white/70">
             <TicketPercent className="size-3.5 text-ember" aria-hidden="true" />
             {t("Il tuo ordine")}</p>
-          {price.active && (
+          {tot.early_active && (
             <span className="inline-flex items-center gap-1.5 rounded-full bg-flame px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-wider text-white">
               <Flame className="size-3" aria-hidden="true" />
               {t("Early bird")}</span>
@@ -658,7 +658,7 @@ function OrderRail({ course, count, coupon, billingType, privatePct, step, goTo,
               <dt className="text-ink/60">{count}{" "}{t("× quota")}{" "}{FORMAT_META[course.format].label}</dt>
               <dd className="font-semibold tabular-nums text-ink">{eur(sub)}</dd>
             </div>
-            {price.active && (
+            {tot.early_active && (
               <div className="flex justify-between gap-4 text-mint">
                 <dt className="flex items-center gap-1.5 font-medium">
                   <Flame className="size-3.5" aria-hidden="true" />
