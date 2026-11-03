@@ -77,7 +77,7 @@ function resolveCoupon(course, settings, code, billingType) {
     const scopes = String(course[`codice_sconto_${n}_ambiti`] || "").split(",").map((x) => x.trim()).filter(Boolean);
     if (scopes.length && !scopes.includes(billingType)) continue;
     const pct = Number(course[`codice_sconto_${n}_percentuale`]);
-    if (pct > 0 && pct <= 100) return { code: cd.toUpperCase(), pct: pct / 100 };
+    if (pct > 0 && pct <= 100) return { code: cd.toUpperCase(), pct: pct / 100, until: to ? String(to) : null };
   }
   return findGlobalCoupon(settings, wanted, billingType);
 }
@@ -131,7 +131,7 @@ export async function apiCoupon(body, ip) {
   const c = await getCourse(Number(body?.courseId));
   const found = c && resolveCoupon(c, await getSettings(db), body?.code, String(body?.billingType || ""));
   if (!found) return fail(404, "Codice non valido o scaduto per questa tipologia di fatturazione");
-  return ok({ code: found.code, pct: found.pct });
+  return ok({ code: found.code, pct: found.pct, until: found.until ?? null });
 }
 
 /**

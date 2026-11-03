@@ -36,7 +36,7 @@ import { ExtLink } from "../components/IsaqbLinks";
 import { isaqbLinks } from "../links";
 import { PrivacyNoticeContent, TermsContent } from "../components/LegalContent";
 import { TERMS } from "../legal/content";
-import { checkCoupon, createOrder, getConfig, type ApiConfig } from "../lib/api";
+import { checkCoupon, createOrder, getConfig, type ApiConfig, type AppliedCoupon } from "../lib/api";
 import {
   FORMAT_META,
   PAYMENT_METHODS,
@@ -152,8 +152,8 @@ const AUDIENCE: { id: BillingType; label: string; desc: string; icon: typeof Use
 ];
 
 interface CouponProps {
-  coupon: { code: string; pct: number } | null;
-  setCoupon: (c: { code: string; pct: number } | null) => void;
+  coupon: AppliedCoupon | null;
+  setCoupon: (c: AppliedCoupon | null) => void;
   couponInput: string; setCouponInput: (v: string) => void; couponError: string | null;
   onApplyCoupon: () => void;
 }
@@ -613,7 +613,7 @@ function StepPayment({
 /* ============================ rail riepilogo ========================= */
 
 /** Totali dell'ordine: stessa funzione usata dal server, che resta l'unica fonte dell'importo addebitato. */
-function orderTotals(course: Course, count: number, coupon: { code: string; pct: number } | null, billingType: string, privatePct: number) {
+function orderTotals(course: Course, count: number, coupon: AppliedCoupon | null, billingType: string, privatePct: number) {
   const price = getLivePrice(course);
   return {
     price,
@@ -625,7 +625,7 @@ function orderTotals(course: Course, count: number, coupon: { code: string; pct:
 }
 
 function OrderRail({ course, count, coupon, billingType, privatePct, step, goTo, maxStep }: {
-  course: Course; count: number; coupon: { code: string; pct: number } | null; billingType: string; privatePct: number;
+  course: Course; count: number; coupon: AppliedCoupon | null; billingType: string; privatePct: number;
   step: number; goTo: (s: number) => void; maxStep: number;
 }) {
   const { price, t: tot } = orderTotals(course, count, coupon, billingType, privatePct);
@@ -635,6 +635,10 @@ function OrderRail({ course, count, coupon, billingType, privatePct, step, goTo,
   const net = (tot.subtotal_cents - tot.discount_cents) / 100;
   const vat = tot.vat_cents / 100;
   const total = tot.total_cents / 100;
+  // fino a quando vale il prezzo mostrato: con un codice sconto, la scadenza del codice (se ne ha una); altrimenti quella dell'early bird, se applicato
+  const validUntil: Date | null = coupon
+    ? coupon.until ? new Date(`${coupon.until.slice(0, 10)}T12:00:00`) : null
+    : tot.early_active ? price.until : null;
 
   return (
     <div className="space-y-5">
@@ -693,10 +697,10 @@ function OrderRail({ course, count, coupon, billingType, privatePct, step, goTo,
               {eur2(total)}
             </p>
           </div>
-          {price.active && (
+          {validUntil && (
             <p className="mt-3 flex items-center gap-1.5 rounded-lg bg-flame/8 px-3 py-2 text-[11.5px] font-medium text-flame">
               <Timer className="size-3.5" aria-hidden="true" />
-              {t("Prezzo bloccato fino al")}{" "}{fmtFull(price.until)}
+              {t("Prezzo valido fino al")}{" "}{fmtFull(validUntil)}
             </p>
           )}
         </div>
@@ -781,7 +785,7 @@ export function Enroll({ course }: { course: Course }) {
   const [participants, setParticipants] = useState<Participant[]>([emptyParticipant()]);
   const [billing, setBillingRaw] = useState<Billing>(emptyBilling());
   const [method, setMethod] = useState<MethodId | null>(null);
-  const [coupon, setCoupon] = useState<{ code: string; pct: number } | null>(null);
+  const [coupon, setCoupon] = useState<AppliedCoupon | null>(null);
   const [couponInput, setCouponInput] = useState("");
   const [couponError, setCouponError] = useState<string | null>(null);
   const [terms, setTerms] = useState(false);

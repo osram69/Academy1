@@ -424,7 +424,7 @@ export const fr: Record<string, string> = {
   "Imponibile": "Base imposable",
   "IVA 22%": "TVA 22 %",
   "Totale ordine": "Total de la commande",
-  "Prezzo bloccato fino al": "Prix garanti jusqu'au",
+  "Prezzo valido fino al": "Prix valable jusqu'au",
   "Avanzamento iscrizione": "Progression de l'inscription",
   "Torna indietro quando vuoi: non perdi i dati": "Revenez en arrière quand vous voulez : vous ne perdez pas vos données",
   "Scegli per chi ti stai iscrivendo": "Choisissez pour qui vous vous inscrivez",

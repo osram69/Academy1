@@ -60,5 +60,5 @@ export function findGlobalCoupon(settings, code, billingType, now = new Date()) 
   if (c.start && today < c.start) return null;
   if (c.end && today > c.end) return null;
   if (!c.scopes.includes(billingType)) return null;
-  return { code: c.code, pct: c.percent / 100, label: c.label || c.code };
+  return { code: c.code, pct: c.percent / 100, label: c.label || c.code, until: c.end || null };
 }

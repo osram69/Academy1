@@ -424,7 +424,7 @@ export const de: Record<string, string> = {
   "Imponibile": "Nettobetrag",
   "IVA 22%": "MwSt. 22 %",
   "Totale ordine": "Gesamtbetrag",
-  "Prezzo bloccato fino al": "Preis garantiert bis",
+  "Prezzo valido fino al": "Preis gültig bis",
   "Avanzamento iscrizione": "Fortschritt der Anmeldung",
   "Torna indietro quando vuoi: non perdi i dati": "Jederzeit zurück: Ihre Daten gehen nicht verloren",
   "Scegli per chi ti stai iscrivendo": "Wählen Sie, für wen Sie anmelden",
