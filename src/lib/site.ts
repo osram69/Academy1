@@ -1,5 +1,5 @@
 /** Origine pubblica del sito (canonical, Open Graph, sitemap). Si cambia con SITE_URL, senza toccare il codice. */
-export const SITE_URL = (process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://academy.cubeng.eu").replace(/\/$/, "");
+export const SITE_URL = (process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://cubeacademy.eu").replace(/\/$/, "");
 
 export const SITE = {
   name: "Cube Academy",

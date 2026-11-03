@@ -19,7 +19,7 @@ const nextConfig: NextConfig = {
       // pagina lunga della lingua (corso + certificazione), "chi siamo" e account → home della lingua
       ...to([`/${l}/isaqb-cpsa:rest(.*)`, `/${l}/chi-siamo-${l}`, `/${l}/mein-konto`, `/${l}/mon-compte`, `/${l}/my-account`], `/${l}`),
     ]);
-    return [
+    const rules = [
       ...to(["/it/:path*"], "/:path*"),
       ...to(["/chi-siamo", "/mio-account"], "/"),
       ...to(["/corsi-it", "/calendario-corsi-isaqb-cpsa-f", "/calendario-corsi", "/registration-form-it"], "/corsi"),
@@ -27,6 +27,20 @@ const nextConfig: NextConfig = {
       ...to(["/privacy-policy"], "/privacy"),
       ...other,
     ];
+    // Il sito ha un solo indirizzo ufficiale (SITE_URL): i vecchi domini e la variante www portano lì con un redirect permanente,
+    // mantenendo il percorso. Le regole dei vecchi URL WordPress vengono ripetute per i vecchi domini con destinazione assoluta,
+    // così basta un solo passaggio. /api, /_next e /pagamento restano sul dominio richiesto: i webhook di Stripe/PayPal non seguono i redirect.
+    const site = (process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://cubeacademy.eu").replace(/\/$/, "");
+    const canonicalHost = new URL(site).hostname;
+    const oldHosts = ["academy.cubeng.eu", `www.${canonicalHost}`].filter((h) => h !== canonicalHost);
+    const fromOldHosts = oldHosts.flatMap((value) => {
+      const has = [{ type: "host" as const, value }];
+      return [
+        ...rules.map((r) => ({ ...r, has, destination: `${site}${r.destination}` })),
+        { source: "/:path((?!api/|_next/|pagamento/).*)", has, destination: `${site}/:path`, permanent: true },
+      ];
+    });
+    return [...fromOldHosts, ...rules];
   },
   async headers() {
     return [

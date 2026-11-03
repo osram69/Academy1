@@ -48,7 +48,10 @@ Gli indirizzi sono percorsi veri (`/corsi`, `/corso/<id>-<descrizione>`, `/event
 strutturati (Course, Event, ItemList, BreadcrumbList, Organization), letti dal database e rinfrescati ogni 5 minuti.
 `/sitemap.xml` e `/robots.txt` si generano da soli (corsi in programma ed eventi inclusi); un corso concluso o inesistente
 risponde 404. I vecchi indirizzi con hash (`/#/corso/12`) e gli indirizzi brevi (`/corso/12`) si portano al nuovo.
-Il dominio si imposta con `SITE_URL` (default `https://academy.cubeng.eu`).
+Il dominio si imposta con `SITE_URL` (default `https://cubeacademy.eu`): da lui dipendono canonical, hreflang, sitemap, dati
+strutturati e gli indirizzi di ritorno dai pagamenti. Il vecchio dominio `academy.cubeng.eu` e la variante `www.` hanno un
+redirect permanente verso `SITE_URL` (stesso percorso; fanno eccezione `/api`, `/_next` e `/pagamento`, dove i webhook dei
+provider non seguono i redirect), configurato in `next.config.ts`.
 
 I vecchi indirizzi del sito WordPress (`/corsi-it/`, `/en/...`, `/de/...`, `/fr/...`, moduli di iscrizione, articoli sugli eventi)
 hanno un redirect permanente verso la pagina equivalente: l'elenco è in `next.config.ts` (`redirects()`).
