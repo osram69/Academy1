@@ -46,6 +46,7 @@ function FloatingCourseCard() {
       <div className="mt-4">
         <SeatsBar course={course} dark />
       </div>
+      <PrivateOffer course={course} dark className="mt-4" />
       <div className="mt-4 flex items-center justify-between gap-3 border-t border-white/10 pt-4">
         <p className="font-display text-xl font-bold text-white">
           {eur(price.unit)}
@@ -97,7 +98,8 @@ export function Hero() {
               {t("Corsi")}{" "}<strong className="font-semibold text-white/85">{t("CPSA-Foundation®")}</strong>{" "}{t("con docenti che progettano sistemi veri, in formato online o in aula. L'esame di certificazione si sostiene a parte, presso gli enti autorizzati iSAQB®.")}</p>
           </Reveal>
 
-          <Reveal delay={220} className="mt-6">
+          {/* la card con l'offerta è visibile solo da lg in su: sui telefoni il tag resta qui */}
+          <Reveal delay={220} className="mt-6 lg:hidden">
             <PrivateOffer course={featuredCourse()} dark />
           </Reveal>
 
