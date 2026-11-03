@@ -64,6 +64,7 @@ export interface Course {
   format: CourseFormat;
   status: CourseStatus;
   concluded: boolean;
+  featured: boolean; // "In evidenza" dal pannello: l'edizione promossa nel pulsante del menu e nella card dell'introduzione
   start: Date;
   end: Date;
   effort: string;
@@ -283,6 +284,7 @@ export interface ApiCourse {
   bookingUrl: Record<string, string>;
   seatsTotal: number | null;
   seatsLeft: number | null;
+  featured?: boolean;
 }
 
 const FORMAT_COPY: Record<CourseFormat, { image: string; tagline: string; description: string }> = {
@@ -340,6 +342,7 @@ function toCourse(a: ApiCourse): Course {
     format,
     status,
     concluded,
+    featured: a.featured === true,
     start,
     end,
     effort: a.modalita !== "intensivo" ? mod.effort : days === 3 ? mod.effort : t("{d} giornate · {h} ore", { d: days, h: days * 8 }),
@@ -562,6 +565,7 @@ const fromRow = (r: PublicRow): ApiCourse => ({
   bookingUrl: { IT: r.link_booking_it ?? "" },
   seatsTotal: r.posti_totali,
   seatsLeft: r.posti_disponibili,
+  featured: r.in_evidenza === true,
 });
 
 export async function loadCourses(): Promise<void> {
@@ -587,6 +591,10 @@ export const nextCourse = (): Course => {
   const up = upcomingCourses();
   return up.find((c) => c.status !== "waitlist") ?? up[0] ?? concludedCourses()[0] ?? EMPTY_COURSE;
 };
+
+/** Edizione promossa nel pulsante "Iscriviti" del menu e nella card dell'introduzione: la prima in programma segnata "In evidenza"
+ *  nel pannello; se nessuna lo è, la prossima edizione con iscrizioni aperte. */
+export const featuredCourse = (): Course => upcomingCourses().find((c) => c.featured) ?? nextCourse();
 
 /** Trova il corso dall'indirizzo: conta solo l'id numerico in testa, il resto dello slug è descrittivo. */
 export const bySlug = (slug: string) => {

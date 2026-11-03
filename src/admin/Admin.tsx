@@ -601,7 +601,7 @@ function Edit({ id }: { id: string }) {
           {F("posti_totali", "Posti totali", text("posti_totali", { type: "number", min: 0 }), "Opzionale: se vuoto, il sito non mostra la barra dei posti.")}
           {F("posti_disponibili", "Posti disponibili", text("posti_disponibili", { type: "number", min: 0 }))}
           <div className="flex flex-wrap items-center gap-6 md:col-span-2">
-            {check("in_evidenza", "In evidenza")}
+            {check("in_evidenza", "In evidenza (pulsante Iscriviti del menu e card dell'introduzione)")}
             {check("iscrizioni_aperte", "Iscrizioni aperte")}
             {check("sconto_privati", "Sconto privati attivo per questa edizione")}
           </div>

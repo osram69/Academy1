@@ -182,6 +182,7 @@ export const fr: Record<string, string> = {
   "Se iscrivi te stesso, senza partita IVA, lo sconto si applica automaticamente in fase d'iscrizione e si somma all'early bird, quando attivo.": "Si vous vous inscrivez vous-même, sans numéro de TVA, la remise s'applique automatiquement lors de l'inscription et s'ajoute à l'early bird, lorsqu'il est actif.",
   "Home": "Accueil",
   "Catalogo corsi": "Catalogue des cours",
+  "Calendario corsi": "Calendrier des cours",
   "Certificazione": "Certification",
   "Navigazione principale": "Navigation principale",
   "Seleziona lingua": "Choisir la langue",

@@ -182,6 +182,7 @@ export const en: Record<string, string> = {
   "Se iscrivi te stesso, senza partita IVA, lo sconto si applica automaticamente in fase d'iscrizione e si somma all'early bird, quando attivo.": "If you enrol yourself, without a VAT number, the discount is applied automatically at registration and adds to the early bird, when active.",
   "Home": "Home",
   "Catalogo corsi": "Course catalogue",
+  "Calendario corsi": "Course calendar",
   "Certificazione": "Certification",
   "Navigazione principale": "Main navigation",
   "Seleziona lingua": "Select language",

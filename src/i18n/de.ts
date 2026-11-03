@@ -182,6 +182,7 @@ export const de: Record<string, string> = {
   "Se iscrivi te stesso, senza partita IVA, lo sconto si applica automaticamente in fase d'iscrizione e si somma all'early bird, quando attivo.": "Wenn Sie sich selbst ohne Umsatzsteuer-ID anmelden, wird der Rabatt bei der Anmeldung automatisch angewendet und zusätzlich zum Frühbucherrabatt gewährt, sofern aktiv.",
   "Home": "Startseite",
   "Catalogo corsi": "Kurskatalog",
+  "Calendario corsi": "Kurskalender",
   "Certificazione": "Zertifizierung",
   "Navigazione principale": "Hauptnavigation",
   "Seleziona lingua": "Sprache wählen",

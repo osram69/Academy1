@@ -1,5 +1,5 @@
 import { ShieldCheck, ArrowDownRight, Timer, CalendarDays, MapPin } from "lucide-react";
-import { nextCourse, fmtRange, getLivePrice, eur, STATS } from "../data";
+import { featuredCourse, fmtRange, getLivePrice, eur, STATS } from "../data";
 import { Btn, EarlyBirdChip, IsoCube, Reveal, SeatsBar, useNow } from "./ui";
 import { PrivateOffer } from "./PrivateOffer";
 
@@ -20,7 +20,7 @@ function IsaqbBadge({ className = "" }: { className?: string }) {
 }
 
 function FloatingCourseCard() {
-  const course = nextCourse();
+  const course = featuredCourse();
   const price = getLivePrice(course);
   const now = useNow(10000);
   void now;
@@ -98,11 +98,11 @@ export function Hero() {
           </Reveal>
 
           <Reveal delay={220} className="mt-6">
-            <PrivateOffer course={nextCourse()} dark />
+            <PrivateOffer course={featuredCourse()} dark />
           </Reveal>
 
           <Reveal delay={260} className="mt-9 flex flex-wrap items-center gap-4">
-            <Btn href={`/iscriviti/${nextCourse().slug}`} size="lg" withArrow ariaLabel={t("Vai all'iscrizione della prossima edizione")}>
+            <Btn href={`/iscriviti/${featuredCourse().slug}`} size="lg" withArrow ariaLabel={t("Vai all'iscrizione della prossima edizione")}>
               {t("Iscriviti alla prossima edizione")}</Btn>
             <Btn href="/corsi" variant="line-dark" size="lg">
               {t("Calendario completo")}</Btn>

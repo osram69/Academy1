@@ -2,15 +2,15 @@ import { navigate } from "../lib/nav";
 import { useEffect, useState } from "react";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { cn } from "../utils/cn";
-import { nextCourse, fmtRange } from "../data";
+import { featuredCourse, fmtRange } from "../data";
 import { WorkshopTicker } from "./WorkshopCard";
 
 import { LANGS, lang, setLang, t } from "../i18n";
 const LINKS = [
   { label: t("Home"), href: "/" },
-  { label: t("Catalogo corsi"), href: "/corsi" },
+  { label: t("Calendario corsi"), href: "/corsi" },
   { label: t("Certificazione"), href: "/", section: "certificazione" },
-  { label: t("Prestige"), href: "/", section: "formati" },
+  { label: t("Catalogo"), href: "/", section: "formati" },
   { label: t("Eventi"), href: "/eventi" },
   { label: t("FAQ"), href: "/", section: "faq" },
   { label: t("Contatti"), href: "/contatti" },
@@ -21,7 +21,7 @@ export function Nav({ route }: { route: string }) {
   const [open, setOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const next = nextCourse();
+  const next = featuredCourse();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
