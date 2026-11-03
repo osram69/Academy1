@@ -1,5 +1,6 @@
 import { privatePrice, useConfig } from "../lib/useConfig";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { courseItem, trackOnce } from "../lib/track";
 import {
   BadgeCheck,
   CalendarDays,
@@ -151,6 +152,11 @@ function Block({ id, n, title, children }: { id: string; n: string; title: strin
 export function CourseDetail({ course }: { course: Course }) {
   const [openModule, setOpenModule] = useState(0);
   const price = getLivePrice(course);
+  useEffect(() => {
+    trackOnce(`view:${course.id}`, "view_item", { currency: "EUR", value: price.unit, items: [courseItem(course, price.unit)] });
+    // una sola volta per edizione e per sessione
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [course.id]);
   const related = COURSES.filter((c) => c.slug !== course.slug && !c.concluded)
     .sort((a, b) => a.start.getTime() - b.start.getTime())
     .slice(0, 3);

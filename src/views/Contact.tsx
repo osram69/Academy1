@@ -5,6 +5,7 @@ import { isEmail, isPhone } from "../../shared/validators.mjs";
 import { ORG } from "../data";
 import { lang, t } from "../i18n";
 import { sendContact } from "../lib/api";
+import { track } from "../lib/track";
 import { Tag } from "../components/ui";
 import { LegalLinkModal } from "../components/LegalLinkModal";
 import { PrivacyNoticeContent } from "../components/LegalContent";
@@ -65,6 +66,7 @@ export function Contact() {
     setError("");
     try {
       await sendContact({ ...form, lang, elapsedMs: Date.now() - startedAt.current });
+      track("generate_lead", { form: "contatto", topic: form.topic, language: lang });
       setDone(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {

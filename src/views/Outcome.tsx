@@ -1,5 +1,6 @@
 import { navigate } from "../lib/nav";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { courseItem, netOfVat, trackOnce } from "../lib/track";
 import {
   AlertTriangle,
   ArrowRight,
@@ -95,6 +96,16 @@ function RecapCard({ order }: { order: OrderInfo }) {
 }
 
 export function Outcome({ variant, order }: { variant: OutcomeVariant; order: OrderInfo }) {
+  // conversioni: pagamento riuscito = purchase; bonifico registrato = generate_lead. Gli ordini di prova non si misurano
+  // e ogni ordine conta una volta sola, anche se la pagina viene ricaricata.
+  useEffect(() => {
+    if (order.testMode) return;
+    const value = netOfVat(order.total);
+    const base = { transaction_id: order.orderRef, currency: "EUR", value, tax: Math.round((order.total - value) * 100) / 100, payment_type: order.method, items: [courseItem(order.course, value / order.count, order.count)] };
+    if (variant === "success") trackOnce(`purchase:${order.orderRef}`, "purchase", base);
+    else if (variant === "bank") trackOnce(`lead:${order.orderRef}`, "generate_lead", { form: "iscrizione_bonifico", ...base });
+  }, [variant, order.orderRef]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const onRestart = () => navigate(`/iscriviti/${order.course.slug}`);
   const causale = `Iscrizione ${order.course.short} ${fmtRange(order.course.start, order.course.end)} rif. ${order.orderRef}`;
 

@@ -50,6 +50,7 @@ import {
 } from "../data";
 
 import { lang, t } from "../i18n";
+import { courseItem, trackOnce } from "../lib/track";
 /** Limite iSAQB: max 12 partecipanti per corso con un solo docente. */
 const MAX_SEATS = 12;
 /** Il singolo privato (per me stesso) iscrive una sola persona; professionisti e aziende fino a 12. */
@@ -786,6 +787,12 @@ export function Enroll({ course }: { course: Course }) {
   const [terms, setTerms] = useState(false);
   const [config, setConfig] = useState<ApiConfig | null>(null);
   const privatePct = course.privateDiscount ? config?.privateDiscount ?? 0 : 0;
+  useEffect(() => {
+    const unit = getLivePrice(course).unit;
+    trackOnce(`checkout:${course.id}`, "begin_checkout", { currency: "EUR", value: unit, items: [courseItem(course, unit)] });
+    // una sola volta per edizione e per sessione: l'inizio dell'iscrizione
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [course.id]);
   const [payError, setPayError] = useState("");
   const [busy, setBusy] = useState(false);
   const [mobileSummary, setMobileSummary] = useState(false);

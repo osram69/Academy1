@@ -76,6 +76,26 @@ All'apertura del sito il banner chiede la scelta sui cookie (necessari, analitic
 "Impostazioni cookie" nel footer). Google Tag Manager si attiva solo con `NEXT_PUBLIC_GTM_ID` e dopo il consenso.
 I testi vanno rivisti dal titolare / dal consulente legale prima della pubblicazione.
 
+### Misurazione e conversioni (GTM · GA4 · Google Ads)
+
+Con `NEXT_PUBLIC_GTM_ID` impostato e dopo il consenso agli analitici, il sito scrive questi eventi nel `dataLayer`
+(`src/lib/track.ts`; nomi degli eventi consigliati di GA4, importi in euro):
+
+| Evento | Quando | Uso consigliato |
+| --- | --- | --- |
+| `view_item` | scheda di un'edizione (una volta per edizione e sessione) | pubblico, funnel |
+| `begin_checkout` | apertura del modulo d'iscrizione | funnel, remarketing |
+| `generate_lead` (`form: "contatto"`) | invio del modulo di contatto riuscito | conversione secondaria |
+| `generate_lead` (`form: "iscrizione_bonifico"`) | iscrizione registrata con bonifico, da pagare | conversione secondaria |
+| `purchase` | pagamento riuscito (`transaction_id` = riferimento ordine) | **conversione principale** |
+
+`purchase` e il lead da bonifico portano il valore IVA esclusa; non partono per gli ordini di prova (sandbox) e una sola volta per ordine,
+anche se la pagina viene ricaricata. Senza consenso non parte nulla e GTM non si carica.
+
+Per usarli: in GTM un tag "GA4 – Evento" con l'evento dal `dataLayer` per ciascuno; in GA4 segna `purchase` e `generate_lead`
+come eventi chiave; in Google Ads (Obiettivi → Conversioni) importa da GA4 `purchase` come azione principale e `generate_lead`
+come secondaria, e imposta l'offerta della campagna sulle conversioni solo quando ce ne sono abbastanza.
+
 ## Pannello di gestione (`/admin`)
 
 - **Corsi**: edizioni, prezzi, early bird, posti, modalità di fruizione e calendario delle sessioni.
