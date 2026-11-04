@@ -77,7 +77,7 @@ export function Contact() {
 
   return (
     <div className="bg-paper">
-      <header className="relative overflow-hidden bg-ink pb-14 pt-32 text-white lg:pt-36">
+      <header className="relative overflow-hidden bg-ink pb-14 pt-28 text-white lg:pt-28">
         <div className="bg-blueprint-dark absolute inset-0" aria-hidden="true" />
         <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
           <Tag dark>{t("Contatti")}</Tag>

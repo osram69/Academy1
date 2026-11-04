@@ -961,7 +961,7 @@ export function Enroll({ course }: { course: Course }) {
     <TouchCtx.Provider value={touch}>
     <div className="bg-paper">
       {/* header */}
-      <header className="relative overflow-hidden bg-ink pb-16 pt-32 text-white lg:pt-36">
+      <header className="relative overflow-hidden bg-ink pb-16 pt-28 text-white lg:pt-28">
         <div className="bg-blueprint-dark absolute inset-0" aria-hidden="true" />
         <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
           <p className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/5 px-3.5 py-1.5 font-mono text-[10.5px] font-semibold uppercase tracking-[0.2em] text-white/76">

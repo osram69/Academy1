@@ -21,7 +21,7 @@ function useEvents() {
 /** Intestazione come quella del Catalogo corsi: etichetta con quadrato rosso, titolo con accento corsivo, introduzione. */
 function Header({ title, intro }: { title: React.ReactNode; intro?: string }) {
   return (
-    <header className="relative overflow-hidden bg-ink pb-14 pt-32 text-white lg:pt-36">
+    <header className="relative overflow-hidden bg-ink pb-14 pt-28 text-white lg:pt-28">
       <div className="bg-blueprint-dark absolute inset-0" aria-hidden="true" />
       <div
         className="absolute -left-40 top-0 size-[480px] rounded-full opacity-25"
