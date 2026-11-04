@@ -9,8 +9,8 @@ import { courseCode, normLevel } from "./course.mjs";
 export const mailMissing = () => ["SMTP_HOST", "SMTP_USER", "SMTP_PASS"].filter((n) => !process.env[n]);
 export const mailConfigured = () => mailMissing().length === 0;
 
-const staffTo = () => process.env.MAIL_STAFF_TO || process.env.ADMIN_EMAIL || "academy@cubeng.eu";
-const staffCc = () => (process.env.MAIL_STAFF_CC ?? "registrazioni@cubeng.eu").trim();
+const staffTo = () => process.env.MAIL_STAFF_TO || process.env.ADMIN_EMAIL || "info@cubeacademy.eu";
+const staffCc = () => (process.env.MAIL_STAFF_CC ?? "info@cubeacademy.eu").trim();
 
 let transport;
 function getTransport() {
@@ -182,7 +182,7 @@ ${bankBlock}
 <h3 style="margin:18px 0 4px">${esc(T.billing)}</h3>${table(billingRows.slice(1))}
 ${isWorkshop ? "" : `<p>${esc(T.exam)}</p>`}
 <p>${esc(T.closing)}</p>
-<p>${esc(T.signature)}<br>Cube Academy — Cube Engineering S.r.l.<br>Via Venti Settembre 118, 00187 Roma<br><a href="mailto:academy@cubeng.eu">academy@cubeng.eu</a></p></div>`;
+<p>${esc(T.signature)}<br>Cube Academy — Cube Engineering S.r.l.<br>Via Venti Settembre 118, 00187 Roma<br><a href="mailto:info@cubeacademy.eu">info@cubeacademy.eu</a></p></div>`;
   return { subject, html };
 }
 

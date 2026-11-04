@@ -27,8 +27,8 @@ percorsi veri (`/corsi`, `/admin`, ...) e le API di iscrizione e pagamento sono 
    (SumUp non ha webhook firmati: il pagamento è verificato dal server al ritorno dal checkout.)
 6. Per passare in produzione: valorizza le chiavi live e, da `/admin/impostazioni`, porta il metodo da Sandbox a Live.
 7. Email: imposta `SMTP_HOST` (es. `smtp.hostinger.com`), `SMTP_PORT` (465), `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM`,
-   `MAIL_FROM_NAME` (e, se vuoi cambiarli, `MAIL_STAFF_TO` / `MAIL_STAFF_CC`: di default `academy@cubeng.eu` e
-   `registrazioni@cubeng.eu`, come nel plugin WordPress). Senza SMTP le iscrizioni funzionano ma le email non partono.
+   `MAIL_FROM_NAME` (e, se vuoi cambiarli, `MAIL_STAFF_TO` / `MAIL_STAFF_CC`: di default entrambi
+   `info@cubeacademy.eu`). Senza SMTP le iscrizioni funzionano ma le email non partono.
    Lo stesso SMTP serve al **modulo di contatto** (`/contatti`): il messaggio arriva a `MAIL_STAFF_TO` con
    Reply-To del mittente, e il mittente riceve una copia.
    **Traduzioni automatiche**: il pulsante «Traduci per le altre lingue» dei workshop e degli eventi usa Claude se

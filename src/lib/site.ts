@@ -9,7 +9,7 @@ export const SITE = {
   logo: "/img/logo-cube-academy.png",
   company: "Cube Engineering S.r.l.",
   vat: "12870461006",
-  email: "academy@cubeng.eu",
+  email: "info@cubeacademy.eu",
   phone: "+39 06 92 92 87 80",
   street: "Via San Martino Della Battaglia, 31",
   postalCode: "00185",

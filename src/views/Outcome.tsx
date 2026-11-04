@@ -182,8 +182,8 @@ export function Outcome({ variant, order }: { variant: OutcomeVariant; order: Or
                 <span>
                   <strong className="font-semibold text-ink">{t("Posti riservati per alcuni giorni lavorativi.")}</strong>{" "}
                   {t("Invia la distinta a")}{" "}
-                  <a className="link-sweep font-semibold text-flame" href="mailto:academy@cubeng.eu">
-                    {t("academy@cubeng.eu")}</a>{" "}
+                  <a className="link-sweep font-semibold text-flame" href="mailto:info@cubeacademy.eu">
+                    {t("info@cubeacademy.eu")}</a>{" "}
                   {t("per accelerare la conferma.")}</span>
               </div>
             </div>

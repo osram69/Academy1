@@ -156,7 +156,7 @@ export async function apiCreateOrder(b, { origin, ip }) {
     if (!["stripe", "paypal", "sumup", "bonifico"].includes(method)) return fail(400, "Metodo di pagamento non valido.");
     const settings = await getSettings(db);
     const status = methodStatus(settings)[method];
-    if (!status.available) return fail(503, "Questo metodo di pagamento non è attivo. Scegline un altro o scrivi a academy@cubeng.eu.");
+    if (!status.available) return fail(503, "Questo metodo di pagamento non è attivo. Scegline un altro o scrivi a info@cubeacademy.eu.");
     const test = status.sandbox;
 
     const course = await getCourse(Number(b.courseId));
@@ -359,8 +359,8 @@ export async function apiContact(b, ip) {
   if (Number(b.elapsedMs) < 2500) return fail(400, "Compila i campi obbligatori."); // inviato troppo in fretta: probabile bot
   if (!mailConfigured()) {
     console.error(`Modulo di contatto: email non inviata, mancano ${mailMissing().join(", ")}`);
-    return fail(503, "Il servizio email non è attivo al momento. Scrivi a academy@cubeng.eu.");
+    return fail(503, "Il servizio email non è attivo al momento. Scrivi a info@cubeacademy.eu.");
   }
   const r = await sendContactEmails({ name, email, phone, message, topic, lang });
-  return r.sent ? ok({ ok: true }) : fail(502, "Non siamo riusciti a inviare il messaggio. Riprova o scrivi a academy@cubeng.eu.");
+  return r.sent ? ok({ ok: true }) : fail(502, "Non siamo riusciti a inviare il messaggio. Riprova o scrivi a info@cubeacademy.eu.");
 }
