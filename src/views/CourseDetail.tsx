@@ -37,6 +37,7 @@ import { ExtLink } from "../components/IsaqbLinks";
 import { isaqbLinks } from "../links";
 import { FaqList } from "../components/FaqList";
 import { LANDING } from "../content/landing-copy";
+import * as COPY from "../content/course-copy";
 /* ------------------------- rail prezzo sticky ------------------------ */
 
 function PriceRail({ course }: { course: Course }) {
@@ -229,6 +230,9 @@ export function CourseDetail({ course }: { course: Course }) {
                 </div>
               ))}
             </div>
+            {course.format === "aula" && (
+              <p className="mt-5 max-w-2xl text-[14.5px] leading-relaxed text-ink/65"><RichText text={t(COPY.VENUE_NOTE)} /></p>
+            )}
           </Block>
 
           <Block id="obiettivi" n="02" title={t("Cosa saprai fare")}>

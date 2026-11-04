@@ -3,6 +3,8 @@ import { Mail, MapPin, Phone, Send, ShieldCheck, Lock, FileCheck } from "lucide-
 import { ORG, upcomingCourses } from "../data";
 import { isaqbLinks } from "../links";
 import { ExtLink } from "./IsaqbLinks";
+import { RichText } from "./RichText";
+import { VENUE_FOOTER } from "../content/course-copy";
 
 import { lang, t } from "../i18n";
 import { LegalLinkModal } from "./LegalLinkModal";
@@ -110,6 +112,9 @@ export function Footer() {
               <li className="flex items-start gap-2.5">
                 <MapPin className="mt-0.5 size-4 shrink-0 text-flame" aria-hidden="true" />
                 {ORG.address}
+              </li>
+              <li className="text-[13px] leading-relaxed text-white/68">
+                <RichText text={t(VENUE_FOOTER)} linkClassName="link-sweep font-semibold text-white transition-colors hover:text-flame" />
               </li>
               <li>
                 <a href={`mailto:${ORG.email}`} className="flex items-center gap-2.5 transition-colors hover:text-white">

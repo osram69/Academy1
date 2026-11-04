@@ -9,6 +9,11 @@
 export const COURSE_INTRO =
   "Un corso pratico di 24 ore per imparare a prendere decisioni architetturali che restano valide nel tempo: requisiti di qualità, stili architetturali, documentazione e valutazione dei rischi, secondo il curriculum iSAQB® Foundation Level. Ti prepara all'esame CPSA-Foundation, con una simulazione d'esame nell'ultima giornata.";
 
+/** Sede dei corsi in aula: Roma Office Sharing. Le traduzioni (en/fr/de) puntano alla pagina in inglese del sito partner, che esiste solo in italiano e inglese. */
+export const VENUE_NOTE =
+  "I corsi in aula a Roma si svolgono presso [Roma Office Sharing](https://www.romaofficesharing.it/sale-corsi.html), in Via Venti Settembre 118, a pochi minuti da Roma Termini.";
+export const VENUE_FOOTER = "Sede dei corsi in aula: [Roma Office Sharing](https://www.romaofficesharing.it/sale-corsi.html), Via Venti Settembre 118, Roma";
+
 export const OBJECTIVES = [
   "Comprendere i concetti fondamentali e la terminologia dell'architettura software",
   "Analizzare e definire i requisiti architetturali, inclusi i requisiti di qualità",
@@ -101,6 +106,10 @@ export const FAQS_COPY: { q: string; a: string; links?: "exam" }[] = [
   {
     q: "Il corso è online o in aula? In che lingua si svolge?",
     a: "Ogni edizione si svolge online, in aula virtuale live su Zoom, oppure in aula a Roma. Il formato e la lingua di ciascuna edizione sono indicati nella scheda del corso.",
+  },
+  {
+    q: "Dove si svolgono i corsi in aula a Roma?",
+    a: "Le edizioni in presenza si tengono a Roma, in Via Venti Settembre 118 (Palazzo Gentiloni, primo piano), a pochi minuti a piedi dalla stazione Roma Termini e dalla Metro A (fermata Repubblica). La sede è [Roma Office Sharing](https://www.romaofficesharing.it/sale-corsi.html), con sale dotate di schermo e videoconferenza e un'area buffet per il caffè.",
   },
   {
     q: "Quanto costa il corso e ci sono sconti?",

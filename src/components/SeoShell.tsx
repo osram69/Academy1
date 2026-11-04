@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { RichText } from "./RichText";
 
 interface Section {
   heading?: string;
@@ -23,14 +24,14 @@ export function SeoShell({ h1, intro, links, sections = [] }: { h1: string; intr
           {s.items && (
             <ul>
               {s.items.map((it) => (
-                <li key={it}>{it}</li>
+                <li key={it}><RichText text={it} /></li>
               ))}
             </ul>
           )}
           {s.faqs?.map((f) => (
             <div key={f.q}>
               <h3>{f.q}</h3>
-              <p>{f.a}</p>
+              <p><RichText text={f.a} /></p>
             </div>
           ))}
         </section>

@@ -1,6 +1,7 @@
 import { BadgeCheck, CalendarDays, Check, GraduationCap, MapPin, Users } from "lucide-react";
 import { CourseCard } from "../components/CourseCard";
 import { FaqList } from "../components/FaqList";
+import { RichText } from "../components/RichText";
 import { Btn, Reveal, Tag } from "../components/ui";
 import { featuredCourse, upcomingCourses } from "../data";
 import * as COPY from "../content/course-copy";
@@ -78,7 +79,8 @@ export function Landing() {
                 <CourseCard key={c.slug} course={c} index={i} />
               ))}
             </div>
-            <p className="mt-6 text-[14px] text-ink/60">
+            <p className="mt-6 max-w-2xl text-[14.5px] leading-relaxed text-ink/65"><RichText text={t(COPY.VENUE_NOTE)} /></p>
+            <p className="mt-3 text-[14px] text-ink/60">
               <a href="/corsi" className="link-sweep font-semibold text-flame">{t("Tutto il calendario →")}</a>
             </p>
           </div>

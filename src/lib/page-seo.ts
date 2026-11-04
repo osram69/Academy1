@@ -3,7 +3,7 @@ import { SITE, SITE_URL } from "./site";
 import { getCourses, getEvents, type SeoCourse, type SeoEvent } from "./server-data";
 import { leadingId } from "./slug";
 import { LANG_CODES, LOCALE, OG_LOCALE, tx, type L, type TextKey } from "./seo-text";
-import { courseSections, faqJsonLd, faqSection, landingSections, tr, type ShellSection } from "./seo-content";
+import { courseSections, faqJsonLd, faqSection, landingSections, tr, venueSection, type ShellSection } from "./seo-content";
 import { LANDING } from "../content/landing-copy";
 
 /** Per ogni percorso del sito: metadati, dati strutturati e testo per i crawler, calcolati sul server.
@@ -171,7 +171,7 @@ export async function resolvePath(all: string[]): Promise<Resolved> {
         h1: title,
         intro: `${course.title}. ${description}${course.schedule ? ` ${T("schedule", { s: course.schedule })}` : ""}`,
         links: [{ href: P(`/iscriviti/${course.slug}`), label: T("enroll") }, ...MAIN_LINKS],
-        sections: courseSections(L),
+        sections: course.online || course.residential ? courseSections(L) : [venueSection(L), ...courseSections(L)],
       },
     };
   }

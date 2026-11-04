@@ -25,7 +25,11 @@ export const faqSection = (l: L): ShellSection => ({
   faqs: faqItems(l),
 });
 
-export const faqItems = (l: L) => COPY.FAQS_COPY.map((f) => ({ q: tr(l, f.q), a: plain(tr(l, f.a)) }));
+/** Risposte con i link in sintassi markdown: la shell per i crawler li mostra come link, i dati strutturati usano il testo semplice. */
+export const faqItems = (l: L) => COPY.FAQS_COPY.map((f) => ({ q: tr(l, f.q), a: tr(l, f.a) }));
+
+/** Frase sulla sede dei corsi in aula (Roma Office Sharing), per le pagine che parlano dell'edizione in aula. */
+export const venueSection = (l: L): ShellSection => ({ items: [tr(l, COPY.VENUE_NOTE)] });
 
 /** Contenuto della scheda corso: obiettivi, programma, destinatari, prerequisiti, cosa include e FAQ (tutto ciò che la pagina mostra). */
 export function courseSections(l: L): ShellSection[] {
@@ -49,6 +53,7 @@ export function landingSections(l: L): ShellSection[] {
     audience,
     prereq,
     includes,
+    venueSection(l),
     { heading: tr(l, LANDING.examTitle), items: [tr(l, LANDING.examText), tr(l, LANDING.examLimit)] },
     faq,
   ];
@@ -58,5 +63,5 @@ export function landingSections(l: L): ShellSection[] {
 export const faqJsonLd = (l: L) => ({
   "@context": "https://schema.org",
   "@type": "FAQPage",
-  mainEntity: faqItems(l).map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+  mainEntity: faqItems(l).map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: plain(f.a) } })),
 });
