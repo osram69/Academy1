@@ -9,7 +9,7 @@ function IsaqbBadge({ className = "" }: { className?: string }) {
   return (
     <div className={`inline-flex ${className}`}>
       <img
-        src="/img/isaqb-accredited-training-provider.png"
+        src="/img/isaqb-accredited-training-provider.webp"
         alt={t("iSAQB® Accredited Training Provider")}
         width={456}
         height={306}

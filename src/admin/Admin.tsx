@@ -122,7 +122,7 @@ function Shell({ children, right }: { children: ReactNode; right?: ReactNode }) 
       <header className="border-b border-ink/10 bg-ink text-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-4">
           <a href="/admin" className="flex items-center gap-3" aria-label="Cube Academy — Gestione corsi">
-            <img src="/img/logo-cube-academy.png" alt="Cube Academy" width={1000} height={173} className="h-7 w-auto" />
+            <img src="/img/logo-cube-academy.webp" alt="Cube Academy" width={640} height={111} className="h-7 w-auto" />
             <span className="border-l border-white/20 pl-3 font-display text-[15px] font-semibold tracking-tight text-ember">Gestione</span>
           </a>
           <nav className="flex items-center gap-5 text-[13px] font-medium" aria-label="Sezioni del pannello">

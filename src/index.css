@@ -21,10 +21,10 @@
   --color-gold: #a9760a;
   --color-err: #c2231c;
 
-  --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
-  --font-serif: "Instrument Serif", Georgia, serif;
-  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-display: var(--font-grotesk-face), "Inter", system-ui, sans-serif;
+  --font-serif: var(--font-serif-face), Georgia, serif;
+  --font-sans: var(--font-inter-face), system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-mono-face), ui-monospace, SFMono-Regular, monospace;
 
   --shadow-card: 0 1px 2px rgb(19 17 23 / 0.05), 0 16px 40px -16px rgb(19 17 23 / 0.16);
   --shadow-lift: 0 28px 70px -28px rgb(19 17 23 / 0.4);

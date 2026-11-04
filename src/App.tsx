@@ -1,29 +1,37 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState, type ComponentType, type LazyExoticComponent } from "react";
 import { Nav } from "./components/Nav";
 import { Footer } from "./components/Footer";
 import { Home } from "./views/Home";
-import { Catalog } from "./views/Catalog";
-import { CourseDetail } from "./views/CourseDetail";
-import { Enroll } from "./views/Enroll";
-import { Esito } from "./views/Esito";
-import { Contact } from "./views/Contact";
-import { Landing } from "./views/Landing";
-import { Exam } from "./views/Exam";
-import { Certification } from "./views/Certification";
-import { About } from "./views/About";
 import { ABOUT } from "./content/about-copy";
 import { CERT } from "./content/cert-copy";
 import { EXAM } from "./content/exam-copy";
 import { LANDING } from "./content/landing-copy";
-import { Events, EventDetail } from "./views/Events";
-import { LegalPage } from "./views/Legal";
 import { CookieConsent } from "./components/CookieConsent";
 import { Analytics } from "./components/Analytics";
-import { Admin } from "./admin/Admin";
 import { bySlug } from "./data";
 import { lang, langFromPath, stripLang, t } from "./i18n";
 import { applySeo, type SeoInput } from "./lib/seo";
 import { NAV_EVENT, fromLegacy, installLangLinks, installLinkInterceptor, navigate } from "./lib/nav";
+
+/** Pagine caricate a richiesta: la home resta nel pacchetto iniziale, le altre (e l'area admin) arrivano solo quando servono. */
+function lazyPage<T extends ComponentType<any>>(factory: () => Promise<{ default: T }>) {
+  const C = lazy(factory) as LazyExoticComponent<T> & { preload: () => Promise<unknown> };
+  C.preload = factory;
+  return C;
+}
+const Catalog = lazyPage(() => import("./views/Catalog").then((m) => ({ default: m.Catalog })));
+const CourseDetail = lazyPage(() => import("./views/CourseDetail").then((m) => ({ default: m.CourseDetail })));
+const Enroll = lazyPage(() => import("./views/Enroll").then((m) => ({ default: m.Enroll })));
+const Esito = lazyPage(() => import("./views/Esito").then((m) => ({ default: m.Esito })));
+const Contact = lazyPage(() => import("./views/Contact").then((m) => ({ default: m.Contact })));
+const Landing = lazyPage(() => import("./views/Landing").then((m) => ({ default: m.Landing })));
+const Exam = lazyPage(() => import("./views/Exam").then((m) => ({ default: m.Exam })));
+const Certification = lazyPage(() => import("./views/Certification").then((m) => ({ default: m.Certification })));
+const About = lazyPage(() => import("./views/About").then((m) => ({ default: m.About })));
+const Events = lazyPage(() => import("./views/Events").then((m) => ({ default: m.Events })));
+const EventDetail = lazyPage(() => import("./views/Events").then((m) => ({ default: m.EventDetail })));
+const LegalPage = lazyPage(() => import("./views/Legal").then((m) => ({ default: m.LegalPage })));
+const Admin = lazyPage(() => import("./admin/Admin").then((m) => ({ default: m.Admin })));
 
 type Route = { page: "home" } | { page: "admin" } | { page: "catalog" } | { page: "course"; slug: string } | { page: "enroll"; slug: string } | { page: "esito"; ref: string; status: string } | { page: "contact" } | { page: "landing" } | { page: "exam" } | { page: "cert" } | { page: "about" } | { page: "events" } | { page: "event"; id: string } | { page: "legal"; kind: "privacy" | "cookie" | "terms" };
 
@@ -45,6 +53,21 @@ export function parseRoute(path: string): Route {
   if (parts[0] === "iscriviti" && parts[1]) return { page: "enroll", slug: decodeURIComponent(parts[1]) };
   if (parts[0] === "esito" && parts[1]) return { page: "esito", ref: decodeURIComponent(parts[1]), status: parts[2] || "pending" };
   return { page: "home" };
+}
+
+/** Inizia a scaricare la pagina richiesta dall'indirizzo, in parallelo con l'elenco corsi. */
+export function preloadRoute(path: string) {
+  const r = parseRoute(path);
+  const pages: Record<string, { preload: () => Promise<unknown> } | undefined> = {
+    admin: Admin, catalog: Catalog, course: CourseDetail, enroll: Enroll, esito: Esito, contact: Contact, landing: Landing,
+    exam: Exam, cert: Certification, about: About, events: Events, event: EventDetail, legal: LegalPage,
+  };
+  void pages[r.page]?.preload();
+}
+
+/** A pagina caricata, scarica in sottofondo le altre pagine pubbliche (non l'admin) così i clic sono immediati. */
+export function preloadPublicPages() {
+  for (const p of [Catalog, CourseDetail, Landing, Exam, Certification, About, Contact, Events, Enroll]) void p.preload();
 }
 
 function seoFor(route: Route): SeoInput {
@@ -171,12 +194,12 @@ export default function App() {
       page = <Home />;
   }
 
-  if (route.page === "admin") return <Admin hash={`#${path}`} />;
+  if (route.page === "admin") return <Suspense fallback={null}><Admin hash={`#${path}`} /></Suspense>;
 
   return (
     <div className="min-h-screen bg-paper">
       <Nav route={path} />
-      {page}
+      <Suspense fallback={null}>{page}</Suspense>
       <Footer />
       <CookieConsent />
       <Analytics />

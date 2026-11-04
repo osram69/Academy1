@@ -1,6 +1,24 @@
 import type { Metadata, Viewport } from "next";
+import localFont from "next/font/local";
 import "../index.css";
 import { SITE, SITE_URL } from "../lib/site";
+
+// Font self-hosted (sottoinsieme latino, variabili): niente foglio di stile esterno che blocca il rendering
+const inter = localFont({ src: "../fonts/inter-latin.woff2", weight: "400 700", display: "swap", variable: "--font-inter-face", fallback: ["system-ui", "-apple-system", "sans-serif"] });
+const grotesk = localFont({ src: "../fonts/space-grotesk-latin.woff2", weight: "400 700", display: "swap", variable: "--font-grotesk-face", fallback: ["Inter", "system-ui", "sans-serif"] });
+const serif = localFont({
+  src: [
+    { path: "../fonts/instrument-serif.woff2", weight: "400", style: "normal" },
+    { path: "../fonts/instrument-serif-italic.woff2", weight: "400", style: "italic" },
+  ],
+  display: "swap",
+  variable: "--font-serif-face",
+  fallback: ["Georgia", "serif"],
+});
+const mono = localFont({ src: "../fonts/jetbrains-mono-latin.woff2", weight: "400 600", display: "swap", preload: false, variable: "--font-mono-face", fallback: ["ui-monospace", "SFMono-Regular", "monospace"] });
+
+// I corsi si leggono da Supabase appena parte l'app: la connessione si apre in anticipo (variabile letta al build)
+const SUPABASE_ORIGIN = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -63,15 +81,8 @@ export const viewport: Viewport = { width: "device-width", initialScale: 1 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="it">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
-          rel="stylesheet"
-        />
-      </head>
+    <html lang="it" className={`${inter.variable} ${grotesk.variable} ${serif.variable} ${mono.variable}`}>
+      <head>{SUPABASE_ORIGIN && <link rel="preconnect" href={SUPABASE_ORIGIN} crossOrigin="" />}</head>
       <body>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
         {children}

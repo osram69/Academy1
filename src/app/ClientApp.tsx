@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import App from "../App";
+import App, { preloadPublicPages, preloadRoute } from "../App";
 import { loadCourses } from "../data";
 import { t } from "../i18n";
 
@@ -25,6 +25,7 @@ export default function ClientApp() {
 
   const boot = useCallback(async () => {
     setState("loading");
+    preloadRoute(window.location.pathname); // la pagina richiesta si scarica mentre arriva l'elenco corsi
     try {
       await loadCourses();
       setState("ready");
@@ -37,6 +38,14 @@ export default function ClientApp() {
   useEffect(() => {
     void boot();
   }, [boot]);
+
+  useEffect(() => {
+    if (state !== "ready") return;
+    const run = () => preloadPublicPages();
+    const idle = (window as { requestIdleCallback?: (cb: () => void) => number }).requestIdleCallback;
+    if (idle) idle(run);
+    else setTimeout(run, 2000);
+  }, [state]);
 
   if (state === "error") return <LoadError retry={boot} />;
   if (state === "loading") return null;

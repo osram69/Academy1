@@ -19,7 +19,7 @@ export function Footer() {
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
           <div>
             <a href="/" className="inline-block" aria-label={t("Cube Academy — Home")}>
-              <img src="/img/logo-cube-academy.png" alt={t("Cube Academy")} width={1000} height={173} className="h-10 w-auto" />
+              <img src="/img/logo-cube-academy.webp" alt={t("Cube Academy")} width={640} height={111} className="h-10 w-auto" />
             </a>
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-white/68">
               {t("Training Provider accreditato iSAQB® dal 2024. Formiamo gli architetti del software italiani — online e in aula a Roma.")}</p>

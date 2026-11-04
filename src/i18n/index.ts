@@ -3,10 +3,6 @@
    se manca, il testo italiano. La lingua si legge una volta all'avvio: cambiarla ricarica la pagina,
    così anche le costanti a livello di modulo (data.ts) nascono già tradotte. */
 
-import { en } from "./en";
-import { fr } from "./fr";
-import { de } from "./de";
-
 export type Lang = "it" | "en" | "fr" | "de";
 export const LANGS: { code: Lang; label: string; name: string }[] = [
   { code: "it", label: "IT", name: "Italiano" },
@@ -16,7 +12,8 @@ export const LANGS: { code: Lang; label: string; name: string }[] = [
 ];
 
 export const LOCALES: Record<Lang, string> = { it: "it-IT", en: "en-GB", fr: "fr-FR", de: "de-DE" };
-const DICTS: Record<Lang, Record<string, string>> = { it: {}, en, fr, de };
+// I dizionari (80 KB l'uno) si scaricano solo per la lingua richiesta: vedi loadDictionary()
+const DICTS: Record<Lang, Record<string, string>> = { it: {}, en: {}, fr: {}, de: {} };
 
 /* La lingua sta nell'indirizzo: l'italiano è senza prefisso (/corsi), le altre hanno /en, /fr, /de (/en/corsi).
    Così ogni lingua ha pagine proprie che i motori di ricerca possono indicizzare. */
@@ -41,6 +38,13 @@ export function withLang(href: string, l: Lang = lang): string {
 export const lang: Lang = typeof location !== "undefined" ? langFromPath(location.pathname) : "it";
 export const locale = LOCALES[lang];
 if (typeof document !== "undefined") document.documentElement.lang = lang;
+
+/** Scarica il dizionario della lingua corrente (l'italiano non ne ha). Va atteso prima di importare i moduli che chiamano t() all'avvio. */
+export async function loadDictionary(): Promise<void> {
+  if (lang === "it") return;
+  const mod: Record<string, Record<string, string>> = lang === "en" ? await import("./en") : lang === "fr" ? await import("./fr") : await import("./de");
+  Object.assign(DICTS[lang], mod[lang]);
+}
 
 /** Cambia lingua aprendo la stessa pagina nella lingua scelta (il testo si legge all'avvio, quindi si ricarica). */
 export function setLang(next: Lang) {

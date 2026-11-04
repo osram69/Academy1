@@ -57,10 +57,10 @@ export function Nav({ route }: { route: string }) {
           {/* logo */}
           <a href="/" className="group flex items-center gap-3" aria-label={t("Cube Academy — Home")}>
             <img
-              src="/img/logo-cube-academy.png"
+              src="/img/logo-cube-academy.webp"
               alt={t("Cube Academy")}
-              width={1000}
-              height={173}
+              width={640}
+              height={111}
               className="h-8 w-auto sm:h-11"
             />
           </a>
