@@ -745,4 +745,8 @@ export const fr: Record<string, string> = {
   "Software industriale: requisiti e architettura software": "Logiciel industriel : exigences et architecture logicielle",
   "Management e soft skills": "Management et soft skills",
   "Oggi il calendario è dedicato ai corsi iSAQB® CPSA-Foundation, per i quali Cube Engineering è stata accreditata come training provider nel 2024.": "Aujourd'hui, notre calendrier est consacré aux formations iSAQB® CPSA-Foundation, pour lesquelles Cube Engineering a été accréditée comme training provider en 2024.",
+  "Chi c'è dietro Cube Academy": "Qui est derrière Cube Academy",
+  "Amministratore di Cube Engineering S.r.l.": "Administrateur de Cube Engineering S.r.l.",
+  "Laureato in Ingegneria Elettronica nel 1999, ha oltre 20 anni di esperienza in ingegneria e consulenza, tra program e project management e sviluppo e integrazione di sistemi hardware e software. Per 13 anni ha lavorato come consulente su progetti aerospaziali e della difesa, dalla progettazione di sistemi di controllo per misure e test automatico allo sviluppo e alla documentazione di software conforme allo standard MIL-STD-498.": "Diplômé en ingénierie électronique (1999), il a plus de 20 ans d'expérience en ingénierie et en conseil, entre gestion de programmes et de projets et développement et intégration de systèmes matériels et logiciels. Pendant 13 ans, il a travaillé comme consultant sur des projets aérospatiaux et de défense, de la conception de systèmes de contrôle pour la mesure et le test automatique au développement et à la documentation de logiciels conformes à la norme MIL-STD-498.",
+  "Profilo LinkedIn": "Profil LinkedIn",
 };

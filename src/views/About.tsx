@@ -2,7 +2,8 @@ import { Check, MapPin } from "lucide-react";
 import { RichText } from "../components/RichText";
 import { Btn, Reveal, Tag } from "../components/ui";
 import { ORG, featuredCourse } from "../data";
-import { ABOUT } from "../content/about-copy";
+import { ABOUT, PERSON } from "../content/about-copy";
+import { ExtLink } from "../components/IsaqbLinks";
 import { VENUE_NOTE } from "../content/course-copy";
 import { t } from "../i18n";
 
@@ -78,7 +79,22 @@ export function About() {
           </div>
         </section>
 
-        <section className="py-20" aria-labelledby="where-h">
+        <section className="py-20" aria-labelledby="team-h">
+          <div className="mx-auto max-w-4xl px-5 lg:px-8">
+            <h2 id="team-h" className="font-display text-[clamp(1.7rem,3.2vw,2.5rem)] font-bold tracking-tight text-ink">{t(ABOUT.teamTitle)}</h2>
+            <div className="mt-8 grid items-center gap-8 rounded-3xl border border-ink/10 bg-white p-6 sm:grid-cols-[176px_1fr] sm:p-8">
+              <img src={PERSON.image} alt={PERSON.name} width={600} height={600} loading="lazy" className="size-40 rounded-2xl object-cover sm:size-44" />
+              <div>
+                <h3 className="font-display text-[1.5rem] font-bold tracking-tight text-ink">{PERSON.name}</h3>
+                <p className="mt-1 font-serif text-[17px] italic text-flame">{t(ABOUT.personRole)}</p>
+                <p className="mt-4 text-[15px] leading-relaxed text-ink/70">{t(ABOUT.personBio)}</p>
+                <p className="mt-4 text-[14.5px]"><ExtLink href={PERSON.linkedin} className="text-flame">{t(ABOUT.linkedinLabel)}</ExtLink></p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="border-t border-ink/8 bg-sand/35 py-20" aria-labelledby="where-h">
           <div className="mx-auto grid max-w-7xl gap-14 px-5 lg:grid-cols-2 lg:px-8">
             <div>
               <h2 id="where-h" className="font-display text-[clamp(1.7rem,3.2vw,2.5rem)] font-bold tracking-tight text-ink">{t(ABOUT.whereTitle)}</h2>

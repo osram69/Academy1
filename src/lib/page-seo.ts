@@ -7,7 +7,7 @@ import { aboutSections, certFaqJsonLd, certSections, courseSections, examFaqJson
 import { LANDING } from "../content/landing-copy";
 import { EXAM } from "../content/exam-copy";
 import { CERT } from "../content/cert-copy";
-import { ABOUT } from "../content/about-copy";
+import { ABOUT, PERSON } from "../content/about-copy";
 
 /** Per ogni percorso del sito: metadati, dati strutturati e testo per i crawler, calcolati sul server.
  *  L'italiano è senza prefisso (/corsi); inglese, francese e tedesco stanno sotto /en, /fr, /de. */
@@ -226,7 +226,9 @@ export async function resolvePath(all: string[]): Promise<Resolved> {
     return {
       kind: "ok", path: P(p), canonical: P(p),
       meta: base(p, tr(L, ABOUT.title), tr(L, ABOUT.description)),
-      jsonLd: [crumbs([[T("home"), "/"], [tr(L, ABOUT.crumb), p]]), { "@context": "https://schema.org", "@type": "AboutPage", name: tr(L, ABOUT.title), url: url(p, L), about: { "@id": `${SITE_URL}/#organization` } }],
+      jsonLd: [crumbs([[T("home"), "/"], [tr(L, ABOUT.crumb), p]]), { "@context": "https://schema.org", "@type": "AboutPage", name: tr(L, ABOUT.title), url: url(p, L), about: { "@id": `${SITE_URL}/#organization` }, mainEntity: { "@id": `${SITE_URL}/#patrick-serra` } },
+        { "@context": "https://schema.org", "@type": "Person", "@id": `${SITE_URL}/#patrick-serra`, name: PERSON.name, givenName: PERSON.givenName, familyName: PERSON.familyName, honorificPrefix: PERSON.honorificPrefix, jobTitle: tr(L, ABOUT.personRole), image: `${SITE_URL}${PERSON.image}`, sameAs: [PERSON.linkedin], worksFor: { "@id": `${SITE_URL}/#organization` } },
+      ],
       shell: {
         h1: tr(L, ABOUT.h1),
         intro: tr(L, ABOUT.lead),

@@ -7,7 +7,7 @@ import * as COPY from "../content/course-copy";
 import { LANDING } from "../content/landing-copy";
 import { EXAM, EXAM_FAQS } from "../content/exam-copy";
 import { CERT, CERT_FAQS } from "../content/cert-copy";
-import { ABOUT } from "../content/about-copy";
+import { ABOUT, PERSON } from "../content/about-copy";
 import type { L } from "./seo-text";
 
 const DICT: Record<L, Record<string, string>> = { it: {}, en, fr, de };
@@ -93,6 +93,7 @@ export function aboutSections(l: L): ShellSection[] {
     { heading: tr(l, ABOUT.howTitle), items: ABOUT.how.map((s) => tr(l, s)) },
     { heading: tr(l, ABOUT.originTitle), items: [tr(l, ABOUT.originText)] },
     { heading: tr(l, ABOUT.skillsTitle), items: [tr(l, ABOUT.skillsIntro), ...ABOUT.skills.map((s) => tr(l, s)), tr(l, ABOUT.skillsNote)] },
+    { heading: tr(l, ABOUT.teamTitle), items: [`${PERSON.name}: ${tr(l, ABOUT.personRole)}`, tr(l, ABOUT.personBio), `[${tr(l, ABOUT.linkedinLabel)}](${PERSON.linkedin})`] },
     { heading: tr(l, ABOUT.whereTitle), items: [tr(l, COPY.VENUE_NOTE), tr(l, ABOUT.contactText)] },
   ];
 }

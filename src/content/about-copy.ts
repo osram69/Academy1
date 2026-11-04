@@ -32,7 +32,22 @@ export const ABOUT = {
     "Management e soft skills",
   ],
   skillsNote: "Oggi il calendario è dedicato ai corsi iSAQB® CPSA-Foundation, per i quali Cube Engineering è stata accreditata come training provider nel 2024.",
+  teamTitle: "Chi c'è dietro Cube Academy",
+  personRole: "Amministratore di Cube Engineering S.r.l.",
+  personBio:
+    "Laureato in Ingegneria Elettronica nel 1999, ha oltre 20 anni di esperienza in ingegneria e consulenza, tra program e project management e sviluppo e integrazione di sistemi hardware e software. Per 13 anni ha lavorato come consulente su progetti aerospaziali e della difesa, dalla progettazione di sistemi di controllo per misure e test automatico allo sviluppo e alla documentazione di software conforme allo standard MIL-STD-498.",
+  linkedinLabel: "Profilo LinkedIn",
   whereTitle: "Dove siamo",
   contactText: "Per informazioni sul corso o sulle edizioni per team scrivici con il [modulo di contatto](/contatti) o chiamaci al +39 06 92.92.87.80.",
   companyTitle: "Dati societari",
+};
+
+/** Persona che compare nella pagina "Chi siamo" (nome non tradotto). */
+export const PERSON = {
+  name: "Ing. Patrick Serra",
+  givenName: "Patrick",
+  familyName: "Serra",
+  honorificPrefix: "Ing.",
+  image: "/img/patrick-serra.jpg",
+  linkedin: "https://www.linkedin.com/in/ing-patrick-serra/",
 };
