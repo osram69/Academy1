@@ -90,13 +90,10 @@ export function Hero() {
 
           <Reveal delay={90}>
             <h1 className="mt-7 text-balance font-display text-[clamp(2.1rem,4.2vw,3.9rem)] font-bold leading-[1.02] tracking-[-0.03em]">
-              <span className="text-white/55">
-                {t("L'architettura software")}<br />
-                <em className="font-serif font-normal italic tracking-[-0.01em]">{t("si disegna.")}</em>
-              </span>
+              {t("L'architettura software")}<br />
+              <em className="font-serif font-normal italic tracking-[-0.01em] text-flame">{t("si disegna.")}</em>
               <br />
-              {t("L'architetto software")}<br />
-              <em className="bg-gradient-to-r from-ember to-flame bg-clip-text pr-1 font-serif font-normal italic tracking-[-0.01em] text-transparent">{t("si certifica.")}</em>
+              <span className="text-white/60">{t("L'architetto software")}<br />{t("si certifica.")}</span>
             </h1>
           </Reveal>
 
