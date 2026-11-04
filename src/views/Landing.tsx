@@ -138,6 +138,7 @@ export function Landing() {
               <h2 id="exam-h" className="font-display text-[1.25rem] font-bold tracking-tight text-ink">{t(LANDING.examTitle)}</h2>
               <p className="mt-2 text-[15px] leading-relaxed text-ink/70">{t(LANDING.examText)}</p>
               <p className="mt-2 text-[15px] leading-relaxed text-ink/70">{t(LANDING.examLimit)}</p>
+              <p className="mt-3 text-[15px]"><a href="/esame-cpsa-f" className="link-sweep font-semibold text-flame">{t("Come funziona l'esame →")}</a></p>
             </div>
           </div>
         </section>

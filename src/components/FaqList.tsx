@@ -7,11 +7,11 @@ import { RichText } from "./RichText";
 import { FAQS } from "../data";
 
 /** Elenco a fisarmonica delle domande frequenti: lo stesso nella home, nelle schede corso e nella pagina del corso Software Architect. */
-export function FaqList() {
+export function FaqList({ items = FAQS }: { items?: { q: string; a: string; links?: { href: string; label: string }[] }[] }) {
   const [open, setOpen] = useState(0);
   return (
     <div className="space-y-3.5">
-      {FAQS.map((f, i) => {
+      {items.map((f, i) => {
         const isOpen = open === i;
         return (
           <Reveal key={f.q} delay={i * 70}>

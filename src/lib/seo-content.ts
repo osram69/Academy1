@@ -5,6 +5,7 @@ import { fr } from "../i18n/fr";
 import { de } from "../i18n/de";
 import * as COPY from "../content/course-copy";
 import { LANDING } from "../content/landing-copy";
+import { EXAM, EXAM_FAQS } from "../content/exam-copy";
 import type { L } from "./seo-text";
 
 const DICT: Record<L, Record<string, string>> = { it: {}, en, fr, de };
@@ -58,6 +59,25 @@ export function landingSections(l: L): ShellSection[] {
     faq,
   ];
 }
+
+/** Contenuto della pagina dedicata all'esame CPSA-F. */
+export const examFaqItems = (l: L) => EXAM_FAQS.map((f) => ({ q: tr(l, f.q), a: tr(l, f.a) }));
+
+export function examSections(l: L): ShellSection[] {
+  return [
+    { items: EXAM.facts.map((s) => tr(l, s)) },
+    { heading: tr(l, EXAM.stepsTitle), items: EXAM.steps.map((s) => tr(l, s)) },
+    { heading: tr(l, EXAM.prepTitle), items: [tr(l, EXAM.prepText)] },
+    { heading: tr(l, EXAM.limitTitle), items: [tr(l, LANDING.examLimit), tr(l, EXAM.source)] },
+    { heading: tr(l, EXAM.faq), faqs: examFaqItems(l) },
+  ];
+}
+
+export const examFaqJsonLd = (l: L) => ({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: examFaqItems(l).map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: plain(f.a) } })),
+});
 
 /** Dati strutturati FAQPage per le pagine che mostrano le domande frequenti. */
 export const faqJsonLd = (l: L) => ({

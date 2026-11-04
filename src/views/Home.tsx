@@ -64,6 +64,10 @@ function CertificationSection() {
             <Btn href="/corsi" variant="ink" withArrow>
               {t("Scegli la tua edizione")}</Btn>
           </Reveal>
+          <Reveal delay={260} className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-[14.5px]">
+            <a href="/corso-software-architect" className="link-sweep font-semibold text-flame">{t("Programma e dettagli del corso →")}</a>
+            <a href="/esame-cpsa-f" className="link-sweep font-semibold text-flame">{t("Come funziona l'esame →")}</a>
+          </Reveal>
           <Reveal delay={280} className="mt-6">
             <IsaqbLinks className="max-w-md" />
           </Reveal>

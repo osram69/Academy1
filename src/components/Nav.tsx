@@ -9,6 +9,7 @@ import { LANGS, lang, setLang, t } from "../i18n";
 const LINKS = [
   { label: t("Home"), href: "/" },
   { label: t("Calendario corsi"), href: "/corsi" },
+  { label: t("Il corso"), href: "/corso-software-architect" },
   { label: t("Certificazione"), href: "/", section: "certificazione" },
   { label: t("Catalogo"), href: "/", section: "formati" },
   { label: t("Eventi"), href: "/eventi" },
@@ -41,7 +42,7 @@ export function Nav({ route }: { route: string }) {
   };
 
   const isActive = (href: string) =>
-    href === "/corsi" ? route.startsWith("/corsi") || route.startsWith("/corso/") : href === "/contatti" ? route.startsWith("/contatti") : href === "/eventi" ? route.startsWith("/eventi") : route === "/" || route === "";
+    href === "/corsi" ? route.startsWith("/corsi") || route.startsWith("/corso/") : href === "/corso-software-architect" ? route.startsWith("/corso-software-architect") : href === "/contatti" ? route.startsWith("/contatti") : href === "/eventi" ? route.startsWith("/eventi") : route === "/" || route === "";
 
   return (
     <header className="fixed inset-x-0 top-0 z-50">
@@ -65,7 +66,7 @@ export function Nav({ route }: { route: string }) {
           </a>
 
           {/* desktop links */}
-          <nav className="hidden items-center gap-7 lg:flex" aria-label={t("Navigazione principale")}>
+          <nav className="hidden items-center gap-5 whitespace-nowrap xl:gap-7 lg:flex" aria-label={t("Navigazione principale")}>
             {LINKS.map((l) => (
               <a
                 key={l.label}
@@ -73,6 +74,7 @@ export function Nav({ route }: { route: string }) {
                 onClick={go(l.href, l.section)}
                 className={cn(
                   "link-sweep text-[13.5px] font-medium transition-colors",
+                  l.href === "/" && !l.section && "hidden xl:inline",
                   isActive(l.href) && !l.section ? "text-white" : "text-white/72 hover:text-white"
                 )}
               >
@@ -124,7 +126,7 @@ export function Nav({ route }: { route: string }) {
 
             <a
               href={`/iscriviti/${next.slug}`}
-              className="group hidden items-center gap-2.5 rounded-full bg-flame py-2 pl-4 pr-5 font-display text-[13px] font-semibold text-white shadow-flame transition-all duration-300 hover:bg-white hover:text-ink md:inline-flex"
+              className="group hidden items-center gap-2.5 whitespace-nowrap rounded-full bg-flame py-2 pl-4 pr-5 font-display text-[13px] font-semibold text-white shadow-flame transition-all duration-300 hover:bg-white hover:text-ink md:inline-flex"
             >
               {t("Iscriviti")}<span className="font-mono text-[10px] font-medium tracking-wider opacity-75">
                 {fmtRange(next.start, next.end)}

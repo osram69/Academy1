@@ -8,6 +8,8 @@ import { Enroll } from "./views/Enroll";
 import { Esito } from "./views/Esito";
 import { Contact } from "./views/Contact";
 import { Landing } from "./views/Landing";
+import { Exam } from "./views/Exam";
+import { EXAM } from "./content/exam-copy";
 import { LANDING } from "./content/landing-copy";
 import { Events, EventDetail } from "./views/Events";
 import { LegalPage } from "./views/Legal";
@@ -19,7 +21,7 @@ import { lang, langFromPath, stripLang, t } from "./i18n";
 import { applySeo, type SeoInput } from "./lib/seo";
 import { NAV_EVENT, fromLegacy, installLangLinks, installLinkInterceptor, navigate } from "./lib/nav";
 
-type Route = { page: "home" } | { page: "admin" } | { page: "catalog" } | { page: "course"; slug: string } | { page: "enroll"; slug: string } | { page: "esito"; ref: string; status: string } | { page: "contact" } | { page: "landing" } | { page: "events" } | { page: "event"; id: string } | { page: "legal"; kind: "privacy" | "cookie" | "terms" };
+type Route = { page: "home" } | { page: "admin" } | { page: "catalog" } | { page: "course"; slug: string } | { page: "enroll"; slug: string } | { page: "esito"; ref: string; status: string } | { page: "contact" } | { page: "landing" } | { page: "exam" } | { page: "events" } | { page: "event"; id: string } | { page: "legal"; kind: "privacy" | "cookie" | "terms" };
 
 export function parseRoute(path: string): Route {
   const parts = stripLang(path.split("?")[0]).split("/").filter(Boolean);
@@ -27,6 +29,7 @@ export function parseRoute(path: string): Route {
   if (parts[0] === "corsi") return { page: "catalog" };
   if (parts[0] === "contatti") return { page: "contact" };
   if (parts[0] === "corso-software-architect") return { page: "landing" };
+  if (parts[0] === "esame-cpsa-f") return { page: "exam" };
   if (parts[0] === "eventi" && parts[1]) return { page: "event", id: decodeURIComponent(parts[1]) };
   if (parts[0] === "eventi") return { page: "events" };
   if (parts[0] === "privacy") return { page: "legal", kind: "privacy" };
@@ -54,6 +57,8 @@ function seoFor(route: Route): SeoInput {
       return { title: t("Contatti") };
     case "landing":
       return { title: t(LANDING.title), description: t(LANDING.description) };
+    case "exam":
+      return { title: t(EXAM.title), description: t(EXAM.description) };
     case "events":
     case "event":
       return { title: t("Eventi") };
@@ -133,6 +138,9 @@ export default function App() {
       break;
     case "landing":
       page = <Landing />;
+      break;
+    case "exam":
+      page = <Exam />;
       break;
     case "events":
       page = <Events />;
