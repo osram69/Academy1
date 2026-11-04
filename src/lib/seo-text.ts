@@ -28,12 +28,6 @@ const X = {
     "Formations iSAQB® CPSA-F en ligne et à Rome pour devenir Software Architect certifié : 24 h avec formateurs accrédités, examen blanc, 12 participants maximum.",
     "iSAQB® CPSA-F Kurse online und in Rom zum zertifizierten Software Architect: 24 Stunden mit akkreditierten Trainern, Probeprüfung, Gruppen bis 12."
   ),
-  secObjectives: r("Cosa imparerai nel corso CPSA-F", "What you will learn in the CPSA-F course", "Ce que vous apprendrez dans la formation CPSA-F", "Was Sie im CPSA-F-Kurs lernen"),
-  secProgram: r("Programma del corso", "Course programme", "Programme de la formation", "Kursprogramm"),
-  secAudience: r("A chi si rivolge", "Who it is for", "À qui s'adresse la formation", "Für wen der Kurs ist"),
-  secPrereq: r("Prerequisiti", "Prerequisites", "Prérequis", "Voraussetzungen"),
-  secIncludes: r("Cosa include", "What is included", "Ce qui est inclus", "Was enthalten ist"),
-  secFaq: r("Domande frequenti sul corso iSAQB® CPSA-F", "Frequently asked questions about the iSAQB® CPSA-F course", "Questions fréquentes sur la formation iSAQB® CPSA-F", "Häufige Fragen zum iSAQB® CPSA-F-Kurs"),
   courseTitleKind: r("Corso iSAQB® CPSA-F", "iSAQB® CPSA-F course", "Formation iSAQB® CPSA-F", "iSAQB® CPSA-F Kurs"),
   modeShortOnline: r("online", "online", "en ligne", "online"),
   modeShortClassroom: r("a {loc}", "in {loc}", "à {loc}", "in {loc}"),

@@ -7,6 +7,8 @@ import { CourseDetail } from "./views/CourseDetail";
 import { Enroll } from "./views/Enroll";
 import { Esito } from "./views/Esito";
 import { Contact } from "./views/Contact";
+import { Landing } from "./views/Landing";
+import { LANDING } from "./content/landing-copy";
 import { Events, EventDetail } from "./views/Events";
 import { LegalPage } from "./views/Legal";
 import { CookieConsent } from "./components/CookieConsent";
@@ -17,13 +19,14 @@ import { lang, langFromPath, stripLang, t } from "./i18n";
 import { applySeo, type SeoInput } from "./lib/seo";
 import { NAV_EVENT, fromLegacy, installLangLinks, installLinkInterceptor, navigate } from "./lib/nav";
 
-type Route = { page: "home" } | { page: "admin" } | { page: "catalog" } | { page: "course"; slug: string } | { page: "enroll"; slug: string } | { page: "esito"; ref: string; status: string } | { page: "contact" } | { page: "events" } | { page: "event"; id: string } | { page: "legal"; kind: "privacy" | "cookie" | "terms" };
+type Route = { page: "home" } | { page: "admin" } | { page: "catalog" } | { page: "course"; slug: string } | { page: "enroll"; slug: string } | { page: "esito"; ref: string; status: string } | { page: "contact" } | { page: "landing" } | { page: "events" } | { page: "event"; id: string } | { page: "legal"; kind: "privacy" | "cookie" | "terms" };
 
 export function parseRoute(path: string): Route {
   const parts = stripLang(path.split("?")[0]).split("/").filter(Boolean);
   if (parts[0] === "admin") return { page: "admin" };
   if (parts[0] === "corsi") return { page: "catalog" };
   if (parts[0] === "contatti") return { page: "contact" };
+  if (parts[0] === "corso-software-architect") return { page: "landing" };
   if (parts[0] === "eventi" && parts[1]) return { page: "event", id: decodeURIComponent(parts[1]) };
   if (parts[0] === "eventi") return { page: "events" };
   if (parts[0] === "privacy") return { page: "legal", kind: "privacy" };
@@ -49,6 +52,8 @@ function seoFor(route: Route): SeoInput {
       return { noindex: true, title: route.page === "admin" ? "Admin" : t("Iscrizione") };
     case "contact":
       return { title: t("Contatti") };
+    case "landing":
+      return { title: t(LANDING.title), description: t(LANDING.description) };
     case "events":
     case "event":
       return { title: t("Eventi") };
@@ -125,6 +130,9 @@ export default function App() {
       break;
     case "contact":
       page = <Contact key={loc} />;
+      break;
+    case "landing":
+      page = <Landing />;
       break;
     case "events":
       page = <Events />;

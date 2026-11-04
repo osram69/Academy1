@@ -1,0 +1,156 @@
+import { BadgeCheck, CalendarDays, Check, GraduationCap, MapPin, Users } from "lucide-react";
+import { CourseCard } from "../components/CourseCard";
+import { FaqList } from "../components/FaqList";
+import { Btn, Reveal, Tag } from "../components/ui";
+import { featuredCourse, upcomingCourses } from "../data";
+import * as COPY from "../content/course-copy";
+import { LANDING } from "../content/landing-copy";
+import { t } from "../i18n";
+
+const FACT_ICONS = [CalendarDays, MapPin, BadgeCheck, Users];
+
+/** Elenco con segni di spunta: obiettivi, destinatari, prerequisiti, cosa include. */
+function CheckList({ items }: { items: string[] }) {
+  return (
+    <ul className="mt-5 space-y-3">
+      {items.map((it) => (
+        <li key={it} className="flex gap-3 text-[15px] leading-relaxed text-ink/75">
+          <Check className="mt-1 size-4 shrink-0 text-flame" aria-hidden="true" />
+          <span>{it}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/**
+ * Pagina dedicata a chi cerca "corso Software Architect" / "corsi iSAQB": spiega il corso e porta alle date.
+ * Gli stessi contenuti stanno anche nell'HTML per i crawler (src/lib/seo-content.ts → landingSections).
+ */
+export function Landing() {
+  const courses = upcomingCourses();
+  const next = featuredCourse();
+  return (
+    <div className="bg-paper">
+      <header className="relative overflow-hidden bg-ink pb-16 pt-32 text-white lg:pt-40">
+        <div className="bg-blueprint-dark absolute inset-0" aria-hidden="true" />
+        <div className="absolute -right-40 -top-40 size-[520px] rounded-full opacity-30" style={{ background: "radial-gradient(circle, #e8321e 0%, transparent 65%)" }} aria-hidden="true" />
+        <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
+          <Reveal>
+            <Tag dark>{t(LANDING.crumb)}</Tag>
+          </Reveal>
+          <Reveal delay={80}>
+            <h1 className="mt-4 max-w-3xl text-balance font-display text-[clamp(2rem,4.6vw,3.6rem)] font-bold leading-[1.04] tracking-[-0.025em]">{t(LANDING.h1)}</h1>
+          </Reveal>
+          <Reveal delay={160}>
+            <p className="mt-6 max-w-2xl text-[17px] leading-relaxed text-white/72">{t(LANDING.lead)}</p>
+          </Reveal>
+          <Reveal delay={220}>
+            <ul className="mt-8 grid max-w-3xl gap-3 sm:grid-cols-2">
+              {LANDING.facts.map((f, i) => {
+                const Icon = FACT_ICONS[i] ?? BadgeCheck;
+                return (
+                  <li key={f} className="flex items-center gap-3 rounded-xl border border-white/12 bg-white/5 px-4 py-3 text-[14px] font-medium text-white/85">
+                    <Icon className="size-4 shrink-0 text-flame" aria-hidden="true" />
+                    {t(f)}
+                  </li>
+                );
+              })}
+            </ul>
+          </Reveal>
+          <Reveal delay={280} className="mt-9 flex flex-wrap items-center gap-4">
+            <Btn href={`/iscriviti/${next.slug}`} size="lg" withArrow ariaLabel={t("Vai all'iscrizione della prossima edizione")}>
+              {t("Iscriviti alla prossima edizione")}
+            </Btn>
+            <Btn href="/corsi" variant="line-dark" size="lg">
+              {t("Calendario completo")}
+            </Btn>
+          </Reveal>
+        </div>
+      </header>
+
+      <main>
+        <section id="date" className="scroll-mt-24 py-20" aria-labelledby="date-h">
+          <div className="mx-auto max-w-7xl px-5 lg:px-8">
+            <h2 id="date-h" className="font-display text-[clamp(1.7rem,3.2vw,2.5rem)] font-bold tracking-tight text-ink">{t(LANDING.dates)}</h2>
+            <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {courses.map((c, i) => (
+                <CourseCard key={c.slug} course={c} index={i} />
+              ))}
+            </div>
+            <p className="mt-6 text-[14px] text-ink/60">
+              <a href="/corsi" className="link-sweep font-semibold text-flame">{t("Tutto il calendario →")}</a>
+            </p>
+          </div>
+        </section>
+
+        <section className="border-t border-ink/8 bg-sand/35 py-20" aria-labelledby="learn-h">
+          <div className="mx-auto grid max-w-7xl gap-14 px-5 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
+            <div>
+              <h2 id="learn-h" className="font-display text-[clamp(1.7rem,3.2vw,2.5rem)] font-bold tracking-tight text-ink">{t(LANDING.objectives)}</h2>
+              <CheckList items={COPY.OBJECTIVES.map((s) => t(s))} />
+            </div>
+            <div>
+              <h2 className="font-display text-[clamp(1.7rem,3.2vw,2.5rem)] font-bold tracking-tight text-ink">{t(LANDING.program)}</h2>
+              <ol className="mt-5 space-y-4">
+                {COPY.MODULES.map((m, i) => (
+                  <li key={m.title} className="rounded-2xl border border-ink/10 bg-white p-5">
+                    <p className="font-display text-[16px] font-semibold tracking-tight text-ink">
+                      <span className="mr-3 font-mono text-[11px] text-flame">{String(i + 1).padStart(2, "0")}</span>
+                      {t(m.title)}
+                    </p>
+                    <ul className="mt-2 space-y-1.5 pl-9 text-[14px] leading-relaxed text-ink/65">
+                      {m.topics.map((s) => (
+                        <li key={s} className="list-disc">{t(s)}</li>
+                      ))}
+                    </ul>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </div>
+        </section>
+
+        <section className="py-20" aria-labelledby="who-h">
+          <div className="mx-auto grid max-w-7xl gap-12 px-5 md:grid-cols-3 lg:px-8">
+            <div>
+              <h2 id="who-h" className="font-display text-[1.5rem] font-bold tracking-tight text-ink">{t(LANDING.audience)}</h2>
+              <CheckList items={COPY.AUDIENCE.map((s) => t(s))} />
+            </div>
+            <div>
+              <h2 className="font-display text-[1.5rem] font-bold tracking-tight text-ink">{t(LANDING.prerequisites)}</h2>
+              <CheckList items={COPY.PREREQUISITES.map((s) => t(s))} />
+            </div>
+            <div>
+              <h2 className="font-display text-[1.5rem] font-bold tracking-tight text-ink">{t(LANDING.includes)}</h2>
+              <CheckList items={COPY.INCLUDES.map((s) => t(s))} />
+            </div>
+          </div>
+        </section>
+
+        <section className="px-5 pb-20 lg:px-8" aria-labelledby="exam-h">
+          <div className="mx-auto flex max-w-4xl gap-5 rounded-3xl border border-flame/30 bg-flame/5 p-7">
+            <GraduationCap className="mt-1 size-7 shrink-0 text-flame" aria-hidden="true" />
+            <div>
+              <h2 id="exam-h" className="font-display text-[1.25rem] font-bold tracking-tight text-ink">{t(LANDING.examTitle)}</h2>
+              <p className="mt-2 text-[15px] leading-relaxed text-ink/70">{t(LANDING.examText)}</p>
+            </div>
+          </div>
+        </section>
+
+        <section className="border-t border-ink/8 bg-paper py-20" aria-labelledby="faq-h">
+          <div className="mx-auto max-w-4xl px-5 lg:px-8">
+            <h2 id="faq-h" className="font-display text-[clamp(1.7rem,3.2vw,2.5rem)] font-bold tracking-tight text-ink">{t(LANDING.faq)}</h2>
+            <div className="mt-8">
+              <FaqList />
+            </div>
+            <p className="mt-8 text-[15px] text-ink/65">
+              {t("Non trovi la risposta?")}{" "}
+              <a href="/contatti" className="link-sweep font-semibold text-flame">{t("Scrivici con il modulo di contatto")}</a>
+            </p>
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+}

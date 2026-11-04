@@ -86,6 +86,10 @@ export function Footer() {
                 </li>
               ))}
               <li>
+                <a href="/corso-software-architect" className="link-sweep text-white/76 transition-colors hover:text-white">
+                  {t("Corso Software Architect")}</a>
+              </li>
+              <li>
                 <a href="/eventi" className="link-sweep text-white/76 transition-colors hover:text-white">
                   {t("Eventi")}</a>
               </li>

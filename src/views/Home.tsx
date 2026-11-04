@@ -1,11 +1,9 @@
-import { useState } from "react";
 import {
   ArrowUpRight,
   BadgeCheck,
   BedDouble,
   Building2,
   Check,
-  ChevronDown,
   FileCheck,
   GraduationCap,
   MonitorPlay,
@@ -16,12 +14,12 @@ import { Hero } from "../components/Hero";
 import { CourseCard } from "../components/CourseCard";
 import { Btn, IsoCube, Reveal, Tag } from "../components/ui";
 import { ModalitaSection } from "../components/ModalitaSection";
-import { ExtLink, IsaqbLinks } from "../components/IsaqbLinks";
+import { IsaqbLinks } from "../components/IsaqbLinks";
 import { WorkshopPromo } from "../components/WorkshopCard";
-import { FAQS, TRAINER, eur, fmtRange, nextCourse, upcomingCourses } from "../data";
+import { TRAINER, eur, fmtRange, nextCourse, upcomingCourses } from "../data";
 
 import { t } from "../i18n";
-import { RichText } from "../components/RichText";
+import { FaqList } from "../components/FaqList";
 /* ============================ cos'è CPSA-F ============================ */
 
 const WHY = [
@@ -288,7 +286,6 @@ function EditionsSection() {
 /* -------------------------------- FAQ ------------------------------- */
 
 function FaqSection() {
-  const [open, setOpen] = useState(0);
   return (
     <section id="faq" className="scroll-mt-0 bg-paper py-24 lg:scroll-mt-[41px] lg:pb-32 lg:pt-[80px]" aria-labelledby="faq-title">
       <div className="mx-auto grid max-w-7xl gap-14 px-5 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
@@ -317,54 +314,7 @@ function FaqSection() {
           </Reveal>
         </div>
 
-        <div className="space-y-3.5">
-          {FAQS.map((f, i) => {
-            const isOpen = open === i;
-            return (
-              <Reveal key={f.q} delay={i * 70}>
-                <div
-                  className={cn(
-                    "overflow-hidden rounded-2xl border bg-white transition-colors duration-300",
-                    isOpen ? "border-flame/50 shadow-card" : "border-ink/10"
-                  )}
-                >
-                  <button
-                    onClick={() => setOpen(isOpen ? -1 : i)}
-                    aria-expanded={isOpen}
-                    aria-controls={`faq-panel-${i}`}
-                    className="flex w-full items-center justify-between gap-5 px-6 py-5 text-left"
-                  >
-                    <span className="flex items-baseline gap-4">
-                      <span className="font-mono text-[11px] font-semibold text-flame">0{i + 1}</span>
-                      <span className="font-display text-[16.5px] font-semibold tracking-tight text-ink">{f.q}</span>
-                    </span>
-                    <ChevronDown
-                      className={cn("size-5 shrink-0 text-steel transition-transform duration-400", isOpen && "rotate-180 text-flame")}
-                      aria-hidden="true"
-                    />
-                  </button>
-                  <div
-                    id={`faq-panel-${i}`}
-                    role="region"
-                    className={cn(
-                      "grid transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
-                      isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-                    )}
-                  >
-                    <div className="overflow-hidden">
-                      <p className="px-6 pb-6 pl-[3.7rem] text-[14.5px] leading-relaxed text-ink/65"><RichText text={f.a} /></p>
-                      {f.links && (
-                        <div className="-mt-3 flex flex-wrap gap-x-6 gap-y-2 px-6 pb-6 pl-[3.7rem] text-[14px]">
-                          {f.links.map((l) => <ExtLink key={l.href} href={l.href} className="text-flame">{l.label}</ExtLink>)}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </Reveal>
-            );
-          })}
-        </div>
+        <FaqList />
       </div>
     </section>
   );

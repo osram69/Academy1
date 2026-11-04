@@ -35,6 +35,8 @@ import { lang, t } from "../i18n";
 import { RichText } from "../components/RichText";
 import { ExtLink } from "../components/IsaqbLinks";
 import { isaqbLinks } from "../links";
+import { FaqList } from "../components/FaqList";
+import { LANDING } from "../content/landing-copy";
 /* ------------------------- rail prezzo sticky ------------------------ */
 
 function PriceRail({ course }: { course: Course }) {
@@ -344,6 +346,16 @@ export function CourseDetail({ course }: { course: Course }) {
 
         <PriceRail course={course} />
       </main>
+
+      {/* domande frequenti */}
+      <section id="faq" className="border-t border-ink/8 bg-paper py-20" aria-labelledby="course-faq-h">
+        <div className="mx-auto max-w-4xl px-5 lg:px-8">
+          <h2 id="course-faq-h" className="font-display text-[clamp(1.7rem,3.2vw,2.5rem)] font-bold tracking-tight text-ink">{t(LANDING.faq)}</h2>
+          <div className="mt-8">
+            <FaqList />
+          </div>
+        </div>
+      </section>
 
       {/* correlati */}
       <section className="border-t border-ink/8 bg-sand/35 py-20" aria-labelledby="related-h">

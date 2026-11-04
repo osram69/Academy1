@@ -68,6 +68,18 @@ export const FAQS_COPY: { q: string; a: string; inSearch?: boolean }[] = [
     a: "No. La tassa d'esame CPSA-F (280 € + IVA) non è inclusa nel prezzo del corso e si paga separatamente all'ente di certificazione autorizzato iSAQB®, con cui organizzi l'esame in autonomia al termine del corso. Durante l'ultima giornata svolgiamo una simulazione d'esame con discussione e correzione.",
   },
   {
+    q: "Che cos'è la certificazione CPSA-F?",
+    a: "CPSA-F è il livello Foundation del programma internazionale iSAQB® Certified Professional for Software Architecture. Attesta le conoscenze di base di architettura software e si ottiene superando un esame, separato dal corso. È il primo livello del percorso iSAQB® e il punto di partenza per i livelli avanzati.",
+  },
+  {
+    q: "Quanto dura il corso?",
+    a: "Il corso dura 24 ore. Si svolge in tre giornate consecutive oppure nella formula weekend, distribuita su più sabati e domeniche: le date di ogni edizione sono indicate nel calendario.",
+  },
+  {
+    q: "Il corso è online o in aula? In che lingua si svolge?",
+    a: "Ogni edizione si svolge online, in aula virtuale live su Zoom, oppure in aula a Roma. Il formato e la lingua di ciascuna edizione sono indicati nella scheda del corso.",
+  },
+  {
     q: "Posso pagare con bonifico e fattura alla mia azienda?",
     a: "Certo. Durante l'iscrizione scegli il soggetto fatturante (privato, libero professionista, azienda italiana o estera) e inserisci P.IVA, codice SDI e PEC. ",
   },

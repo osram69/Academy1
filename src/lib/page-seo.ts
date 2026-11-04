@@ -3,7 +3,8 @@ import { SITE, SITE_URL } from "./site";
 import { getCourses, getEvents, type SeoCourse, type SeoEvent } from "./server-data";
 import { leadingId } from "./slug";
 import { LANG_CODES, LOCALE, OG_LOCALE, tx, type L, type TextKey } from "./seo-text";
-import { courseSections, faqSection, type ShellSection } from "./seo-content";
+import { courseSections, faqJsonLd, faqSection, landingSections, tr, type ShellSection } from "./seo-content";
+import { LANDING } from "../content/landing-copy";
 
 /** Per ogni percorso del sito: metadati, dati strutturati e testo per i crawler, calcolati sul server.
  *  L'italiano è senza prefisso (/corsi); inglese, francese e tedesco stanno sotto /en, /fr, /de. */
@@ -79,6 +80,7 @@ export async function resolvePath(all: string[]): Promise<Resolved> {
   });
 
   const MAIN_LINKS = [
+    { href: P("/corso-software-architect"), label: tr(L, LANDING.crumb) },
     { href: P("/corsi"), label: T("catalogLink") },
     { href: P("/eventi"), label: T("events") },
     { href: P("/contatti"), label: T("contacts") },
@@ -126,9 +128,12 @@ export async function resolvePath(all: string[]): Promise<Resolved> {
     return {
       kind: "ok", path: P("/"), canonical: P("/"),
       meta: base("/", null, T("homeDesc")),
-      jsonLd: courses.length
-        ? [{ "@context": "https://schema.org", "@type": "ItemList", name: T("nextEditions"), itemListElement: courses.map((x, i) => ({ "@type": "ListItem", position: i + 1, url: url(`/corso/${x.slug}`, L), name: x.title })) }]
-        : [],
+      jsonLd: [
+        ...(courses.length
+          ? [{ "@context": "https://schema.org", "@type": "ItemList", name: T("nextEditions"), itemListElement: courses.map((x, i) => ({ "@type": "ListItem", position: i + 1, url: url(`/corso/${x.slug}`, L), name: x.title })) }]
+          : []),
+        faqJsonLd(L),
+      ],
       shell: { h1: T("homeH1"), intro: T("homeIntro"), links: [...courseLinks(courses), ...MAIN_LINKS], sections: [faqSection(L)] },
     };
   }
@@ -161,12 +166,51 @@ export async function resolvePath(all: string[]): Promise<Resolved> {
     return {
       kind: "ok", path: P(p), canonical: P(p),
       meta: base(p, title, description),
-      jsonLd: [crumbs([[T("home"), "/"], [T("catalogCrumb"), "/corsi"], [course.title, p]]), courseJsonLd(course, p)],
+      jsonLd: [crumbs([[T("home"), "/"], [T("catalogCrumb"), "/corsi"], [course.title, p]]), courseJsonLd(course, p), faqJsonLd(L)],
       shell: {
         h1: title,
         intro: `${course.title}. ${description}${course.schedule ? ` ${T("schedule", { s: course.schedule })}` : ""}`,
         links: [{ href: P(`/iscriviti/${course.slug}`), label: T("enroll") }, ...MAIN_LINKS],
         sections: courseSections(L),
+      },
+    };
+  }
+
+  if (!b && a === "corso-software-architect") {
+    const courses = (await getCourses())?.filter((x) => !x.concluded) ?? [];
+    const p = "/corso-software-architect";
+    const here = url(p, L);
+    const description = tr(L, LANDING.description);
+    return {
+      kind: "ok", path: P(p), canonical: P(p),
+      meta: base(p, tr(L, LANDING.title), description),
+      jsonLd: [
+        crumbs([[T("home"), "/"], [tr(L, LANDING.crumb), p]]),
+        {
+          "@context": "https://schema.org",
+          "@type": "Course",
+          "@id": `${here}#course`,
+          name: tr(L, LANDING.title),
+          description,
+          url: here,
+          educationalLevel: "Foundation",
+          provider: { "@id": `${SITE_URL}/#organization` },
+          hasCourseInstance: courses.map((x) => ({
+            "@type": "CourseInstance",
+            courseMode: x.online ? "Online" : "Onsite",
+            startDate: x.start,
+            endDate: x.end,
+            url: url(`/corso/${x.slug}`, L),
+            location: x.online ? { "@type": "VirtualLocation", url: url(`/corso/${x.slug}`, L) } : { "@type": "Place", name: x.location, address: x.location },
+          })),
+        },
+        faqJsonLd(L),
+      ],
+      shell: {
+        h1: tr(L, LANDING.h1),
+        intro: tr(L, LANDING.lead),
+        links: [...courseLinks(courses), { href: P("/corsi"), label: T("catalogLink") }, { href: P("/contatti"), label: T("contacts") }],
+        sections: landingSections(L),
       },
     };
   }

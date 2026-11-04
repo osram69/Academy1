@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 interface Section {
-  heading: string;
+  heading?: string;
   items?: string[];
   faqs?: { q: string; a: string }[];
 }
@@ -17,9 +17,9 @@ export function SeoShell({ h1, intro, links, sections = [] }: { h1: string; intr
     <div className="sr-only">
       <h1>{h1}</h1>
       {intro && <p>{intro}</p>}
-      {sections.map((s) => (
-        <section key={s.heading}>
-          <h2>{s.heading}</h2>
+      {sections.map((s, i) => (
+        <section key={s.heading ?? i}>
+          {s.heading && <h2>{s.heading}</h2>}
           {s.items && (
             <ul>
               {s.items.map((it) => (
