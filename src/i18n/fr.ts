@@ -716,4 +716,5 @@ export const fr: Record<string, string> = {
   "Dove trovo i corsi per il livello Foundation?": "Où trouver les formations pour le niveau Foundation ?",
   "Nel [calendario dei corsi](/corsi) trovi le prossime edizioni online e in aula a Roma, con date, prezzi e iscrizione.": "Dans le [calendrier des formations](/corsi), vous trouverez les prochaines sessions en ligne et en présentiel à Rome, avec dates, prix et inscription.",
   "Scopri la certificazione →": "Découvrir la certification →",
+  "Come puoi seguire il corso": "Comment suivre la formation",
 };

@@ -14,6 +14,31 @@ export const VENUE_NOTE =
   "I corsi in aula a Roma si svolgono presso [Roma Office Sharing](https://www.romaofficesharing.it/sale-corsi.html), in Via Venti Settembre 118, a pochi minuti da Roma Termini.";
 export const VENUE_FOOTER = "Sede dei corsi in aula: [Roma Office Sharing](https://www.romaofficesharing.it/sale-corsi.html), Via Venti Settembre 118, Roma";
 
+/** I tre formati di erogazione (home e pagina del corso). `id` collega testo, icona e immagine nelle viste. */
+export const FORMATS_COPY: { id: "online" | "aula" | "prestige"; title: string; claim: string; text: string; points: string[] }[] = [
+  {
+    id: "online",
+    title: "Live Online",
+    claim: "L'aula viene da te.",
+    text: "Aula virtuale su Zoom con docente accreditato iSAQB®, esercitazioni ed esame simulato nell'ultima giornata.",
+    points: ["24 ore su 3 giornate", "Max 12 partecipanti", "Zero trasferte"],
+  },
+  {
+    id: "aula",
+    title: "In Aula",
+    claim: "Full immersion, networking vero.",
+    text: "Corso in presenza a Roma, con docente accreditato iSAQB® e gruppi di massimo 12 partecipanti.",
+    points: ["Sede a Roma", "Max 12 partecipanti", "Docente accreditato iSAQB®"],
+  },
+  {
+    id: "prestige",
+    title: "Prestige Residenziale",
+    claim: "Certificarsi è un'esperienza.",
+    text: "Corsi residenziali di 4 giorni nelle più belle città italiane, con albergo e mezza pensione. Presto maggiori informazioni.",
+    points: ["4 giorni in residenza", "Albergo e mezza pensione", "Presto informazioni"],
+  },
+];
+
 export const OBJECTIVES = [
   "Comprendere i concetti fondamentali e la terminologia dell'architettura software",
   "Analizzare e definire i requisiti architetturali, inclusi i requisiti di qualità",

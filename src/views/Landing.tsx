@@ -1,4 +1,4 @@
-import { BadgeCheck, CalendarDays, Check, GraduationCap, MapPin, Users } from "lucide-react";
+import { BadgeCheck, BedDouble, Building2, CalendarDays, Check, GraduationCap, MapPin, MonitorPlay, Users } from "lucide-react";
 import { CourseCard } from "../components/CourseCard";
 import { FaqList } from "../components/FaqList";
 import { RichText } from "../components/RichText";
@@ -9,6 +9,7 @@ import { LANDING } from "../content/landing-copy";
 import { t } from "../i18n";
 
 const FACT_ICONS = [CalendarDays, MapPin, BadgeCheck, Users];
+const FORMAT_ICONS = { online: MonitorPlay, aula: Building2, prestige: BedDouble };
 
 /** Elenco con segni di spunta: obiettivi, destinatari, prerequisiti, cosa include. */
 function CheckList({ items }: { items: string[] }) {
@@ -86,7 +87,37 @@ export function Landing() {
           </div>
         </section>
 
-        <section className="border-t border-ink/8 bg-sand/35 py-20" aria-labelledby="learn-h">
+        <section id="formati" className="scroll-mt-24 border-t border-ink/8 bg-sand/35 py-20" aria-labelledby="formats-h">
+          <div className="mx-auto max-w-7xl px-5 lg:px-8">
+            <h2 id="formats-h" className="font-display text-[clamp(1.7rem,3.2vw,2.5rem)] font-bold tracking-tight text-ink">{t(LANDING.formats)}</h2>
+            <p className="mt-3 max-w-2xl text-[16px] leading-relaxed text-ink/65">{t("Scegli in base ad agenda e budget: il docente accreditato iSAQB® e il programma sono identici in ogni formato.")}</p>
+            <ul className="mt-8 grid gap-5 md:grid-cols-3">
+              {COPY.FORMATS_COPY.map((f) => {
+                const Icon = FORMAT_ICONS[f.id];
+                return (
+                  <li key={f.id} className="flex flex-col rounded-2xl border border-ink/10 bg-white p-6">
+                    <span className="grid size-11 place-items-center rounded-xl bg-flame/10 text-flame">
+                      <Icon className="size-5" aria-hidden="true" />
+                    </span>
+                    <h3 className="mt-5 font-display text-[1.2rem] font-bold tracking-tight text-ink">{t(f.title)}</h3>
+                    <p className="mt-1 font-serif text-[17px] italic text-flame">{t(f.claim)}</p>
+                    <p className="mt-3 text-[14.5px] leading-relaxed text-ink/70">{t(f.text)}</p>
+                    <ul className="mt-5 space-y-2 border-t border-ink/8 pt-4">
+                      {f.points.map((p) => (
+                        <li key={p} className="flex items-start gap-2.5 text-[14px] font-medium text-ink/75">
+                          <Check className="mt-0.5 size-4 shrink-0 text-flame" aria-hidden="true" />
+                          {t(p)}
+                        </li>
+                      ))}
+                    </ul>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </section>
+
+        <section className="border-t border-ink/8 py-20" aria-labelledby="learn-h">
           <div className="mx-auto grid max-w-7xl gap-14 px-5 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
             <div>
               <h2 id="learn-h" className="font-display text-[clamp(1.7rem,3.2vw,2.5rem)] font-bold tracking-tight text-ink">{t(LANDING.objectives)}</h2>

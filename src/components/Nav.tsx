@@ -11,7 +11,6 @@ const LINKS = [
   { label: t("Calendario corsi"), href: "/corsi" },
   { label: t("Il corso"), href: "/corso-software-architect" },
   { label: t("Certificazione"), href: "/certificazione-isaqb" },
-  { label: t("Catalogo"), href: "/", section: "formati" },
   { label: t("Eventi"), href: "/eventi" },
   { label: t("FAQ"), href: "/", section: "faq" },
   { label: t("Contatti"), href: "/contatti" },

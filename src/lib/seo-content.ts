@@ -54,6 +54,7 @@ export function landingSections(l: L): ShellSection[] {
   const [objectives, program, audience, prereq, includes, faq] = courseSections(l);
   return [
     { items: LANDING.facts.map((s) => tr(l, s)) },
+    { heading: tr(l, LANDING.formats), items: COPY.FORMATS_COPY.map((f) => `${tr(l, f.title)}: ${tr(l, f.text)} ${f.points.map((p) => tr(l, p)).join("; ")}.`) },
     objectives,
     program,
     audience,

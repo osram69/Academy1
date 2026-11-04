@@ -20,6 +20,7 @@ import { TRAINER, eur, fmtRange, nextCourse, upcomingCourses } from "../data";
 
 import { t } from "../i18n";
 import { FaqList } from "../components/FaqList";
+import * as COPY from "../content/course-copy";
 /* ============================ cos'è CPSA-F ============================ */
 
 const WHY = [
@@ -137,38 +138,22 @@ function CertificationSection() {
 
 /* ============================== formati ============================== */
 
-const FORMATS = [
-  {
-    id: "online",
-    icon: MonitorPlay,
-    title: t("Live Online"),
-    claim: t("L'aula viene da te."),
-    text: t("Aula virtuale su Zoom con docente accreditato iSAQB®, esercitazioni ed esame simulato nell'ultima giornata."),
-    points: [t("24 ore su 3 giornate"), t("Max 12 partecipanti"), t("Zero trasferte")],
-    dark: true,
-    img: "https://images.pexels.com/photos/4175446/pexels-photo-4175446.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200" as string | null,
-  },
-  {
-    id: "aula",
-    icon: Building2,
-    title: t("In Aula"),
-    claim: t("Full immersion, networking vero."),
-    text: t("Corso in presenza a Roma, con docente accreditato iSAQB® e gruppi di massimo 12 partecipanti."),
-    points: [t("Sede a Roma"), t("Max 12 partecipanti"), t("Docente accreditato iSAQB®")],
-    dark: true,
-    img: "https://images.pexels.com/photos/1181396/pexels-photo-1181396.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200" as string | null,
-  },
-  {
-    id: "prestige",
-    icon: BedDouble,
-    title: t("Prestige Residenziale"),
-    claim: t("Certificarsi è un'esperienza."),
-    text: t("Corsi residenziali di 4 giorni nelle più belle città italiane, con albergo e mezza pensione. Presto maggiori informazioni."),
-    points: [t("4 giorni in residenza"), t("Albergo e mezza pensione"), t("Presto informazioni")],
-    dark: true,
-    img: "https://images.pexels.com/photos/38115059/pexels-photo-38115059.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
-  },
-];
+const FORMAT_VISUALS = {
+  online: { icon: MonitorPlay, img: "https://images.pexels.com/photos/4175446/pexels-photo-4175446.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200" },
+  aula: { icon: Building2, img: "https://images.pexels.com/photos/1181396/pexels-photo-1181396.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200" },
+  prestige: { icon: BedDouble, img: "https://images.pexels.com/photos/38115059/pexels-photo-38115059.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200" },
+};
+
+const FORMATS = COPY.FORMATS_COPY.map((f) => ({
+  id: f.id,
+  icon: FORMAT_VISUALS[f.id].icon,
+  title: t(f.title),
+  claim: t(f.claim),
+  text: t(f.text),
+  points: f.points.map((p) => t(p)),
+  dark: true,
+  img: FORMAT_VISUALS[f.id].img as string | null,
+}));
 
 function FormatsSection() {
   return (

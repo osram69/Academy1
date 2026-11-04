@@ -11,6 +11,7 @@ export const LANDING = {
   crumb: "Corso Software Architect",
   facts: ["24 ore di formazione live", "Online o in aula a Roma", "Docenti accreditati iSAQB®", "Gruppi fino a 12 partecipanti"],
   dates: "Prossime date del corso",
+  formats: "Come puoi seguire il corso",
   examTitle: "Il corso prepara all'esame, ma non lo sostituisce",
   examText: "Frequentare il corso non equivale a ottenere la certificazione: serve superare un esame separato, presso gli enti autorizzati iSAQB®. Nell'ultima giornata svolgiamo una simulazione d'esame con discussione e correzione.",
   examLimit: "La certificazione attesta le conoscenze di base di architettura software, ma non garantisce assunzioni, promozioni o il titolo professionale di Software Architect.",

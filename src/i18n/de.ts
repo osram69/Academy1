@@ -716,4 +716,5 @@ export const de: Record<string, string> = {
   "Dove trovo i corsi per il livello Foundation?": "Wo finde ich die Kurse für die Stufe Foundation?",
   "Nel [calendario dei corsi](/corsi) trovi le prossime edizioni online e in aula a Roma, con date, prezzi e iscrizione.": "Im [Kurskalender](/corsi) finden Sie die nächsten Online- und Präsenztermine in Rom, mit Terminen, Preisen und Anmeldung.",
   "Scopri la certificazione →": "Die Zertifizierung entdecken →",
+  "Come puoi seguire il corso": "So können Sie am Kurs teilnehmen",
 };
