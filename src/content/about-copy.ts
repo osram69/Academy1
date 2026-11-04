@@ -20,6 +20,18 @@ export const ABOUT = {
     "Gruppi fino a 12 partecipanti, per lavorare davvero su esercizi e discussioni.",
     "Simulazione d'esame nell'ultima giornata; l'esame di certificazione si sostiene a parte, presso l'ente di certificazione.",
   ],
+  originTitle: "Da dove veniamo",
+  originText:
+    "Cube Academy nasce da Cube Engineering S.r.l. come ramo dedicato ai corsi ad alto contenuto tecnologico. Cube Engineering è nata nel 2014 come società di consulenza, progettazione e costruzione di apparecchiature elettroniche, e offre servizi alle imprese con il brand Roma Office Sharing. Operiamo in settori come aerospaziale, automobilistico, difesa e industriale.",
+  skillsTitle: "Le competenze dietro i corsi",
+  skillsIntro: "L'esperienza dei nostri professionisti nella progettazione software e hardware si estende a:",
+  skills: [
+    "Hardware: FPGA e VLSI",
+    "Bus avionici: MIL-STD-1553, STANAG 3910, ARINC 429",
+    "Software industriale: requisiti e architettura software",
+    "Management e soft skills",
+  ],
+  skillsNote: "Oggi il calendario è dedicato ai corsi iSAQB® CPSA-Foundation, per i quali Cube Engineering è stata accreditata come training provider nel 2024.",
   whereTitle: "Dove siamo",
   contactText: "Per informazioni sul corso o sulle edizioni per team scrivici con il [modulo di contatto](/contatti) o chiamaci al +39 06 92.92.87.80.",
   companyTitle: "Dati societari",

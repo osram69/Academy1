@@ -56,7 +56,29 @@ export function About() {
           </div>
         </section>
 
-        <section className="border-t border-ink/8 bg-sand/35 py-20" aria-labelledby="where-h">
+        <section className="border-t border-ink/8 bg-sand/35 py-20" aria-labelledby="origin-h">
+          <div className="mx-auto grid max-w-7xl gap-14 px-5 lg:grid-cols-2 lg:px-8">
+            <div>
+              <h2 id="origin-h" className="font-display text-[clamp(1.7rem,3.2vw,2.5rem)] font-bold tracking-tight text-ink">{t(ABOUT.originTitle)}</h2>
+              <p className="mt-5 text-[16px] leading-[1.75] text-ink/70">{t(ABOUT.originText)}</p>
+            </div>
+            <div>
+              <h2 className="font-display text-[clamp(1.7rem,3.2vw,2.5rem)] font-bold tracking-tight text-ink">{t(ABOUT.skillsTitle)}</h2>
+              <p className="mt-5 text-[15.5px] leading-relaxed text-ink/70">{t(ABOUT.skillsIntro)}</p>
+              <ul className="mt-4 space-y-3">
+                {ABOUT.skills.map((s) => (
+                  <li key={s} className="flex gap-3 text-[15px] leading-relaxed text-ink/75">
+                    <Check className="mt-1 size-4 shrink-0 text-flame" aria-hidden="true" />
+                    <span>{t(s)}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-5 text-[14.5px] leading-relaxed text-ink/60">{t(ABOUT.skillsNote)}</p>
+            </div>
+          </div>
+        </section>
+
+        <section className="py-20" aria-labelledby="where-h">
           <div className="mx-auto grid max-w-7xl gap-14 px-5 lg:grid-cols-2 lg:px-8">
             <div>
               <h2 id="where-h" className="font-display text-[clamp(1.7rem,3.2vw,2.5rem)] font-bold tracking-tight text-ink">{t(ABOUT.whereTitle)}</h2>

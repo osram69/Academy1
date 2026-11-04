@@ -91,6 +91,8 @@ export function aboutSections(l: L): ShellSection[] {
   return [
     { heading: tr(l, ABOUT.whoTitle), items: [tr(l, ABOUT.whoText)] },
     { heading: tr(l, ABOUT.howTitle), items: ABOUT.how.map((s) => tr(l, s)) },
+    { heading: tr(l, ABOUT.originTitle), items: [tr(l, ABOUT.originText)] },
+    { heading: tr(l, ABOUT.skillsTitle), items: [tr(l, ABOUT.skillsIntro), ...ABOUT.skills.map((s) => tr(l, s)), tr(l, ABOUT.skillsNote)] },
     { heading: tr(l, ABOUT.whereTitle), items: [tr(l, COPY.VENUE_NOTE), tr(l, ABOUT.contactText)] },
   ];
 }
