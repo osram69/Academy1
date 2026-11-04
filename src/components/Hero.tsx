@@ -93,7 +93,8 @@ export function Hero() {
               {t("L'architettura software")}<br />
               <em className="font-serif font-normal italic tracking-[-0.01em] text-flame">{t("si disegna.")}</em>
               <br />
-              <span className="text-white/60">{t("L'architetto software")}<br />{t("si certifica.")}</span>
+              {t("L'architetto software")}<br />
+              <em className="bg-gradient-to-r from-ember to-flame bg-clip-text pr-1 font-serif font-normal italic tracking-[-0.01em] text-transparent">{t("si certifica.")}</em>
             </h1>
           </Reveal>
 
