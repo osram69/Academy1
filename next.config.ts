@@ -17,11 +17,12 @@ const nextConfig: NextConfig = {
       ...to([`/${l}/eventi-${l}`, `/${l}/evento-di-presentazione-isaqb-a-roma`, `/${l}/isaqb-software-architecture-gathering-2024`, `/${l}/cube-academy-:rest(.*)`], `/${l}/eventi`),
       ...to([`/${l}/privacy-policy-${l}`], `/${l}/privacy`),
       // pagina lunga della lingua (corso + certificazione), "chi siamo" e account → home della lingua
-      ...to([`/${l}/isaqb-cpsa:rest(.*)`, `/${l}/chi-siamo-${l}`, `/${l}/mein-konto`, `/${l}/mon-compte`, `/${l}/my-account`], `/${l}`),
+      ...to([`/${l}/isaqb-cpsa:rest(.*)`, `/${l}/mein-konto`, `/${l}/mon-compte`, `/${l}/my-account`], `/${l}`),
+      ...to([`/${l}/chi-siamo-${l}`], `/${l}/chi-siamo`),
     ]);
     const rules = [
       ...to(["/it/:path*"], "/:path*"),
-      ...to(["/chi-siamo", "/mio-account"], "/"),
+      ...to(["/mio-account"], "/"),
       ...to(["/corsi-it", "/calendario-corsi-isaqb-cpsa-f", "/calendario-corsi", "/registration-form-it"], "/corsi"),
       ...to(["/berlino", "/berlin", "/cube-academy-al-italian-software-testing-forum-2025:rest(.*)"], "/eventi"),
       ...to(["/privacy-policy"], "/privacy"),

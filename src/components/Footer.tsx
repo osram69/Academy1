@@ -99,6 +99,10 @@ export function Footer() {
                   {t("Esame CPSA-F")}</a>
               </li>
               <li>
+                <a href="/chi-siamo" className="link-sweep text-white/76 transition-colors hover:text-white">
+                  {t("Chi siamo")}</a>
+              </li>
+              <li>
                 <a href="/eventi" className="link-sweep text-white/76 transition-colors hover:text-white">
                   {t("Eventi")}</a>
               </li>

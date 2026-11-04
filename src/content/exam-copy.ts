@@ -47,6 +47,14 @@ export const EXAM_FAQS: { q: string; a: string }[] = [
     a: "Per superare l'esame serve almeno il 60% del punteggio massimo ottenibile.",
   },
   {
+    q: "Come viene valutato l'esame?",
+    a: "Le domande valgono da 1 a 3 punti in base alla difficoltà e sono di tre tipi: scelta tra due opzioni, risposta singola e risposta multipla. Per superare l'esame serve almeno il 60% del punteggio totale; secondo il regolamento iSAQB® le risposte errate possono togliere punti, quindi conviene rispondere con attenzione.",
+  },
+  {
+    q: "Posso ripetere l'esame se non lo supero?",
+    a: "Secondo il regolamento d'esame iSAQB®, l'esame si può ripetere due volte senza periodo di attesa; dopo il terzo esito negativo occorre aspettare un anno. Le condizioni possono cambiare: verifica quelle aggiornate sul sito dell'ente di certificazione.",
+  },
+  {
     q: "L'esame si fa online o in presenza?",
     a: "Online, in modalità Live Remote Proctored, cioè sorvegliato da remoto in tempo reale. Al momento dell'iscrizione scegli se sostenerlo in italiano o in inglese.",
   },

@@ -20,6 +20,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const fixed: MetadataRoute.Sitemap = [
     ...page("/", { lastModified: now, changeFrequency: "weekly", priority: 1 }),
     ...page("/corso-software-architect", { lastModified: now, changeFrequency: "weekly", priority: 0.9 }),
+    ...page("/chi-siamo", { lastModified: now, changeFrequency: "monthly", priority: 0.6 }),
     ...page("/certificazione-isaqb", { lastModified: now, changeFrequency: "monthly", priority: 0.8 }),
     ...page("/esame-cpsa-f", { lastModified: now, changeFrequency: "monthly", priority: 0.8 }),
     ...page("/corsi", { lastModified: now, changeFrequency: "daily", priority: 0.9 }),

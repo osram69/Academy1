@@ -13,6 +13,7 @@ const LINKS = [
   { label: t("Certificazione"), href: "/certificazione-isaqb" },
   { label: t("Eventi"), href: "/eventi" },
   { label: t("FAQ"), href: "/", section: "faq" },
+  { label: t("Chi siamo"), href: "/chi-siamo" },
   { label: t("Contatti"), href: "/contatti" },
 ];
 
@@ -41,7 +42,7 @@ export function Nav({ route }: { route: string }) {
   };
 
   const isActive = (href: string) =>
-    href === "/corsi" ? route.startsWith("/corsi") || route.startsWith("/corso/") : href === "/certificazione-isaqb" ? route.startsWith("/certificazione-isaqb") : href === "/corso-software-architect" ? route.startsWith("/corso-software-architect") : href === "/contatti" ? route.startsWith("/contatti") : href === "/eventi" ? route.startsWith("/eventi") : route === "/" || route === "";
+    href === "/corsi" ? route.startsWith("/corsi") || route.startsWith("/corso/") : href === "/chi-siamo" ? route.startsWith("/chi-siamo") : href === "/certificazione-isaqb" ? route.startsWith("/certificazione-isaqb") : href === "/corso-software-architect" ? route.startsWith("/corso-software-architect") : href === "/contatti" ? route.startsWith("/contatti") : href === "/eventi" ? route.startsWith("/eventi") : route === "/" || route === "";
 
   return (
     <header className="fixed inset-x-0 top-0 z-50">

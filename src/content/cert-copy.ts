@@ -18,12 +18,12 @@ export const CERT = {
   ],
   whatTitle: "Che cos'è iSAQB®",
   whatText:
-    "iSAQB®, International Software Architecture Qualification Board, è l'associazione che definisce il programma di certificazione CPSA per chi lavora nell'architettura software. Il programma si basa su curricula di riferimento e su corsi tenuti da training provider accreditati. In Italia l'iscrizione agli esami passa da ITA-STQB; Cube Academy è Training Provider accreditato iSAQB® dal 2024.",
+    "iSAQB®, International Software Architecture Qualification Board, è l'organismo internazionale indipendente che definisce gli standard di formazione, esame e certificazione, tra cui il programma CPSA per chi lavora nell'architettura software. Il programma si basa su curricula di riferimento e su corsi tenuti da training provider accreditati. In Italia l'iscrizione agli esami passa da ITA-STQB; Cube Academy è Training Provider accreditato iSAQB® dal 2024.",
   levelsTitle: "I livelli della certificazione",
   levels: [
     {
       name: "Foundation (CPSA-F)",
-      text: "Il punto di partenza: le conoscenze di base di architettura software, dai requisiti di qualità alla progettazione, alla documentazione e alla valutazione. Per sostenere l'esame non servono prerequisiti. È il livello per cui eroghiamo i corsi.",
+      text: "Il punto di partenza: le conoscenze per progettare e documentare architetture di sistemi di piccole e medie dimensioni, dai requisiti di qualità alla valutazione. Per sostenere l'esame non servono prerequisiti. È il livello per cui eroghiamo i corsi.",
     },
     {
       name: "Advanced (CPSA-A)",

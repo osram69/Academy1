@@ -7,6 +7,7 @@ import * as COPY from "../content/course-copy";
 import { LANDING } from "../content/landing-copy";
 import { EXAM, EXAM_FAQS } from "../content/exam-copy";
 import { CERT, CERT_FAQS } from "../content/cert-copy";
+import { ABOUT } from "../content/about-copy";
 import type { L } from "./seo-text";
 
 const DICT: Record<L, Record<string, string>> = { it: {}, en, fr, de };
@@ -84,6 +85,15 @@ export const examFaqJsonLd = (l: L) => ({
   "@type": "FAQPage",
   mainEntity: examFaqItems(l).map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: plain(f.a) } })),
 });
+
+/** Contenuto della pagina "Chi siamo". */
+export function aboutSections(l: L): ShellSection[] {
+  return [
+    { heading: tr(l, ABOUT.whoTitle), items: [tr(l, ABOUT.whoText)] },
+    { heading: tr(l, ABOUT.howTitle), items: ABOUT.how.map((s) => tr(l, s)) },
+    { heading: tr(l, ABOUT.whereTitle), items: [tr(l, COPY.VENUE_NOTE), tr(l, ABOUT.contactText)] },
+  ];
+}
 
 /** Contenuto della pagina dedicata alla certificazione iSAQB®. */
 export const certFaqItems = (l: L) => CERT_FAQS.map((f) => ({ q: tr(l, f.q), a: tr(l, f.a) }));

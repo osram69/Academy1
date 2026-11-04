@@ -3,10 +3,11 @@ import { SITE, SITE_URL } from "./site";
 import { getCourses, getEvents, type SeoCourse, type SeoEvent } from "./server-data";
 import { leadingId } from "./slug";
 import { LANG_CODES, LOCALE, OG_LOCALE, tx, type L, type TextKey } from "./seo-text";
-import { certFaqJsonLd, certSections, courseSections, examFaqJsonLd, examSections, faqJsonLd, faqSection, landingSections, tr, venueSection, type ShellSection } from "./seo-content";
+import { aboutSections, certFaqJsonLd, certSections, courseSections, examFaqJsonLd, examSections, faqJsonLd, faqSection, landingSections, tr, venueSection, type ShellSection } from "./seo-content";
 import { LANDING } from "../content/landing-copy";
 import { EXAM } from "../content/exam-copy";
 import { CERT } from "../content/cert-copy";
+import { ABOUT } from "../content/about-copy";
 
 /** Per ogni percorso del sito: metadati, dati strutturati e testo per i crawler, calcolati sul server.
  *  L'italiano è senza prefisso (/corsi); inglese, francese e tedesco stanno sotto /en, /fr, /de. */
@@ -87,6 +88,7 @@ export async function resolvePath(all: string[]): Promise<Resolved> {
     { href: P("/esame-cpsa-f"), label: tr(L, EXAM.crumb) },
     { href: P("/corsi"), label: T("catalogLink") },
     { href: P("/eventi"), label: T("events") },
+    { href: P("/chi-siamo"), label: tr(L, ABOUT.crumb) },
     { href: P("/contatti"), label: T("contacts") },
     { href: P("/privacy"), label: T("privacy") },
     { href: P("/condizioni"), label: T("terms") },
@@ -215,6 +217,21 @@ export async function resolvePath(all: string[]): Promise<Resolved> {
         intro: tr(L, LANDING.lead),
         links: [...courseLinks(courses), { href: P("/corsi"), label: T("catalogLink") }, { href: P("/contatti"), label: T("contacts") }],
         sections: landingSections(L),
+      },
+    };
+  }
+
+  if (!b && a === "chi-siamo") {
+    const p = "/chi-siamo";
+    return {
+      kind: "ok", path: P(p), canonical: P(p),
+      meta: base(p, tr(L, ABOUT.title), tr(L, ABOUT.description)),
+      jsonLd: [crumbs([[T("home"), "/"], [tr(L, ABOUT.crumb), p]]), { "@context": "https://schema.org", "@type": "AboutPage", name: tr(L, ABOUT.title), url: url(p, L), about: { "@id": `${SITE_URL}/#organization` } }],
+      shell: {
+        h1: tr(L, ABOUT.h1),
+        intro: tr(L, ABOUT.lead),
+        links: [{ href: P("/corso-software-architect"), label: tr(L, LANDING.crumb) }, { href: P("/corsi"), label: T("catalogLink") }, { href: P("/contatti"), label: T("contacts") }],
+        sections: aboutSections(L),
       },
     };
   }
