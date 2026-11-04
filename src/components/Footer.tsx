@@ -69,7 +69,6 @@ export function Footer() {
             <h3 className="font-mono text-[11px] font-medium uppercase tracking-[0.22em] text-white/56">{t("Academy")}</h3>
             <ul className="mt-4 space-y-2.5 text-sm">
               {[
-                { label: t("La certificazione CPSA-F"), section: "certificazione" },
                 { label: t("I formati"), section: "formati" },
                 { label: t("FAQ"), section: "faq" },
               ].map((l) => (
@@ -87,6 +86,10 @@ export function Footer() {
                   </a>
                 </li>
               ))}
+              <li>
+                <a href="/certificazione-isaqb" className="link-sweep text-white/76 transition-colors hover:text-white">
+                  {t("La certificazione CPSA-F")}</a>
+              </li>
               <li>
                 <a href="/corso-software-architect" className="link-sweep text-white/76 transition-colors hover:text-white">
                   {t("Corso Software Architect")}</a>

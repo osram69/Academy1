@@ -10,7 +10,7 @@ const LINKS = [
   { label: t("Home"), href: "/" },
   { label: t("Calendario corsi"), href: "/corsi" },
   { label: t("Il corso"), href: "/corso-software-architect" },
-  { label: t("Certificazione"), href: "/", section: "certificazione" },
+  { label: t("Certificazione"), href: "/certificazione-isaqb" },
   { label: t("Catalogo"), href: "/", section: "formati" },
   { label: t("Eventi"), href: "/eventi" },
   { label: t("FAQ"), href: "/", section: "faq" },
@@ -42,7 +42,7 @@ export function Nav({ route }: { route: string }) {
   };
 
   const isActive = (href: string) =>
-    href === "/corsi" ? route.startsWith("/corsi") || route.startsWith("/corso/") : href === "/corso-software-architect" ? route.startsWith("/corso-software-architect") : href === "/contatti" ? route.startsWith("/contatti") : href === "/eventi" ? route.startsWith("/eventi") : route === "/" || route === "";
+    href === "/corsi" ? route.startsWith("/corsi") || route.startsWith("/corso/") : href === "/certificazione-isaqb" ? route.startsWith("/certificazione-isaqb") : href === "/corso-software-architect" ? route.startsWith("/corso-software-architect") : href === "/contatti" ? route.startsWith("/contatti") : href === "/eventi" ? route.startsWith("/eventi") : route === "/" || route === "";
 
   return (
     <header className="fixed inset-x-0 top-0 z-50">

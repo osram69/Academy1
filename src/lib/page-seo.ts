@@ -3,9 +3,10 @@ import { SITE, SITE_URL } from "./site";
 import { getCourses, getEvents, type SeoCourse, type SeoEvent } from "./server-data";
 import { leadingId } from "./slug";
 import { LANG_CODES, LOCALE, OG_LOCALE, tx, type L, type TextKey } from "./seo-text";
-import { courseSections, examFaqJsonLd, examSections, faqJsonLd, faqSection, landingSections, tr, venueSection, type ShellSection } from "./seo-content";
+import { certFaqJsonLd, certSections, courseSections, examFaqJsonLd, examSections, faqJsonLd, faqSection, landingSections, tr, venueSection, type ShellSection } from "./seo-content";
 import { LANDING } from "../content/landing-copy";
 import { EXAM } from "../content/exam-copy";
+import { CERT } from "../content/cert-copy";
 
 /** Per ogni percorso del sito: metadati, dati strutturati e testo per i crawler, calcolati sul server.
  *  L'italiano è senza prefisso (/corsi); inglese, francese e tedesco stanno sotto /en, /fr, /de. */
@@ -82,6 +83,7 @@ export async function resolvePath(all: string[]): Promise<Resolved> {
 
   const MAIN_LINKS = [
     { href: P("/corso-software-architect"), label: tr(L, LANDING.crumb) },
+    { href: P("/certificazione-isaqb"), label: tr(L, CERT.crumb) },
     { href: P("/esame-cpsa-f"), label: tr(L, EXAM.crumb) },
     { href: P("/corsi"), label: T("catalogLink") },
     { href: P("/eventi"), label: T("events") },
@@ -213,6 +215,21 @@ export async function resolvePath(all: string[]): Promise<Resolved> {
         intro: tr(L, LANDING.lead),
         links: [...courseLinks(courses), { href: P("/corsi"), label: T("catalogLink") }, { href: P("/contatti"), label: T("contacts") }],
         sections: landingSections(L),
+      },
+    };
+  }
+
+  if (!b && a === "certificazione-isaqb") {
+    const p = "/certificazione-isaqb";
+    return {
+      kind: "ok", path: P(p), canonical: P(p),
+      meta: base(p, tr(L, CERT.title), tr(L, CERT.description)),
+      jsonLd: [crumbs([[T("home"), "/"], [tr(L, CERT.crumb), p]]), certFaqJsonLd(L)],
+      shell: {
+        h1: tr(L, CERT.h1),
+        intro: tr(L, CERT.lead),
+        links: [{ href: P("/corso-software-architect"), label: tr(L, LANDING.crumb) }, { href: P("/esame-cpsa-f"), label: tr(L, EXAM.crumb) }, { href: P("/corsi"), label: T("catalogLink") }],
+        sections: certSections(L),
       },
     };
   }

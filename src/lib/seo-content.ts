@@ -6,11 +6,16 @@ import { de } from "../i18n/de";
 import * as COPY from "../content/course-copy";
 import { LANDING } from "../content/landing-copy";
 import { EXAM, EXAM_FAQS } from "../content/exam-copy";
+import { CERT, CERT_FAQS } from "../content/cert-copy";
 import type { L } from "./seo-text";
 
 const DICT: Record<L, Record<string, string>> = { it: {}, en, fr, de };
 /** Traduce un testo italiano nella lingua richiesta (come t() nel browser). */
-export const tr = (l: L, s: string) => DICT[l][s] ?? s;
+export const tr = (l: L, s: string) => {
+  const v = DICT[l][s] ?? s;
+  // link interni scritti come [etichetta](/percorso): nelle altre lingue puntano alla pagina con il prefisso (/en/…), come nel browser
+  return l === "it" ? v : v.replace(/\]\(\//g, `](/${l}/`);
+};
 /** Toglie i link in sintassi markdown: "[scrivici](/contatti)" → "scrivici". */
 const plain = (s: string) => s.replace(/\[([^\]]+)\]\([^)]*\)/g, "$1").replace(/\s+/g, " ").trim();
 
@@ -77,6 +82,27 @@ export const examFaqJsonLd = (l: L) => ({
   "@context": "https://schema.org",
   "@type": "FAQPage",
   mainEntity: examFaqItems(l).map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: plain(f.a) } })),
+});
+
+/** Contenuto della pagina dedicata alla certificazione iSAQB®. */
+export const certFaqItems = (l: L) => CERT_FAQS.map((f) => ({ q: tr(l, f.q), a: tr(l, f.a) }));
+
+export function certSections(l: L): ShellSection[] {
+  return [
+    { items: CERT.facts.map((s) => tr(l, s)) },
+    { heading: tr(l, CERT.whatTitle), items: [tr(l, CERT.whatText)] },
+    { heading: tr(l, CERT.levelsTitle), items: CERT.levels.map((v) => `${tr(l, v.name)}: ${tr(l, v.text)}`) },
+    { heading: tr(l, CERT.audienceTitle), items: COPY.AUDIENCE.map((s) => tr(l, s)) },
+    { heading: tr(l, CERT.limitTitle), items: [tr(l, LANDING.examLimit)] },
+    { heading: tr(l, CERT.pathTitle), items: CERT.path.map((s) => tr(l, s)) },
+    { heading: tr(l, CERT.faq), faqs: certFaqItems(l) },
+  ];
+}
+
+export const certFaqJsonLd = (l: L) => ({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: certFaqItems(l).map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: plain(f.a) } })),
 });
 
 /** Dati strutturati FAQPage per le pagine che mostrano le domande frequenti. */
