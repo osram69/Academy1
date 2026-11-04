@@ -194,7 +194,7 @@ export const TRAINER = {
   name: t("Docente accreditato iSAQB®"),
   role: t("iSAQB® Accredited Trainer"),
   img: "/img/isaqb-accredited-trainer.jpg",
-  bio: t("I corsi CPSA-F sono tenuti da un docente accreditato iSAQB®, come richiesto dal programma di accreditamento: Cube Engineering organizza e conduce i corsi solo con trainer accreditati e materiale didattico accreditato iSAQB®. Ogni edizione ha un unico docente, per questo i partecipanti sono al massimo 12."),
+  bio: t("I corsi CPSA-F sono tenuti da un docente accreditato iSAQB®, come richiesto dal programma di accreditamento: la Cube Engineering organizza e conduce i corsi solo con trainer accreditati e materiale didattico accreditato iSAQB®. Ogni edizione ha un unico docente, per questo i partecipanti sono al massimo 12."),
 };
 
 /* --------------------------- contenuti base ----------------------- */

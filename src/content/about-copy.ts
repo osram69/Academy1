@@ -6,9 +6,9 @@
 
 export const ABOUT = {
   title: "Chi siamo: Cube Academy, Training Provider iSAQB®",
-  description: "Cube Academy è il Training Provider accreditato iSAQB® di Cube Engineering a Roma: docenti accreditati, materiale ufficiale, gruppi fino a 12 partecipanti.",
+  description: "Cube Academy è il Training Provider accreditato iSAQB® della Cube Engineering a Roma: docenti accreditati, materiale ufficiale, gruppi fino a 12 partecipanti.",
   h1: "Chi siamo: formazione iSAQB® per architetti software",
-  lead: "Cube Academy è il nome con cui Cube Engineering S.r.l. organizza a Roma i corsi di preparazione alla certificazione iSAQB® CPSA-Foundation, online e in aula.",
+  lead: "Cube Academy è il ramo della Cube Engineering S.r.l. dedicato ai corsi ad alto contenuto tecnologico: a Roma organizza i corsi di preparazione alla certificazione iSAQB® CPSA-Foundation, online e in aula.",
   crumb: "Chi siamo",
   whoTitle: "Cosa facciamo",
   whoText:
@@ -22,7 +22,7 @@ export const ABOUT = {
   ],
   originTitle: "Da dove veniamo",
   originText:
-    "Cube Academy nasce da Cube Engineering S.r.l. come ramo dedicato ai corsi ad alto contenuto tecnologico. Cube Engineering è nata nel 2014 come società di consulenza, progettazione e costruzione di apparecchiature elettroniche, e offre servizi alle imprese con il brand Roma Office Sharing. Operiamo in settori come aerospaziale, automobilistico, difesa e industriale.",
+    "Cube Academy nasce dalla Cube Engineering S.r.l. come ramo dedicato ai corsi ad alto contenuto tecnologico. La Cube Engineering è nata nel 2014 come società di consulenza, progettazione e costruzione di apparecchiature elettroniche, e offre servizi alle imprese con il brand Roma Office Sharing. Operiamo in settori come aerospaziale, automobilistico, difesa e industriale.",
   skillsTitle: "Le competenze dietro i corsi",
   skillsIntro: "L'esperienza dei nostri professionisti nella progettazione software e hardware si estende a:",
   skills: [
@@ -31,9 +31,9 @@ export const ABOUT = {
     "Software industriale: requisiti e architettura software",
     "Management e soft skills",
   ],
-  skillsNote: "Oggi il calendario è dedicato ai corsi iSAQB® CPSA-Foundation, per i quali Cube Engineering è stata accreditata come training provider nel 2024.",
+  skillsNote: "Oggi il calendario è dedicato ai corsi iSAQB® CPSA-Foundation, per i quali la Cube Engineering è stata accreditata come training provider nel 2024.",
   teamTitle: "Chi c'è dietro Cube Academy",
-  personRole: "Amministratore di Cube Engineering S.r.l.",
+  personRole: "Amministratore della Cube Engineering S.r.l.",
   personBio:
     "Laureato in Ingegneria Elettronica nel 1999, ha oltre 20 anni di esperienza in ingegneria e consulenza, tra program e project management e sviluppo e integrazione di sistemi hardware e software. Per 13 anni ha lavorato come consulente su progetti aerospaziali e della difesa, dalla progettazione di sistemi di controllo per misure e test automatico allo sviluppo e alla documentazione di software conforme allo standard MIL-STD-498.",
   linkedinLabel: "Profilo LinkedIn",

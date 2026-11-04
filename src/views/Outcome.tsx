@@ -193,7 +193,7 @@ export function Outcome({ variant, order }: { variant: OutcomeVariant; order: Or
             <ol className="mt-5 space-y-3" aria-label={t("Prossimi passi")}>
               {[
                 { t: t("Conferma"), d: t("ti scriviamo all'email del partecipante con le istruzioni per collegarti al corso (Zoom).") },
-                { t: t("Fattura"), d: t("Cube Engineering emette la fattura elettronica ai dati di fatturazione indicati.") },
+                { t: t("Fattura"), d: t("La Cube Engineering emette la fattura elettronica ai dati di fatturazione indicati.") },
                 { t: t("Esame iSAQB®"), d: t("non è incluso: si organizza a parte con gli enti autorizzati (280 € + IVA).") },
               ].map((s, i) => (
                 <li key={s.t} className="flex gap-4 rounded-xl border border-ink/10 bg-white px-4 py-3.5">

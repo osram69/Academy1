@@ -468,7 +468,7 @@ function StepBilling({ billing, set, errors, attempted, privatePct, onEditType }
 
       <p className="flex items-start gap-2.5 text-[12.5px] leading-snug text-steel">
         <ShieldCheck className="mt-0.5 size-4 shrink-0 text-mint" aria-hidden="true" />
-        {t("La fattura elettronica è emessa da Cube Engineering ai dati di fatturazione indicati.")}</p>
+        {t("La fattura elettronica è emessa dalla Cube Engineering ai dati di fatturazione indicati.")}</p>
     </div>
   );
 }
