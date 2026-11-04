@@ -9,6 +9,7 @@ import { supabase, supabaseConfigured } from "./lib/supabase";
 
 import { lang, locale, t } from "./i18n";
 import { isaqbLinks } from "./links";
+import * as COPY from "./content/course-copy";
 const DAY = 86400000;
 
 export type CourseFormat = "online" | "aula" | "prestige";
@@ -197,66 +198,12 @@ export const TRAINER = {
 
 /* --------------------------- contenuti base ----------------------- */
 
-const F_OBJECTIVES = [
-  t("Comprendere i concetti fondamentali e la terminologia dell'architettura software"),
-  t("Analizzare e definire i requisiti architetturali, inclusi i requisiti di qualità"),
-  t("Applicare metodologie e strumenti per la progettazione e documentazione dell'architettura software"),
-  t("Valutare diverse soluzioni architetturali rispetto ai requisiti e ai vincoli aziendali e tecnici"),
-  t("Collaborare efficacemente con team multidisciplinari e stakeholder"),
-];
-
-const F_AUDIENCE = [
-  t("Software Architect"),
-  t("Sviluppatori senior e Lead Developer"),
-  t("Project Manager con focus tecnico"),
-  t("IT Consultant e Technical Leader"),
-  t("Esperti di requisiti e ingegneri del software"),
-];
-
-const F_PREREQUISITES = [
-  t("Almeno 18 mesi di esperienza pratica nello sviluppo di software, acquisita programmando vari progetti o sistemi al di fuori dell'istruzione"),
-  t("Conoscenza ed esperienza pratica in almeno un linguaggio di programmazione, preferibilmente ad oggetti"),
-  t("Nozioni di base di UML (diagrammi di classe, di pacchetto, di componente e di sequenza) e loro relazione con il codice sorgente"),
-  t("Esperienza pratica nella documentazione tecnica"),
-];
-
-const F_MODULES: CourseModule[] = [
-  {
-    title: t("Introduzione all'architettura software"),
-    hours: 0,
-    topics: [t("Concetti base e terminologia"), t("Ruolo e responsabilità dell'architetto software")],
-  },
-  {
-    title: t("Requisiti e qualità del software"),
-    hours: 0,
-    topics: [t("Raccolta e gestione dei requisiti architetturali"), t("Requisiti di qualità e scenari di qualità")],
-  },
-  {
-    title: t("Progettazione dell'architettura software"),
-    hours: 0,
-    topics: [
-      t("Modelli architetturali e stili (ad esempio Layered Architecture, Microservices, Event-Driven Architecture)"),
-      t("Decisioni architetturali e trade-off"),
-    ],
-  },
-  {
-    title: t("Documentazione e comunicazione"),
-    hours: 0,
-    topics: [t("Tecniche di documentazione dell'architettura"), t("Comunicazione con stakeholder tecnici e non tecnici")],
-  },
-  {
-    title: t("Valutazione delle architetture software"),
-    hours: 0,
-    topics: [t("Strumenti e tecniche per valutare la qualità dell'architettura"), t("Analisi dei rischi e mitigazione")],
-  },
-];
-
-const F_INCLUDES = [
-  t("Corso sincrono con docente accreditato iSAQB® (max 12 partecipanti)"),
-  t("Materiale Cube Academy / iSAQB®"),
-  t("Simulazione d'esame con discussione e correzione (ultima giornata)"),
-  t("Attestato di partecipazione Cube Academy, su richiesta"),
-];
+// I testi stanno in src/content/course-copy.ts (condivisi con l'HTML per i crawler); qui si traducono nella lingua del sito.
+const F_OBJECTIVES = COPY.OBJECTIVES.map((s) => t(s));
+const F_AUDIENCE = COPY.AUDIENCE.map((s) => t(s));
+const F_PREREQUISITES = COPY.PREREQUISITES.map((s) => t(s));
+const F_MODULES: CourseModule[] = COPY.MODULES.map((m) => ({ title: t(m.title), hours: 0, topics: m.topics.map((s) => t(s)) }));
+const F_INCLUDES = COPY.INCLUDES.map((s) => t(s));
 
 /* ------------------------------ corsi ----------------------------- */
 /* I corsi arrivano dal database (vista Supabase corsi_public), gestito dal pannello #/admin. */
@@ -625,33 +572,12 @@ export const STATS = [
 
 /* -------------------------------- FAQ ----------------------------- */
 
-export const FAQS = [
-  {
-    q: t("L'esame di certificazione è incluso nel prezzo?"),
-    a: t("No. La tassa d'esame CPSA-F (280 € + IVA) non è inclusa nel prezzo del corso e si paga separatamente all'ente di certificazione autorizzato iSAQB®, con cui organizzi l'esame in autonomia al termine del corso. Durante l'ultima giornata svolgiamo una simulazione d'esame con discussione e correzione."),
-    links: [isaqbLinks().exams, isaqbLinks().certification, isaqbLinks().cpsaF],
-  },
-  {
-    q: t("Posso pagare con bonifico e fattura alla mia azienda?"),
-    a: t("Certo. Durante l'iscrizione scegli il soggetto fatturante (privato, libero professionista, azienda italiana o estera) e inserisci P.IVA, codice SDI e PEC. "),
-  },
-  {
-    q: t("Come funziona la politica di rimborso?"),
-    a: t("Se il corso non viene erogato per mancato raggiungimento del numero minimo di partecipanti, la quota versata è rimborsata (in alternativa puoi scegliere un'altra data). Per altre esigenze, come la sostituzione di un partecipante, usa il [modulo di contatto](/contatti?oggetto=rimborso)."),
-  },
-  {
-    q: t("Cosa sono i corsi Prestige residenziali?"),
-    a: t("I corsi residenziali durano 4 giorni e comprendono albergo e mezza pensione, nelle più belle città italiane. Le informazioni arriveranno presto: [scrivici](/contatti?oggetto=prestige) per essere avvisato."),
-  },
-  {
-    q: t("Serve esperienza da architetto per iscriversi?"),
-    a: t("No: servono almeno 18 mesi di esperienza in sviluppo software. Il corso Foundation è pensato per costruire il metodo, parte dalle basi del ruolo. Se hai dubbi sul livello, [scrivici](/contatti?oggetto=info)."),
-  },
-  {
-    q: t("Organizzate edizioni dedicate per il nostro team?"),
-    a: t("Per gruppi aziendali puoi contattarci per valutare edizioni dedicate: [scrivici](/contatti?oggetto=gruppi)."),
-  },
-];
+export const FAQS = COPY.FAQS_COPY.map((f, i) => ({
+  q: t(f.q),
+  a: t(f.a),
+  // la prima risposta (esame) rimanda alle pagine ufficiali iSAQB®
+  ...(i === 0 ? { links: [isaqbLinks().exams, isaqbLinks().certification, isaqbLinks().cpsaF] } : {}),
+}));
 
 export const ORG = {
   name: t("Cube Academy"),

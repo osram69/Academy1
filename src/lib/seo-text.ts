@@ -9,24 +9,34 @@ const r = (it: string, en: string, fr: string, de: string): Record<L, string> =>
 
 const X = {
   home: r("Home", "Home", "Accueil", "Startseite"),
+  // Titoli e descrizioni: i termini con cui si cerca il corso (corsi iSAQB, Software Architect, certificazione CPSA-F) stanno nelle prime parole.
   homeTitle: r(
-    "Cube Academy — Certificazione iSAQB® CPSA-F",
-    "Cube Academy — iSAQB® CPSA-F Certification Courses",
-    "Cube Academy — Certification iSAQB® CPSA-F",
-    "Cube Academy — iSAQB® CPSA-F Zertifizierung"
+    "Corsi iSAQB® CPSA-F: diventa Software Architect | Cube Academy",
+    "iSAQB® CPSA-F courses: become a Software Architect | Cube Academy",
+    "Formations iSAQB® CPSA-F : devenez Software Architect | Cube Academy",
+    "iSAQB® CPSA-F Kurse: Software Architect werden | Cube Academy"
   ),
   homeH1: r(
-    "Cube Academy — Corsi di certificazione iSAQB® CPSA-F",
-    "Cube Academy — iSAQB® CPSA-F certification courses",
-    "Cube Academy — Formations de certification iSAQB® CPSA-F",
-    "Cube Academy — iSAQB® CPSA-F Zertifizierungskurse"
+    "Corsi iSAQB® CPSA-F: diventa Software Architect certificato",
+    "iSAQB® CPSA-F courses: become a certified Software Architect",
+    "Formations iSAQB® CPSA-F : devenez Software Architect certifié",
+    "iSAQB® CPSA-F Kurse: zertifizierter Software Architect werden"
   ),
   homeDesc: r(
-    "Cube Academy — Training Provider accreditato iSAQB® dal 2024. Corsi CPSA-Foundation online e in aula a Roma.",
-    "Cube Academy — accredited iSAQB® Training Provider since 2024. CPSA-Foundation courses online and in the classroom in Rome.",
-    "Cube Academy — Training Provider accrédité iSAQB® depuis 2024. Formations CPSA-Foundation en ligne et en présentiel à Rome.",
-    "Cube Academy — seit 2024 akkreditierter iSAQB® Training Provider. CPSA-Foundation-Kurse online und in Präsenz in Rom."
+    "Corsi iSAQB® CPSA-F online e a Roma per diventare Software Architect certificato: 24 ore con docenti accreditati, simulazione d'esame, gruppi fino a 12.",
+    "iSAQB® CPSA-F courses online and in Rome to become a certified Software Architect: 24 hours with accredited trainers, mock exam, groups of up to 12.",
+    "Formations iSAQB® CPSA-F en ligne et à Rome pour devenir Software Architect certifié : 24 h avec formateurs accrédités, examen blanc, 12 participants maximum.",
+    "iSAQB® CPSA-F Kurse online und in Rom zum zertifizierten Software Architect: 24 Stunden mit akkreditierten Trainern, Probeprüfung, Gruppen bis 12."
   ),
+  secObjectives: r("Cosa imparerai nel corso CPSA-F", "What you will learn in the CPSA-F course", "Ce que vous apprendrez dans la formation CPSA-F", "Was Sie im CPSA-F-Kurs lernen"),
+  secProgram: r("Programma del corso", "Course programme", "Programme de la formation", "Kursprogramm"),
+  secAudience: r("A chi si rivolge", "Who it is for", "À qui s'adresse la formation", "Für wen der Kurs ist"),
+  secPrereq: r("Prerequisiti", "Prerequisites", "Prérequis", "Voraussetzungen"),
+  secIncludes: r("Cosa include", "What is included", "Ce qui est inclus", "Was enthalten ist"),
+  secFaq: r("Domande frequenti sul corso iSAQB® CPSA-F", "Frequently asked questions about the iSAQB® CPSA-F course", "Questions fréquentes sur la formation iSAQB® CPSA-F", "Häufige Fragen zum iSAQB® CPSA-F-Kurs"),
+  courseTitleKind: r("Corso iSAQB® CPSA-F", "iSAQB® CPSA-F course", "Formation iSAQB® CPSA-F", "iSAQB® CPSA-F Kurs"),
+  modeShortOnline: r("online", "online", "en ligne", "online"),
+  modeShortClassroom: r("a {loc}", "in {loc}", "à {loc}", "in {loc}"),
   homeIntro: r(
     "Cube Academy è Training Provider accreditato iSAQB® dal 2024. Corsi CPSA-Foundation online e in aula a Roma per diventare architetto del software certificato, con docenti accreditati e gruppi fino a 12 partecipanti.",
     "Cube Academy has been an accredited iSAQB® Training Provider since 2024. CPSA-Foundation courses online and in the classroom in Rome to become a certified software architect, with accredited trainers and groups of up to 12 participants.",
@@ -42,10 +52,10 @@ const X = {
   catalogLink: r("Catalogo corsi iSAQB® CPSA-F", "iSAQB® CPSA-F course catalogue", "Catalogue des formations iSAQB® CPSA-F", "Kurskatalog iSAQB® CPSA-F"),
   catalogCrumb: r("Catalogo corsi", "Course catalogue", "Catalogue des formations", "Kurskatalog"),
   catalogTitle: r(
-    "Catalogo corsi iSAQB® CPSA-F 2026 — date e prezzi",
-    "iSAQB® CPSA-F course catalogue 2026 — dates and prices",
-    "Catalogue des formations iSAQB® CPSA-F 2026 — dates et tarifs",
-    "Kurskatalog iSAQB® CPSA-F 2026 — Termine und Preise"
+    "Corsi iSAQB® CPSA-F 2026: date, prezzi e iscrizione",
+    "iSAQB® CPSA-F courses 2026: dates, prices and enrolment",
+    "Formations iSAQB® CPSA-F 2026 : dates, tarifs et inscription",
+    "iSAQB® CPSA-F Kurse 2026: Termine, Preise und Anmeldung"
   ),
   catalogDesc: r(
     "Calendario 2026 dei corsi iSAQB® CPSA-F Foundation: edizioni online e in aula a Roma, date, prezzi e iscrizione. Docenti accreditati, gruppi fino a 12 partecipanti.",
@@ -60,10 +70,10 @@ const X = {
   modeClassroom: r("in aula a {loc}", "in the classroom in {loc}", "en présentiel à {loc}", "in Präsenz in {loc}"),
   priceFrom: r("Da € {p} + IVA.", "From € {p} + VAT.", "À partir de {p} € + TVA.", "Ab {p} € zzgl. MwSt."),
   courseTail: r(
-    "Docente accreditato iSAQB®, gruppi fino a 12 partecipanti, Cube Academy Training Provider accreditato.",
-    "iSAQB®-accredited trainer, groups of up to 12 participants, Cube Academy accredited Training Provider.",
-    "Formateur accrédité iSAQB®, groupes de 12 participants maximum, Cube Academy Training Provider accrédité.",
-    "iSAQB®-akkreditierter Trainer, Gruppen bis 12 Teilnehmer, Cube Academy akkreditierter Training Provider."
+    "Docente accreditato iSAQB®, max 12 partecipanti.",
+    "iSAQB®-accredited trainer, max. 12 participants.",
+    "Formateur accrédité iSAQB®, 12 participants max.",
+    "iSAQB®-akkreditierter Trainer, max. 12 Teilnehmer."
   ),
   schedule: r("Orario: {s}.", "Schedule: {s}.", "Horaires : {s}.", "Zeiten: {s}."),
   enroll: r("Iscriviti a questa edizione", "Enrol in this edition", "S'inscrire à cette session", "Für diesen Termin anmelden"),

@@ -3,6 +3,7 @@ import { SITE, SITE_URL } from "./site";
 import { getCourses, getEvents, type SeoCourse, type SeoEvent } from "./server-data";
 import { leadingId } from "./slug";
 import { LANG_CODES, LOCALE, OG_LOCALE, tx, type L, type TextKey } from "./seo-text";
+import { courseSections, faqSection, type ShellSection } from "./seo-content";
 
 /** Per ogni percorso del sito: metadati, dati strutturati e testo per i crawler, calcolati sul server.
  *  L'italiano è senza prefisso (/corsi); inglese, francese e tedesco stanno sotto /en, /fr, /de. */
@@ -16,6 +17,7 @@ export interface ShellContent {
   h1: string;
   intro: string;
   links: { href: string; label: string }[];
+  sections?: ShellSection[];
 }
 
 /** "10–12 novembre 2026", "30 ottobre – 2 novembre 2026", "5 marzo 2026" (mesi nella lingua richiesta) */
@@ -127,7 +129,7 @@ export async function resolvePath(all: string[]): Promise<Resolved> {
       jsonLd: courses.length
         ? [{ "@context": "https://schema.org", "@type": "ItemList", name: T("nextEditions"), itemListElement: courses.map((x, i) => ({ "@type": "ListItem", position: i + 1, url: url(`/corso/${x.slug}`, L), name: x.title })) }]
         : [],
-      shell: { h1: T("homeH1"), intro: T("homeIntro"), links: [...courseLinks(courses), ...MAIN_LINKS] },
+      shell: { h1: T("homeH1"), intro: T("homeIntro"), links: [...courseLinks(courses), ...MAIN_LINKS], sections: [faqSection(L)] },
     };
   }
 
@@ -153,14 +155,18 @@ export async function resolvePath(all: string[]): Promise<Resolved> {
     if (course.slug !== b) return { kind: "redirect", to: P(`/corso/${course.slug}`) };
     const p = `/corso/${course.slug}`;
     const description = courseDescription(course);
+    // titolo costruito dai dati dell'edizione ("Corso iSAQB® CPSA-F online — 21–29 novembre 2026"), non dal nome libero salvato a database
+    const modeShort = course.online ? T("modeShortOnline") : course.residential ? T("modeResidential") : T("modeShortClassroom", { loc: course.location });
+    const title = `${T("courseTitleKind")} ${modeShort} — ${dateRange(L, course.start, course.end)}`;
     return {
       kind: "ok", path: P(p), canonical: P(p),
-      meta: base(p, `${course.title} — ${dateRange(L, course.start, course.end)}`, description),
+      meta: base(p, title, description),
       jsonLd: [crumbs([[T("home"), "/"], [T("catalogCrumb"), "/corsi"], [course.title, p]]), courseJsonLd(course, p)],
       shell: {
-        h1: `${course.title} — ${dateRange(L, course.start, course.end)}`,
-        intro: `${description}${course.schedule ? ` ${T("schedule", { s: course.schedule })}` : ""}`,
+        h1: title,
+        intro: `${course.title}. ${description}${course.schedule ? ` ${T("schedule", { s: course.schedule })}` : ""}`,
         links: [{ href: P(`/iscriviti/${course.slug}`), label: T("enroll") }, ...MAIN_LINKS],
+        sections: courseSections(L),
       },
     };
   }

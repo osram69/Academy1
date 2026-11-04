@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: { default: SITE.title, template: `%s | ${SITE.name}` },
   description: SITE.description,
   applicationName: SITE.name,
-  keywords: ["iSAQB", "CPSA-F", "CPSA Foundation", "certificazione architetto software", "corso architettura software", "training provider iSAQB", "Roma", "Cube Academy", "Cube Engineering"],
+  keywords: ["corsi iSAQB", "corso iSAQB", "iSAQB", "CPSA-F", "CPSA Foundation", "corso Software Architect", "certificazione architetto software", "esame CPSA-F", "corso architettura software", "training provider iSAQB", "Roma", "Cube Academy", "Cube Engineering"],
   authors: [{ name: SITE.company, url: SITE_URL }],
   creator: SITE.company,
   publisher: SITE.company,
