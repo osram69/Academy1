@@ -271,7 +271,7 @@ export function CourseDetail({ course }: { course: Course }) {
                       </span>
                       <span className="min-w-0 flex-1">
                         <span className="block truncate font-display text-[15.5px] font-semibold tracking-tight text-ink">{m.title}</span>
-                        <span className="mt-0.5 block font-mono text-[11px] uppercase tracking-widest text-steel">{m.topics.length}{" "}{t("argomenti")}</span>
+                        <span className="mt-0.5 line-clamp-2 block text-[13px] leading-snug text-ink/60">{m.outcome}</span>
                       </span>
                       <ChevronDown className={cn("size-5 shrink-0 text-steel transition-transform duration-300", isOpen && "rotate-180 text-flame")} aria-hidden="true" />
                     </button>

@@ -5,6 +5,10 @@
  * Le chiavi di traduzione sono questi stessi testi: modificarne uno richiede di aggiornare src/i18n/{en,fr,de}.ts.
  */
 
+/** Presentazione del corso nelle schede online e in aula. */
+export const COURSE_INTRO =
+  "Un corso pratico di 24 ore per imparare a prendere decisioni architetturali che restano valide nel tempo: requisiti di qualità, stili architetturali, documentazione e valutazione dei rischi, secondo il curriculum iSAQB® Foundation Level. Ti prepara all'esame CPSA-Foundation, con una simulazione d'esame nell'ultima giornata.";
+
 export const OBJECTIVES = [
   "Comprendere i concetti fondamentali e la terminologia dell'architettura software",
   "Analizzare e definire i requisiti architetturali, inclusi i requisiti di qualità",
@@ -28,17 +32,21 @@ export const PREREQUISITES = [
   "Esperienza pratica nella documentazione tecnica",
 ];
 
-export const MODULES: { title: string; topics: string[] }[] = [
+/** `outcome` = ciò che sai fare alla fine del modulo, in una riga. */
+export const MODULES: { title: string; outcome: string; topics: string[] }[] = [
   {
     title: "Introduzione all'architettura software",
+    outcome: "Il linguaggio comune dell'architettura e le responsabilità dell'architetto.",
     topics: ["Concetti base e terminologia", "Ruolo e responsabilità dell'architetto software"],
   },
   {
     title: "Requisiti e qualità del software",
+    outcome: "Come trasformare i requisiti in scenari di qualità e vincoli di progetto.",
     topics: ["Raccolta e gestione dei requisiti architetturali", "Requisiti di qualità e scenari di qualità"],
   },
   {
     title: "Progettazione dell'architettura software",
+    outcome: "Stili architetturali, trade-off e decisioni, prima che diventino debito tecnico.",
     topics: [
       "Modelli architetturali e stili (ad esempio Layered Architecture, Microservices, Event-Driven Architecture)",
       "Decisioni architetturali e trade-off",
@@ -46,10 +54,12 @@ export const MODULES: { title: string; topics: string[] }[] = [
   },
   {
     title: "Documentazione e comunicazione",
+    outcome: "Come descrivere e comunicare l'architettura a team e stakeholder.",
     topics: ["Tecniche di documentazione dell'architettura", "Comunicazione con stakeholder tecnici e non tecnici"],
   },
   {
     title: "Valutazione delle architetture software",
+    outcome: "Come valutare un'architettura rispetto ai requisiti e gestire i rischi.",
     topics: ["Strumenti e tecniche per valutare la qualità dell'architettura", "Analisi dei rischi e mitigazione"],
   },
 ];
@@ -61,11 +71,24 @@ export const INCLUDES = [
   "Attestato di partecipazione Cube Academy, su richiesta",
 ];
 
-/** `inSearch: false` = la domanda non va nell'HTML per i crawler (informazioni non ancora definitive). */
-export const FAQS_COPY: { q: string; a: string; inSearch?: boolean }[] = [
+/**
+ * Domande frequenti, nell'ordine in cui le pone chi decide se iscriversi: prima certificazione, esame e a chi è adatto,
+ * poi durata e formato, prezzo, infine pagamento, rimborso e gruppi.
+ * `links: "exam"` = la risposta rimanda alle pagine ufficiali iSAQB® sull'esame.
+ */
+export const FAQS_COPY: { q: string; a: string; links?: "exam" }[] = [
   {
-    q: "L'esame di certificazione è incluso nel prezzo?",
-    a: "No. La tassa d'esame CPSA-F (280 € + IVA) non è inclusa nel prezzo del corso e si paga separatamente all'ente di certificazione autorizzato iSAQB®, con cui organizzi l'esame in autonomia al termine del corso. Durante l'ultima giornata svolgiamo una simulazione d'esame con discussione e correzione.",
+    q: "Il corso rilascia la certificazione CPSA-F?",
+    a: "No. Il corso ti prepara all'esame CPSA-Foundation, che si sostiene separatamente presso un ente autorizzato iSAQB®. Nell'ultima giornata svolgiamo una simulazione d'esame con discussione e correzione.",
+  },
+  {
+    q: "Quanto costa l'esame e chi lo organizza?",
+    a: "La tassa d'esame CPSA-F (280 € + IVA) non è inclusa nel prezzo del corso: la paghi all'ente di certificazione autorizzato iSAQB®, con cui organizzi l'esame in autonomia al termine del corso.",
+    links: "exam",
+  },
+  {
+    q: "A chi è adatto il corso? Devo già essere un architetto?",
+    a: "No. Servono almeno 18 mesi di esperienza nello sviluppo software, non da architetto: il corso parte dalle basi del ruolo. È pensato per sviluppatori senior, Tech Lead, IT Consultant e Project Manager con focus tecnico. Se hai dubbi sul livello, [scrivici](/contatti?oggetto=info).",
   },
   {
     q: "Che cos'è la certificazione CPSA-F?",
@@ -80,21 +103,16 @@ export const FAQS_COPY: { q: string; a: string; inSearch?: boolean }[] = [
     a: "Ogni edizione si svolge online, in aula virtuale live su Zoom, oppure in aula a Roma. Il formato e la lingua di ciascuna edizione sono indicati nella scheda del corso.",
   },
   {
+    q: "Quanto costa il corso e ci sono sconti?",
+    a: "Il prezzo è indicato a persona, IVA esclusa, nella scheda di ogni edizione e può comprendere uno sconto early bird. Chi si iscrive a titolo personale, senza partita IVA, ha una tariffa dedicata, mostrata nel riepilogo prima del pagamento. Un codice sconto sostituisce l'early bird e non si somma ad altre promozioni.",
+  },
+  {
     q: "Posso pagare con bonifico e fattura alla mia azienda?",
-    a: "Certo. Durante l'iscrizione scegli il soggetto fatturante (privato, libero professionista, azienda italiana o estera) e inserisci P.IVA, codice SDI e PEC. ",
+    a: "Certo. Durante l'iscrizione scegli il soggetto fatturante (privato, libero professionista, azienda italiana o estera) e inserisci P.IVA, codice SDI e PEC.",
   },
   {
     q: "Come funziona la politica di rimborso?",
     a: "Se il corso non viene erogato per mancato raggiungimento del numero minimo di partecipanti, la quota versata è rimborsata (in alternativa puoi scegliere un'altra data). Per altre esigenze, come la sostituzione di un partecipante, usa il [modulo di contatto](/contatti?oggetto=rimborso).",
-  },
-  {
-    q: "Cosa sono i corsi Prestige residenziali?",
-    a: "I corsi residenziali durano 4 giorni e comprendono albergo e mezza pensione, nelle più belle città italiane. Le informazioni arriveranno presto: [scrivici](/contatti?oggetto=prestige) per essere avvisato.",
-    inSearch: false,
-  },
-  {
-    q: "Serve esperienza da architetto per iscriversi?",
-    a: "No: servono almeno 18 mesi di esperienza in sviluppo software. Il corso Foundation è pensato per costruire il metodo, parte dalle basi del ruolo. Se hai dubbi sul livello, [scrivici](/contatti?oggetto=info).",
   },
   {
     q: "Organizzate edizioni dedicate per il nostro team?",

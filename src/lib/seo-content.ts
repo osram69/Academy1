@@ -25,13 +25,13 @@ export const faqSection = (l: L): ShellSection => ({
   faqs: faqItems(l),
 });
 
-export const faqItems = (l: L) => COPY.FAQS_COPY.filter((f) => f.inSearch !== false).map((f) => ({ q: tr(l, f.q), a: plain(tr(l, f.a)) }));
+export const faqItems = (l: L) => COPY.FAQS_COPY.map((f) => ({ q: tr(l, f.q), a: plain(tr(l, f.a)) }));
 
 /** Contenuto della scheda corso: obiettivi, programma, destinatari, prerequisiti, cosa include e FAQ (tutto ciò che la pagina mostra). */
 export function courseSections(l: L): ShellSection[] {
   return [
     { heading: tr(l, LANDING.objectives), items: COPY.OBJECTIVES.map((s) => tr(l, s)) },
-    { heading: tr(l, LANDING.program), items: COPY.MODULES.map((m) => `${tr(l, m.title)}: ${m.topics.map((s) => tr(l, s)).join("; ")}`) },
+    { heading: tr(l, LANDING.program), items: COPY.MODULES.map((m) => `${tr(l, m.title)}: ${tr(l, m.outcome)} ${m.topics.map((s) => tr(l, s)).join("; ")}.`) },
     { heading: tr(l, LANDING.audience), items: COPY.AUDIENCE.map((s) => tr(l, s)) },
     { heading: tr(l, LANDING.prerequisites), items: COPY.PREREQUISITES.map((s) => tr(l, s)) },
     { heading: tr(l, LANDING.includes), items: COPY.INCLUDES.map((s) => tr(l, s)) },
@@ -49,7 +49,7 @@ export function landingSections(l: L): ShellSection[] {
     audience,
     prereq,
     includes,
-    { heading: tr(l, LANDING.examTitle), items: [tr(l, LANDING.examText)] },
+    { heading: tr(l, LANDING.examTitle), items: [tr(l, LANDING.examText), tr(l, LANDING.examLimit)] },
     faq,
   ];
 }

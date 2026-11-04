@@ -53,6 +53,7 @@ export type Lang = "IT" | "EN";
 export interface CourseModule {
   title: string;
   hours: number;
+  outcome: string;
   topics: string[];
 }
 
@@ -202,7 +203,7 @@ export const TRAINER = {
 const F_OBJECTIVES = COPY.OBJECTIVES.map((s) => t(s));
 const F_AUDIENCE = COPY.AUDIENCE.map((s) => t(s));
 const F_PREREQUISITES = COPY.PREREQUISITES.map((s) => t(s));
-const F_MODULES: CourseModule[] = COPY.MODULES.map((m) => ({ title: t(m.title), hours: 0, topics: m.topics.map((s) => t(s)) }));
+const F_MODULES: CourseModule[] = COPY.MODULES.map((m) => ({ title: t(m.title), hours: 0, outcome: t(m.outcome), topics: m.topics.map((s) => t(s)) }));
 const F_INCLUDES = COPY.INCLUDES.map((s) => t(s));
 
 /* ------------------------------ corsi ----------------------------- */
@@ -239,13 +240,13 @@ const FORMAT_COPY: Record<CourseFormat, { image: string; tagline: string; descri
     image: "https://images.pexels.com/photos/18999565/pexels-photo-18999565.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
     tagline: t("Aula virtuale live su Zoom con docente accreditato e simulazione d'esame nell'ultima giornata."),
     description:
-      t("Il corso iSAQB® CPSA Foundation Level fornisce una solida base per apprendere i principi fondamentali della progettazione e gestione dell'architettura software, con l'obiettivo di creare sistemi robusti, scalabili e facilmente manutenibili."),
+      t(COPY.COURSE_INTRO),
   },
   aula: {
     image: "https://images.pexels.com/photos/3184328/pexels-photo-3184328.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
     tagline: t("In presenza a Roma, con docente accreditato iSAQB® e gruppi fino a 12 partecipanti."),
     description:
-      t("Lo stesso programma iSAQB® CPSA Foundation Level, seguito in aula a Roma."),
+      t(COPY.COURSE_INTRO),
   },
   prestige: {
     image: "https://images.pexels.com/photos/38120266/pexels-photo-38120266.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
@@ -572,11 +573,11 @@ export const STATS = [
 
 /* -------------------------------- FAQ ----------------------------- */
 
-export const FAQS = COPY.FAQS_COPY.map((f, i) => ({
+export const FAQS = COPY.FAQS_COPY.map((f) => ({
   q: t(f.q),
   a: t(f.a),
-  // la prima risposta (esame) rimanda alle pagine ufficiali iSAQB®
-  ...(i === 0 ? { links: [isaqbLinks().exams, isaqbLinks().certification, isaqbLinks().cpsaF] } : {}),
+  // la risposta sull'esame rimanda alle pagine ufficiali iSAQB®
+  ...(f.links === "exam" ? { links: [isaqbLinks().exams, isaqbLinks().certification, isaqbLinks().cpsaF] } : {}),
 }));
 
 export const ORG = {

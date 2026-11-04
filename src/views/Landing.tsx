@@ -99,6 +99,7 @@ export function Landing() {
                       <span className="mr-3 font-mono text-[11px] text-flame">{String(i + 1).padStart(2, "0")}</span>
                       {t(m.title)}
                     </p>
+                    <p className="mt-1 pl-9 text-[14px] font-medium leading-relaxed text-ink/80">{t(m.outcome)}</p>
                     <ul className="mt-2 space-y-1.5 pl-9 text-[14px] leading-relaxed text-ink/65">
                       {m.topics.map((s) => (
                         <li key={s} className="list-disc">{t(s)}</li>
@@ -134,6 +135,7 @@ export function Landing() {
             <div>
               <h2 id="exam-h" className="font-display text-[1.25rem] font-bold tracking-tight text-ink">{t(LANDING.examTitle)}</h2>
               <p className="mt-2 text-[15px] leading-relaxed text-ink/70">{t(LANDING.examText)}</p>
+              <p className="mt-2 text-[15px] leading-relaxed text-ink/70">{t(LANDING.examLimit)}</p>
             </div>
           </div>
         </section>
