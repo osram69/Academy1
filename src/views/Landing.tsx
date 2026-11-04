@@ -125,6 +125,7 @@ export function Landing() {
             </div>
             <div>
               <h2 className="font-display text-[clamp(1.7rem,3.2vw,2.5rem)] font-bold tracking-tight text-ink">{t(LANDING.program)}</h2>
+              <p className="mt-3 text-[14.5px] text-ink/65"><RichText text={t(COPY.CURRICULUM_NOTE)} /></p>
               <ol className="mt-5 space-y-4">
                 {COPY.MODULES.map((m, i) => (
                   <li key={m.title} className="rounded-2xl border border-ink/10 bg-white p-5">

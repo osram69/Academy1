@@ -66,6 +66,7 @@ export function Certification() {
         <section className="border-t border-ink/8 bg-sand/35 py-20" aria-labelledby="levels-h">
           <div className="mx-auto max-w-7xl px-5 lg:px-8">
             <h2 id="levels-h" className="font-display text-[clamp(1.7rem,3.2vw,2.5rem)] font-bold tracking-tight text-ink">{t(CERT.levelsTitle)}</h2>
+            <p className="mt-3 text-[15px] text-ink/70"><RichText text={t(COPY.CURRICULUM_NOTE)} /></p>
             <ol className="mt-8 grid gap-5 md:grid-cols-3">
               {CERT.levels.map((l, i) => (
                 <li key={l.name} className="rounded-2xl border border-ink/10 bg-white p-6">

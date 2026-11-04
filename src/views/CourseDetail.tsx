@@ -263,6 +263,7 @@ export function CourseDetail({ course }: { course: Course }) {
           </Block>
 
           <Block id="programma" n="04" title={t("Programma del corso")}>
+            <p className="mb-5 text-[14.5px] text-ink/65"><RichText text={t(COPY.CURRICULUM_NOTE)} /></p>
             <div className="space-y-3">
               {course.modules.map((m, i) => {
                 const isOpen = openModule === i;

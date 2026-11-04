@@ -42,7 +42,7 @@ export const venueSection = (l: L): ShellSection => ({ items: [tr(l, COPY.VENUE_
 export function courseSections(l: L): ShellSection[] {
   return [
     { heading: tr(l, LANDING.objectives), items: COPY.OBJECTIVES.map((s) => tr(l, s)) },
-    { heading: tr(l, LANDING.program), items: COPY.MODULES.map((m) => `${tr(l, m.title)}: ${tr(l, m.outcome)} ${m.topics.map((s) => tr(l, s)).join("; ")}.`) },
+    { heading: tr(l, LANDING.program), items: [tr(l, COPY.CURRICULUM_NOTE), ...COPY.MODULES.map((m) => `${tr(l, m.title)}: ${tr(l, m.outcome)} ${m.topics.map((s) => tr(l, s)).join("; ")}.`)] },
     { heading: tr(l, LANDING.audience), items: COPY.AUDIENCE.map((s) => tr(l, s)) },
     { heading: tr(l, LANDING.prerequisites), items: COPY.PREREQUISITES.map((s) => tr(l, s)) },
     { heading: tr(l, LANDING.includes), items: COPY.INCLUDES.map((s) => tr(l, s)) },
@@ -74,7 +74,7 @@ export function examSections(l: L): ShellSection[] {
   return [
     { items: EXAM.facts.map((s) => tr(l, s)) },
     { heading: tr(l, EXAM.stepsTitle), items: EXAM.steps.map((s) => tr(l, s)) },
-    { heading: tr(l, EXAM.prepTitle), items: [tr(l, EXAM.prepText)] },
+    { heading: tr(l, EXAM.prepTitle), items: [tr(l, EXAM.prepText), tr(l, COPY.CURRICULUM_NOTE)] },
     { heading: tr(l, EXAM.limitTitle), items: [tr(l, LANDING.examLimit), tr(l, EXAM.source)] },
     { heading: tr(l, EXAM.faq), faqs: examFaqItems(l) },
   ];
@@ -105,7 +105,7 @@ export function certSections(l: L): ShellSection[] {
   return [
     { items: CERT.facts.map((s) => tr(l, s)) },
     { heading: tr(l, CERT.whatTitle), items: [tr(l, CERT.whatText)] },
-    { heading: tr(l, CERT.levelsTitle), items: CERT.levels.map((v) => `${tr(l, v.name)}: ${tr(l, v.text)}`) },
+    { heading: tr(l, CERT.levelsTitle), items: [tr(l, COPY.CURRICULUM_NOTE), ...CERT.levels.map((v) => `${tr(l, v.name)}: ${tr(l, v.text)}`)] },
     { heading: tr(l, CERT.audienceTitle), items: COPY.AUDIENCE.map((s) => tr(l, s)) },
     { heading: tr(l, CERT.limitTitle), items: [tr(l, LANDING.examLimit)] },
     { heading: tr(l, CERT.pathTitle), items: CERT.path.map((s) => tr(l, s)) },

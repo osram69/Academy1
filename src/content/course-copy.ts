@@ -14,6 +14,9 @@ export const VENUE_NOTE =
   "I corsi in aula a Roma si svolgono presso [Roma Office Sharing](https://www.romaofficesharing.it/sale-corsi.html), in Via Venti Settembre 118, a pochi minuti da Roma Termini.";
 export const VENUE_FOOTER = "Sede dei corsi in aula: [Roma Office Sharing](https://www.romaofficesharing.it/sale-corsi.html), Via Venti Settembre 118, Roma";
 
+/** Rimando al curriculum ufficiale (le traduzioni puntano alla versione nella loro lingua: en e fr all'inglese, de al tedesco). */
+export const CURRICULUM_NOTE = "Il programma segue il curriculum ufficiale iSAQB® CPSA-Foundation: [leggi il curriculum (PDF)](https://public.isaqb.org/curriculum-foundation/curriculum-foundation-it.pdf).";
+
 /** I tre formati di erogazione (home e pagina del corso). `id` collega testo, icona e immagine nelle viste. */
 export const FORMATS_COPY: { id: "online" | "aula" | "prestige"; title: string; claim: string; text: string; points: string[] }[] = [
   {

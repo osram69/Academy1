@@ -4,6 +4,7 @@ import { RichText } from "../components/RichText";
 import { Btn, Reveal, Tag } from "../components/ui";
 import { featuredCourse } from "../data";
 import { EXAM, EXAM_FAQS } from "../content/exam-copy";
+import { CURRICULUM_NOTE } from "../content/course-copy";
 import { LANDING } from "../content/landing-copy";
 import { t } from "../i18n";
 
@@ -71,6 +72,7 @@ export function Exam() {
             <div>
               <h2 className="font-display text-[clamp(1.7rem,3.2vw,2.5rem)] font-bold tracking-tight text-ink">{t(EXAM.prepTitle)}</h2>
               <p className="mt-6 text-[16px] leading-[1.75] text-ink/70">{t(EXAM.prepText)}</p>
+              <p className="mt-3 text-[15px] text-ink/70"><RichText text={t(CURRICULUM_NOTE)} /></p>
               <div className="mt-6 flex gap-5 rounded-3xl border border-flame/30 bg-flame/5 p-6">
                 <GraduationCap className="mt-1 size-7 shrink-0 text-flame" aria-hidden="true" />
                 <div>
