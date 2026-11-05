@@ -28,7 +28,7 @@ export interface ShellSection {
   faqs?: { q: string; a: string }[];
 }
 
-/** Domande frequenti (le stesse della home, delle schede corso e della pagina del corso Software Architect). */
+/** Domande frequenti (le stesse della home, delle schede corso e della pagina del corso Architetto Software). */
 export const faqSection = (l: L): ShellSection => ({
   heading: tr(l, LANDING.faq),
   faqs: faqItems(l),
@@ -52,7 +52,7 @@ export function courseSections(l: L): ShellSection[] {
   ];
 }
 
-/** Contenuto della pagina dedicata al corso Software Architect. */
+/** Contenuto della pagina dedicata al corso Architetto Software. */
 export function landingSections(l: L): ShellSection[] {
   const [objectives, program, audience, prereq, includes, faq] = courseSections(l);
   return [

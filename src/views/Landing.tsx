@@ -26,7 +26,7 @@ function CheckList({ items }: { items: string[] }) {
 }
 
 /**
- * Pagina dedicata a chi cerca "corso Software Architect" / "corsi iSAQB": spiega il corso e porta alle date.
+ * Pagina dedicata a chi cerca "corso Architetto Software" / "corsi iSAQB": spiega il corso e porta alle date.
  * Gli stessi contenuti stanno anche nell'HTML per i crawler (src/lib/seo-content.ts → landingSections).
  */
 export function Landing() {

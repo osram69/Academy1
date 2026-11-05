@@ -92,7 +92,7 @@ export function Footer() {
               </li>
               <li>
                 <a href="/corso-architettura-software" className="link-sweep text-white/76 transition-colors hover:text-white">
-                  {t("Corso Software Architect")}</a>
+                  {t("Corso Architetto Software")}</a>
               </li>
               <li>
                 <a href="/esame-cpsa-f" className="link-sweep text-white/76 transition-colors hover:text-white">

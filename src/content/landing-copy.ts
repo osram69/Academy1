@@ -1,14 +1,14 @@
 /**
- * Testi della pagina dedicata al corso Software Architect (/corso-architettura-software), in italiano.
+ * Testi della pagina dedicata al corso Architetto Software (/corso-architettura-software), in italiano.
  * Come course-copy.ts: il sito li traduce con t(), il server (HTML per i crawler) con gli stessi dizionari.
  */
 
 export const LANDING = {
-  title: "Corso Software Architect iSAQB® CPSA-F",
+  title: "Corso Architetto Software iSAQB® CPSA-F",
   description: "Prepara la certificazione iSAQB® CPSA-F con 24 ore di formazione live, online o a Roma: programma, date 2026, prezzi e docenti accreditati.",
-  h1: "Corso Software Architect: prepara la certificazione iSAQB® CPSA-F",
+  h1: "Corso Architetto Software: prepara la certificazione iSAQB® CPSA-F",
   lead: "Un corso di 24 ore con docenti accreditati iSAQB®, online o in aula a Roma, per imparare a prendere decisioni architetturali che restano valide nel tempo e prepararti all'esame CPSA-Foundation.",
-  crumb: "Corso Software Architect",
+  crumb: "Corso Architetto Software",
   facts: ["24 ore di formazione live", "Online o in aula a Roma", "Docenti accreditati iSAQB®", "Gruppi fino a 12 partecipanti"],
   dates: "Prossime date del corso",
   formats: "Come puoi seguire il corso",

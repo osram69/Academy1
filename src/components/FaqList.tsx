@@ -6,7 +6,7 @@ import { ExtLink } from "./IsaqbLinks";
 import { RichText } from "./RichText";
 import { FAQS } from "../data";
 
-/** Elenco a fisarmonica delle domande frequenti: lo stesso nella home, nelle schede corso e nella pagina del corso Software Architect. */
+/** Elenco a fisarmonica delle domande frequenti: lo stesso nella home, nelle schede corso e nella pagina del corso Architetto Software. */
 export function FaqList({ items = FAQS }: { items?: { q: string; a: string; links?: { href: string; label: string }[] }[] }) {
   const [open, setOpen] = useState(0);
   return (
