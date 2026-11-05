@@ -38,7 +38,7 @@ export const CERT = {
   limitTitle: "Cosa certifica, e cosa no",
   pathTitle: "Il percorso per ottenere la certificazione Foundation",
   path: [
-    "Il corso: 24 ore con docente accreditato iSAQB®, online o in aula a Roma. [Scopri il corso Software Architect](/corso-software-architect).",
+    "Il corso: 24 ore con docente accreditato iSAQB®, online o in aula a Roma. [Scopri il corso Software Architect](/corso-architettura-software).",
     "L'esame: si sostiene a parte, online, presso l'ente di certificazione. [Come funziona l'esame CPSA-F](/esame-cpsa-f).",
     "Il certificato: se superi l'esame lo ricevi in PDF via email, con validità illimitata.",
   ],

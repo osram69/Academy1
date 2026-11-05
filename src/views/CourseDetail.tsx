@@ -231,7 +231,7 @@ export function CourseDetail({ course }: { course: Course }) {
               ))}
             </div>
             <p className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-[14.5px]">
-              <a href="/corso-software-architect" className="link-sweep font-semibold text-flame">{t("Programma e dettagli del corso →")}</a>
+              <a href="/corso-architettura-software" className="link-sweep font-semibold text-flame">{t("Programma e dettagli del corso →")}</a>
               <a href="/esame-cpsa-f" className="link-sweep font-semibold text-flame">{t("Come funziona l'esame →")}</a>
             </p>
             {course.format === "aula" && (

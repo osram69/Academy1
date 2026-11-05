@@ -22,9 +22,9 @@ update public.corsi set link_booking_it  = 'https://cubeacademy.eu/corsi'    whe
 update public.corsi set link_booking_en  = 'https://cubeacademy.eu/en/corsi' where link_booking_en  like '%academy.cubeng.eu%';
 update public.corsi set link_booking_fr  = 'https://cubeacademy.eu/fr/corsi' where link_booking_fr  like '%academy.cubeng.eu%';
 update public.corsi set link_booking_de  = 'https://cubeacademy.eu/de/corsi' where link_booking_de  like '%academy.cubeng.eu%';
-update public.corsi set link_readmore_it = 'https://cubeacademy.eu/corso-software-architect'    where link_readmore_it like '%academy.cubeng.eu%';
-update public.corsi set link_readmore_en = 'https://cubeacademy.eu/en/corso-software-architect' where link_readmore_en like '%academy.cubeng.eu%';
-update public.corsi set link_readmore_fr = 'https://cubeacademy.eu/fr/corso-software-architect' where link_readmore_fr like '%academy.cubeng.eu%';
-update public.corsi set link_readmore_de = 'https://cubeacademy.eu/de/corso-software-architect' where link_readmore_de like '%academy.cubeng.eu%';
+update public.corsi set link_readmore_it = 'https://cubeacademy.eu/corso-architettura-software'    where link_readmore_it like '%academy.cubeng.eu%';
+update public.corsi set link_readmore_en = 'https://cubeacademy.eu/en/software-architect-course' where link_readmore_en like '%academy.cubeng.eu%';
+update public.corsi set link_readmore_fr = 'https://cubeacademy.eu/fr/formation-architecte-logiciel' where link_readmore_fr like '%academy.cubeng.eu%';
+update public.corsi set link_readmore_de = 'https://cubeacademy.eu/de/software-architekt-kurs' where link_readmore_de like '%academy.cubeng.eu%';
 
 -- 4) Controllo: ripeti la query 1, le tre righe devono dare 0

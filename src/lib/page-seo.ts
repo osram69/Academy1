@@ -5,6 +5,7 @@ import { leadingId } from "./slug";
 import { LANG_CODES, LOCALE, OG_LOCALE, tx, type L, type TextKey } from "./seo-text";
 import { aboutSections, certFaqJsonLd, ecosystemSection, certSections, courseSections, examFaqJsonLd, examSections, faqJsonLd, faqSection, landingSections, tr, venueSection, type ShellSection } from "./seo-content";
 import { LANDING } from "../content/landing-copy";
+import { toItalianPath, toLocalPath } from "./slugs";
 import { EXAM } from "../content/exam-copy";
 import { CERT } from "../content/cert-copy";
 import { ABOUT, PERSON } from "../content/about-copy";
@@ -43,7 +44,10 @@ const clip = (s: string, n = 158) => (s.length <= n ? s : `${s.slice(0, n - 1).r
 
 /** Indirizzo assoluto di un percorso senza prefisso, nella lingua richiesta. */
 const url = (path: string, l: L) => `${SITE_URL}${prefixed(path, l)}`;
-const prefixed = (path: string, l: L) => (l === "it" ? (path === "/" ? "" : path) : `/${l}${path === "/" ? "" : path}`);
+const prefixed = (path: string, l: L) => {
+  const p = l === "it" ? path : toLocalPath(path, l); // alcune pagine hanno un indirizzo tradotto (lib/slugs.ts)
+  return l === "it" ? (p === "/" ? "" : p) : `/${l}${p === "/" ? "" : p}`;
+};
 
 /** Chiavi e indirizzi hreflang di una pagina: la stessa pagina in ogni lingua. */
 const languagesOf = (path: string) => ({
@@ -55,9 +59,15 @@ export const LANG_SEGMENTS = ["en", "fr", "de"];
 
 export async function resolvePath(all: string[]): Promise<Resolved> {
   const L: L = LANG_SEGMENTS.includes(all[0]) ? (all[0] as L) : "it";
-  const segments = L === "it" ? all : all.slice(1);
+  const rawSegments = L === "it" ? all : all.slice(1);
+  const rawPath = `/${rawSegments.join("/")}`;
+  // nelle altre lingue l'indirizzo può essere tradotto: si lavora sempre sul percorso italiano (quello del codice)
+  const itPath = L === "it" ? rawPath : toItalianPath(rawPath, L);
+  // l'indirizzo italiano usato in un'altra lingua porta a quello tradotto (un solo indirizzo per pagina)
+  if (L !== "it" && itPath === rawPath && toLocalPath(itPath, L) !== itPath) return { kind: "redirect", to: `/${L}${toLocalPath(itPath, L)}` };
+  const segments = L === "it" ? all : itPath.split("/").filter(Boolean);
   const [a, b, c] = segments;
-  const path = `/${segments.join("/")}`; // percorso senza prefisso di lingua
+  const path = `/${segments.join("/")}`; // percorso italiano senza prefisso di lingua
   const P = (p: string) => prefixed(p, L) || "/"; // …con il prefisso, per i link interni
   const T = (k: TextKey, vars?: Record<string, string | number>) => tx(k, L, vars);
   const eur = (n: number) => n.toLocaleString(LOCALE[L], { maximumFractionDigits: 0 });
@@ -83,7 +93,7 @@ export async function resolvePath(all: string[]): Promise<Resolved> {
   });
 
   const MAIN_LINKS = [
-    { href: P("/corso-software-architect"), label: tr(L, LANDING.crumb) },
+    { href: P("/corso-architettura-software"), label: tr(L, LANDING.crumb) },
     { href: P("/certificazione-isaqb"), label: tr(L, CERT.crumb) },
     { href: P("/esame-cpsa-f"), label: tr(L, EXAM.crumb) },
     { href: P("/corsi"), label: T("catalogLink") },
@@ -182,9 +192,9 @@ export async function resolvePath(all: string[]): Promise<Resolved> {
     };
   }
 
-  if (!b && a === "corso-software-architect") {
+  if (!b && a === "corso-architettura-software") {
     const courses = (await getCourses())?.filter((x) => !x.concluded) ?? [];
-    const p = "/corso-software-architect";
+    const p = "/corso-architettura-software";
     const here = url(p, L);
     const description = tr(L, LANDING.description);
     return {
@@ -232,7 +242,7 @@ export async function resolvePath(all: string[]): Promise<Resolved> {
       shell: {
         h1: tr(L, ABOUT.h1),
         intro: tr(L, ABOUT.lead),
-        links: [{ href: P("/corso-software-architect"), label: tr(L, LANDING.crumb) }, { href: P("/corsi"), label: T("catalogLink") }, { href: P("/contatti"), label: T("contacts") }],
+        links: [{ href: P("/corso-architettura-software"), label: tr(L, LANDING.crumb) }, { href: P("/corsi"), label: T("catalogLink") }, { href: P("/contatti"), label: T("contacts") }],
         sections: aboutSections(L),
       },
     };
@@ -247,7 +257,7 @@ export async function resolvePath(all: string[]): Promise<Resolved> {
       shell: {
         h1: tr(L, CERT.h1),
         intro: tr(L, CERT.lead),
-        links: [{ href: P("/corso-software-architect"), label: tr(L, LANDING.crumb) }, { href: P("/esame-cpsa-f"), label: tr(L, EXAM.crumb) }, { href: P("/corsi"), label: T("catalogLink") }],
+        links: [{ href: P("/corso-architettura-software"), label: tr(L, LANDING.crumb) }, { href: P("/esame-cpsa-f"), label: tr(L, EXAM.crumb) }, { href: P("/corsi"), label: T("catalogLink") }],
         sections: certSections(L),
       },
     };
@@ -262,7 +272,7 @@ export async function resolvePath(all: string[]): Promise<Resolved> {
       shell: {
         h1: tr(L, EXAM.h1),
         intro: tr(L, EXAM.lead),
-        links: [{ href: P("/corso-software-architect"), label: tr(L, LANDING.crumb) }, { href: P("/corsi"), label: T("catalogLink") }, { href: P("/contatti"), label: T("contacts") }],
+        links: [{ href: P("/corso-architettura-software"), label: tr(L, LANDING.crumb) }, { href: P("/corsi"), label: T("catalogLink") }, { href: P("/contatti"), label: T("contacts") }],
         sections: examSections(L),
       },
     };

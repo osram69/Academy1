@@ -112,7 +112,7 @@ export function Hero() {
               {t("Iscriviti alla prossima edizione")}</Btn>
             <Btn href="/corsi" variant="line-dark" size="lg">
               {t("Calendario completo")}</Btn>
-            <a href="/corso-software-architect" className="link-sweep text-[14.5px] font-semibold text-white/85 hover:text-white">{t("Programma e dettagli del corso →")}</a>
+            <a href="/corso-architettura-software" className="link-sweep text-[14.5px] font-semibold text-white/85 hover:text-white">{t("Programma e dettagli del corso →")}</a>
           </Reveal>
 
           <Reveal delay={340}>

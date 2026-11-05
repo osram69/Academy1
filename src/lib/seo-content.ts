@@ -10,13 +10,14 @@ import { CERT, CERT_FAQS } from "../content/cert-copy";
 import { ABOUT, PERSON } from "../content/about-copy";
 import { ECO } from "../content/ecosystem-copy";
 import type { L } from "./seo-text";
+import { localizeHref } from "./slugs";
 
 const DICT: Record<L, Record<string, string>> = { it: {}, en, fr, de };
 /** Traduce un testo italiano nella lingua richiesta (come t() nel browser). */
 export const tr = (l: L, s: string) => {
   const v = DICT[l][s] ?? s;
   // link interni scritti come [etichetta](/percorso): nelle altre lingue puntano alla pagina con il prefisso (/en/…), come nel browser
-  return l === "it" ? v : v.replace(/\]\(\//g, `](/${l}/`);
+  return l === "it" ? v : v.replace(/\]\((\/[^)\s]*)\)/g, (_, href: string) => `](${localizeHref(href, l)})`);
 };
 /** Toglie i link in sintassi markdown: "[scrivici](/contatti)" → "scrivici". */
 const plain = (s: string) => s.replace(/\[([^\]]+)\]\([^)]*\)/g, "$1").replace(/\s+/g, " ").trim();

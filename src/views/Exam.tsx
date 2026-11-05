@@ -48,7 +48,7 @@ export function Exam() {
             <Btn href={`/iscriviti/${next.slug}`} size="lg" withArrow ariaLabel={t("Vai all'iscrizione della prossima edizione")}>
               {t("Iscriviti alla prossima edizione")}
             </Btn>
-            <Btn href="/corso-software-architect" variant="line-dark" size="lg">
+            <Btn href="/corso-architettura-software" variant="line-dark" size="lg">
               {t("Programma e dettagli del corso →")}
             </Btn>
           </Reveal>

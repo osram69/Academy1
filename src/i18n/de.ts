@@ -701,7 +701,7 @@ export const de: Record<string, string> = {
   "Il livello più alto del programma: presuppone la certificazione Advanced.": "Die höchste Stufe des Programms: Sie setzt die Advanced-Zertifizierung voraus.",
   "A chi serve": "Für wen sie gedacht ist",
   "Il percorso per ottenere la certificazione Foundation": "Der Weg zur Foundation-Zertifizierung",
-  "Il corso: 24 ore con docente accreditato iSAQB®, online o in aula a Roma. [Scopri il corso Software Architect](/corso-software-architect).": "Der Kurs: 24 Stunden mit iSAQB®-akkreditiertem Trainer, online oder in Präsenz in Rom. [Entdecken Sie den Kurs Software Architect](/corso-software-architect).",
+  "Il corso: 24 ore con docente accreditato iSAQB®, online o in aula a Roma. [Scopri il corso Software Architect](/corso-architettura-software).": "Der Kurs: 24 Stunden mit iSAQB®-akkreditiertem Trainer, online oder in Präsenz in Rom. [Entdecken Sie den Kurs Software Architect](/corso-architettura-software).",
   "L'esame: si sostiene a parte, online, presso l'ente di certificazione. [Come funziona l'esame CPSA-F](/esame-cpsa-f).": "Die Prüfung: Sie wird separat und online bei der Zertifizierungsstelle abgelegt. [So funktioniert die CPSA-F-Prüfung](/esame-cpsa-f).",
   "Il certificato: se superi l'esame lo ricevi in PDF via email, con validità illimitata.": "Das Zertifikat: Wenn Sie die Prüfung bestehen, erhalten Sie es als PDF per E-Mail, mit unbegrenzter Gültigkeit.",
   "Domande frequenti sulla certificazione iSAQB®": "Häufige Fragen zur iSAQB®-Zertifizierung",

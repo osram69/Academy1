@@ -40,7 +40,7 @@ export function parseRoute(path: string): Route {
   if (parts[0] === "admin") return { page: "admin" };
   if (parts[0] === "corsi") return { page: "catalog" };
   if (parts[0] === "contatti") return { page: "contact" };
-  if (parts[0] === "corso-software-architect") return { page: "landing" };
+  if (parts[0] === "corso-architettura-software") return { page: "landing" };
   if (parts[0] === "esame-cpsa-f") return { page: "exam" };
   if (parts[0] === "certificazione-isaqb") return { page: "cert" };
   if (parts[0] === "chi-siamo") return { page: "about" };

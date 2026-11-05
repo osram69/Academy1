@@ -28,7 +28,7 @@ export function EcosystemCards({ homeOnly = false }: { homeOnly?: boolean }) {
                 <h3 className="mt-3 font-display text-[1.25rem] font-bold tracking-tight text-ink">{t(i.name)}</h3>
                 <p className="mt-3 flex-1 text-[14.5px] leading-relaxed text-ink/70">{t(i.text)}</p>
                 {ours ? (
-                  <a href="/corso-software-architect" className="link-sweep mt-5 inline-block text-[14px] font-semibold text-flame">{t("Programma e dettagli del corso →")}</a>
+                  <a href="/corso-architettura-software" className="link-sweep mt-5 inline-block text-[14px] font-semibold text-flame">{t("Programma e dettagli del corso →")}</a>
                 ) : (
                   i.url && (
                     <a href={i.url} target="_blank" rel="noopener noreferrer" className="link-sweep mt-5 inline-flex items-center gap-1.5 text-[14px] font-semibold text-ink/75 hover:text-flame">

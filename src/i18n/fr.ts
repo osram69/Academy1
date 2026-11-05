@@ -701,7 +701,7 @@ export const fr: Record<string, string> = {
   "Il livello più alto del programma: presuppone la certificazione Advanced.": "Le niveau le plus élevé du programme : il suppose la certification Advanced.",
   "A chi serve": "À qui elle s'adresse",
   "Il percorso per ottenere la certificazione Foundation": "Le parcours vers la certification Foundation",
-  "Il corso: 24 ore con docente accreditato iSAQB®, online o in aula a Roma. [Scopri il corso Software Architect](/corso-software-architect).": "La formation : 24 heures avec un formateur accrédité iSAQB®, en ligne ou en présentiel à Rome. [Découvrez la formation Software Architect](/corso-software-architect).",
+  "Il corso: 24 ore con docente accreditato iSAQB®, online o in aula a Roma. [Scopri il corso Software Architect](/corso-architettura-software).": "La formation : 24 heures avec un formateur accrédité iSAQB®, en ligne ou en présentiel à Rome. [Découvrez la formation Software Architect](/corso-architettura-software).",
   "L'esame: si sostiene a parte, online, presso l'ente di certificazione. [Come funziona l'esame CPSA-F](/esame-cpsa-f).": "L'examen : il se passe séparément, en ligne, auprès de l'organisme de certification. [Comment fonctionne l'examen CPSA-F](/esame-cpsa-f).",
   "Il certificato: se superi l'esame lo ricevi in PDF via email, con validità illimitata.": "Le certificat : si vous réussissez l'examen, vous le recevez en PDF par e-mail, avec une validité illimitée.",
   "Domande frequenti sulla certificazione iSAQB®": "Questions fréquentes sur la certification iSAQB®",

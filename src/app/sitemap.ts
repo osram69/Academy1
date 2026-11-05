@@ -2,10 +2,14 @@ import type { MetadataRoute } from "next";
 import { SITE_URL } from "../lib/site";
 import { getCourses, getEvents } from "../lib/server-data";
 import { LANG_CODES, type L } from "../lib/seo-text";
+import { toLocalPath } from "../lib/slugs";
 
 export const revalidate = 3600;
 
-const loc = (path: string, l: L) => `${SITE_URL}${l === "it" ? (path === "/" ? "" : path) : `/${l}${path === "/" ? "" : path}`}`;
+const loc = (path: string, l: L) => {
+  const p = l === "it" ? path : toLocalPath(path, l); // pagine con indirizzo tradotto (lib/slugs.ts)
+  return `${SITE_URL}${l === "it" ? (p === "/" ? "" : p) : `/${l}${p === "/" ? "" : p}`}`;
+};
 
 type Entry = Omit<MetadataRoute.Sitemap[number], "url" | "alternates">;
 
@@ -19,7 +23,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
   const fixed: MetadataRoute.Sitemap = [
     ...page("/", { lastModified: now, changeFrequency: "weekly", priority: 1 }),
-    ...page("/corso-software-architect", { lastModified: now, changeFrequency: "weekly", priority: 0.9 }),
+    ...page("/corso-architettura-software", { lastModified: now, changeFrequency: "weekly", priority: 0.9 }),
     ...page("/chi-siamo", { lastModified: now, changeFrequency: "monthly", priority: 0.6 }),
     ...page("/certificazione-isaqb", { lastModified: now, changeFrequency: "monthly", priority: 0.8 }),
     ...page("/esame-cpsa-f", { lastModified: now, changeFrequency: "monthly", priority: 0.8 }),

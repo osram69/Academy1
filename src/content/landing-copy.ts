@@ -1,5 +1,5 @@
 /**
- * Testi della pagina dedicata al corso Software Architect (/corso-software-architect), in italiano.
+ * Testi della pagina dedicata al corso Software Architect (/corso-architettura-software), in italiano.
  * Come course-copy.ts: il sito li traduce con t(), il server (HTML per i crawler) con gli stessi dizionari.
  */
 

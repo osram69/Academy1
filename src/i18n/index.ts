@@ -3,6 +3,8 @@
    se manca, il testo italiano. La lingua si legge una volta all'avvio: cambiarla ricarica la pagina,
    così anche le costanti a livello di modulo (data.ts) nascono già tradotte. */
 
+import { toItalianPath, toLocalPath } from "../lib/slugs";
+
 export type Lang = "it" | "en" | "fr" | "de";
 export const LANGS: { code: Lang; label: string; name: string }[] = [
   { code: "it", label: "IT", name: "Italiano" },
@@ -21,7 +23,12 @@ const PREFIX = /^\/(en|fr|de)(?=\/|$)/;
 
 export const langFromPath = (path: string): Lang => (PREFIX.exec(path)?.[1] as Lang | undefined) ?? "it";
 /** Percorso senza il prefisso di lingua: /en/corsi → /corsi */
-export const stripLang = (path: string) => path.replace(PREFIX, "") || "/";
+/** Percorso senza prefisso di lingua e in forma italiana (quella del codice): /en/software-architect-course → /corso-architettura-software */
+export const stripLang = (path: string) => {
+  const l = langFromPath(path);
+  const rest = path.replace(PREFIX, "") || "/";
+  return l === "it" ? rest : toItalianPath(rest, l);
+};
 
 // indirizzi che non hanno versioni per lingua: pannello admin, API, ritorni di pagamento, file statici
 const NO_LANG = /^\/(api|pagamento|_next|admin)(\/|$|\?|#)/;
@@ -32,7 +39,8 @@ export function withLang(href: string, l: Lang = lang): string {
   if (!href.startsWith("/") || href.startsWith("//") || NO_LANG.test(href) || IS_FILE.test(href) || PREFIX.test(href) || l === "it") return href;
   const i = href.search(/[?#]/);
   const path = i < 0 ? href : href.slice(0, i);
-  return `/${l}${path === "/" ? "" : path}${i < 0 ? "" : href.slice(i)}`;
+  const local = toLocalPath(path, l);
+  return `/${l}${local === "/" ? "" : local}${i < 0 ? "" : href.slice(i)}`;
 }
 
 export const lang: Lang = typeof location !== "undefined" ? langFromPath(location.pathname) : "it";
