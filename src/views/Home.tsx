@@ -15,7 +15,7 @@ import { Btn, IsoCube, Reveal, Tag } from "../components/ui";
 import { ModalitaSection } from "../components/ModalitaSection";
 import { IsaqbLinks } from "../components/IsaqbLinks";
 import { WorkshopPromo } from "../components/WorkshopCard";
-import { TRAINER, eur, fmtRange, nextCourse, upcomingCourses } from "../data";
+import { TRAINER, eur, featuredCourse, fmtRange, nextCourse, upcomingCourses } from "../data";
 
 import { t } from "../i18n";
 import { FaqList } from "../components/FaqList";
@@ -79,7 +79,7 @@ function CertificationSection() {
           <Reveal delay={300} className="mt-12 hidden lg:block">
             <figure className="ticks relative max-w-sm p-2.5">
               <img
-                src="https://images.pexels.com/photos/18999483/pexels-photo-18999483.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200"
+                src="/img/certificazione.webp"
                 alt={t("Professionisti durante un workshop di architettura software")}
                 loading="lazy"
                 className="aspect-[4/3] w-full rounded-lg object-cover"
@@ -323,7 +323,7 @@ function FaqSection() {
 /* ------------------------------- CTA -------------------------------- */
 
 function CtaSection() {
-  const next = nextCourse();
+  const next = featuredCourse(); // il corso "In evidenza" nel pannello, che non è detto sia il prossimo in ordine di data
   return (
     <section className="relative overflow-hidden bg-ink py-24 text-white lg:py-32" aria-labelledby="cta-title">
       <img

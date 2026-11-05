@@ -21,7 +21,7 @@ values
 -- 1) Italian Software Testing Forum 2025 (stand iSAQB)
 ('Cube Academy allo Italian Software Testing Forum 2025', true, date '2025-05-21', date '2025-05-21',
  'Assago (Milano)', 'https://www.soiel.it/eventi/stf-2025-milano/',
- 'https://academy.cubeng.eu/wp-content/uploads/2025/03/IMG_20250521_101701-scaled.jpg',
+ '/wp-content/uploads/2025/03/IMG_20250521_101701-scaled.jpg',
  $it$Il 21 maggio 2025 Cube Academy ha partecipato all'Italian Software Testing Forum (STF 2025), l'appuntamento italiano dedicato alla qualità del software, organizzato da Soiel International con ITA-STQB e ospitato all'NH Milano Congress Centre di Assago.
 
 Eravamo presenti nello stand iSAQB®, che era tra i Platinum sponsor dell'evento. Allo stand abbiamo incontrato professionisti del testing, della qualità e dell'architettura software, raccontando il percorso di certificazione CPSA® e i corsi che organizziamo come Training Provider accreditato.
@@ -54,7 +54,7 @@ Es war eine wertvolle Gelegenheit, sich mit der italienischen Community über ei
 -- 2) Software Architecture Gathering 2024, Berlino (sponsor)
 ('Cube Academy al Software Architecture Gathering 2024 di Berlino', true, date '2024-11-11', date '2024-11-14',
  'Berlino', 'https://www.software-architecture-gathering.com/',
- 'https://academy.cubeng.eu/wp-content/uploads/2024/07/Berlino-1024x440.jpg',
+ '/wp-content/uploads/2024/07/Berlino-1024x440.jpg',
  $it$Dall'11 al 14 novembre 2024 Berlino ha ospitato il Software Architecture Gathering, la conferenza internazionale sull'architettura software organizzata da iSAQB® in collaborazione con heise conferences. Cube Academy ha partecipato come sponsor.
 
 Per quattro giorni architetti, sviluppatori e responsabili tecnici si sono confrontati su strumenti, tecniche collaudate e tendenze dell'architettura software, tra sessioni, incontri e momenti di networking.
