@@ -9,7 +9,6 @@ import {
   MonitorPlay,
   RotateCcw,
 } from "lucide-react";
-import { cn } from "../utils/cn";
 import { Hero } from "../components/Hero";
 import { CourseCard } from "../components/CourseCard";
 import { Btn, IsoCube, Reveal, Tag } from "../components/ui";
@@ -141,9 +140,9 @@ function CertificationSection() {
 /* ============================== formati ============================== */
 
 const FORMAT_VISUALS = {
-  online: { icon: MonitorPlay, img: "https://images.pexels.com/photos/4175446/pexels-photo-4175446.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200" },
-  aula: { icon: Building2, img: "https://images.pexels.com/photos/1181396/pexels-photo-1181396.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200" },
-  prestige: { icon: BedDouble, img: "https://images.pexels.com/photos/38115059/pexels-photo-38115059.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200" },
+  online: { icon: MonitorPlay, img: "/img/corsi/online-1.webp" },
+  aula: { icon: Building2, img: "/img/corsi/aula-1.webp" },
+  prestige: { icon: BedDouble, img: "/img/corsi/prestige-1.webp" },
 };
 
 const FORMATS = COPY.FORMATS_COPY.map((f) => ({
@@ -154,7 +153,7 @@ const FORMATS = COPY.FORMATS_COPY.map((f) => ({
   text: t(f.text),
   points: f.points.map((p) => t(p)),
   dark: true,
-  img: FORMAT_VISUALS[f.id].img as string | null,
+  img: FORMAT_VISUALS[f.id].img,
 }));
 
 function EcosystemSection() {
@@ -202,53 +201,38 @@ function FormatsSection() {
         <div className="mt-14 grid gap-5 md:grid-cols-3">
           {FORMATS.map((f, i) => (
             <Reveal key={f.id} delay={i * 120}>
-              <article
-                className={cn(
-                  "group relative flex h-full flex-col overflow-hidden rounded-[24px] border p-7 transition-all duration-500 hover:-translate-y-1.5",
-                  f.dark
-                    ? "border-flame/40 bg-ink2 shadow-lift"
-                    : "border-white/10 bg-white/[0.045] hover:border-white/25 hover:bg-white/[0.07]"
-                )}
-              >
-                {f.img && (
-                  <>
-                    <img
-                      src={f.img}
-                      alt=""
-                      loading="lazy"
-                      className="absolute inset-0 size-full object-cover opacity-25 transition-all duration-700 group-hover:scale-105 group-hover:opacity-35"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/60 to-ink/20" aria-hidden="true" />
-                  </>
-                )}
-                <div className="relative flex flex-1 flex-col">
-                  <div className="flex items-center justify-between">
-                    <span
-                      className={cn(
-                        "grid size-12 place-items-center rounded-2xl transition-colors duration-500",
-                        f.dark ? "bg-flame text-white" : "bg-white/8 text-ember group-hover:bg-flame group-hover:text-white"
-                      )}
-                    >
-                      <f.icon className="size-5.5" aria-hidden="true" />
-                    </span>
-                    <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-white/52">
-                      0{i + 1}
-                    </span>
-                  </div>
-                  <h3 className="mt-6 font-display text-2xl font-bold tracking-tight">{f.title}</h3>
-                  <p className={cn("mt-1 font-serif text-lg italic", f.dark ? "text-ember" : "text-white/72")}>{f.claim}</p>
-                  <p className="mb-6 mt-4 text-[14.5px] leading-relaxed text-white/68">{f.text}</p>
-                  <ul className="mt-auto space-y-2.5 border-t border-white/10 pt-5">
+              <article className="group flex h-full flex-col overflow-hidden rounded-[24px] border border-flame/40 bg-ink2 shadow-lift transition-all duration-500 hover:-translate-y-1.5">
+                {/* foto con lo stesso trattamento per tutte e tre; il testo sta su sfondo pieno */}
+                <div className="relative aspect-[16/10] overflow-hidden">
+                  <img
+                    src={f.img}
+                    alt=""
+                    loading="lazy"
+                    className="size-full object-cover saturate-[0.95] transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-ink2 via-ink2/10 to-transparent" aria-hidden="true" />
+                  <span className="absolute left-5 top-5 grid size-12 place-items-center rounded-2xl bg-flame text-white shadow-flame">
+                    <f.icon className="size-5.5" aria-hidden="true" />
+                  </span>
+                  <span className="absolute right-5 top-5 rounded-full bg-ink/70 px-3 py-1 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-white">
+                    0{i + 1}
+                  </span>
+                </div>
+                <div className="flex flex-1 flex-col px-7 pb-7 pt-5">
+                  <h3 className="font-display text-2xl font-bold tracking-tight text-white">{f.title}</h3>
+                  <p className="mt-1 font-serif text-lg italic text-ember">{f.claim}</p>
+                  <p className="mb-6 mt-4 text-[15px] leading-relaxed text-white/80">{f.text}</p>
+                  <ul className="mt-auto space-y-2.5 border-t border-white/12 pt-5">
                     {f.points.map((p) => (
-                      <li key={p} className="flex items-start gap-2.5 text-[13.5px] font-medium text-white/75">
-                        <Check className={cn("mt-0.5 size-4 shrink-0", f.dark ? "text-ember" : "text-flame")} aria-hidden="true" />
+                      <li key={p} className="flex items-start gap-2.5 text-[14px] font-medium text-white/88">
+                        <Check className="mt-0.5 size-4 shrink-0 text-ember" aria-hidden="true" />
                         {p}
                       </li>
                     ))}
                   </ul>
                   <a
                     href="/corsi"
-                    className="mt-7 inline-flex items-center gap-2 text-[13.5px] font-semibold text-white transition-colors hover:text-ember"
+                    className="mt-7 inline-flex items-center gap-2 text-[14px] font-semibold text-white transition-colors hover:text-ember"
                     aria-label={t("Vedi le edizioni in formato {format}", { format: f.title })}
                   >
                     {t("Vedi le edizioni")}<ArrowUpRight className="size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden="true" />

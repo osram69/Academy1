@@ -235,21 +235,25 @@ export interface ApiCourse {
   featured?: boolean;
 }
 
-const FORMAT_COPY: Record<CourseFormat, { image: string; tagline: string; description: string }> = {
+/** Foto di ogni formato, ospitate sul sito: a ogni edizione tocca una foto diversa (vedi loadCourses). */
+const FORMAT_IMAGES: Record<CourseFormat, string[]> = {
+  online: ["/img/corsi/online-1.webp", "/img/corsi/online-2.webp", "/img/corsi/online-3.webp"],
+  aula: ["/img/corsi/aula-1.webp", "/img/corsi/aula-2.webp", "/img/corsi/aula-3.webp", "/img/corsi/aula-4.webp"],
+  prestige: ["/img/corsi/prestige-1.webp", "/img/corsi/prestige-2.webp", "/img/corsi/prestige-3.webp", "/img/corsi/prestige-4.webp"],
+};
+
+const FORMAT_COPY: Record<CourseFormat, { tagline: string; description: string }> = {
   online: {
-    image: "https://images.pexels.com/photos/18999565/pexels-photo-18999565.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
     tagline: t("Aula virtuale live su Zoom con docente accreditato e simulazione d'esame nell'ultima giornata."),
     description:
       t(COPY.COURSE_INTRO),
   },
   aula: {
-    image: "https://images.pexels.com/photos/3184328/pexels-photo-3184328.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
     tagline: t("In presenza a Roma, con docente accreditato iSAQB® e gruppi fino a 12 partecipanti."),
     description:
       t(COPY.COURSE_INTRO),
   },
   prestige: {
-    image: "https://images.pexels.com/photos/38120266/pexels-photo-38120266.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
     tagline: t("Corso e soggiorno in una location d'eccezione: formazione intensiva senza distrazioni."),
     description:
       t("Il percorso Foundation in formato residenziale di 4 giorni, con albergo e mezza pensione nelle più belle città italiane. Presto maggiori informazioni."),
@@ -307,7 +311,7 @@ function toCourse(a: ApiCourse): Course {
     earlyBirdFrom: a.earlyBirdStart ? new Date(a.earlyBirdStart) : new Date(0),
     earlyBirdUntil: a.earlyBirdEnd ? new Date(a.earlyBirdEnd) : new Date(0),
     examIncluded: false,
-    image: copy.image,
+    image: FORMAT_IMAGES[format][0],
     tagline: copy.tagline,
     description: copy.description,
     bookingUrl: a.bookingUrl.IT || "",
@@ -526,6 +530,14 @@ export async function loadCourses(): Promise<void> {
   const isWorkshop = (r: PublicRow) => String(r.livello ?? "").trim().toLowerCase() === "workshop";
   WORKSHOPS = rows.filter(isWorkshop).filter((r) => r.stato !== 2).map(toWorkshop);
   COURSES = rows.filter((r) => !isWorkshop(r)).map(fromRow).map(toCourse);
+  // a ogni edizione la sua foto: nello stesso formato si scorrono le foto in ordine di data, così le card vicine non si ripetono
+  const used: Partial<Record<CourseFormat, number>> = {};
+  for (const c of [...COURSES].sort((x, y) => x.start.getTime() - y.start.getTime())) {
+    const pool = FORMAT_IMAGES[c.format];
+    const n = used[c.format] ?? 0;
+    c.image = pool[n % pool.length];
+    used[c.format] = n + 1;
+  }
 }
 
 export const upcomingCourses = () =>

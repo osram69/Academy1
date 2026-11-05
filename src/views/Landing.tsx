@@ -34,7 +34,7 @@ export function Landing() {
   const next = featuredCourse();
   return (
     <div className="bg-paper">
-      <header className="relative overflow-hidden bg-ink pb-16 pt-32 text-white lg:pt-40">
+      <header className="relative overflow-hidden bg-ink pb-16 pt-28 text-white lg:pt-28">
         <div className="bg-blueprint-dark absolute inset-0" aria-hidden="true" />
         <div className="absolute -right-40 -top-40 size-[520px] rounded-full opacity-30" style={{ background: "radial-gradient(circle, #e8321e 0%, transparent 65%)" }} aria-hidden="true" />
         <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
