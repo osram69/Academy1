@@ -286,6 +286,7 @@ function List() {
                       if (error || !data) return act(async () => ({ error: error ?? { message: "Corso non trovato." } }), "");
                       const copy = { ...(data as Row) };
                       delete copy.id_corso;
+                      if (copy.livello !== "Workshop") copy.in_evidenza = false; // un solo corso in evidenza: la copia non lo è
                       const ins = await supabase.from("corsi").insert(copy).select("id_corso").single();
                       if (ins.error) return act(async () => ({ error: ins.error }), "");
                       go(`/admin/corso/${(ins.data as Row).id_corso}`);
@@ -339,6 +340,8 @@ function Edit({ id }: { id: string }) {
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
   const [lang, setLang] = useState("it");
+  // corsi che perdono "In evidenza" quando si salva questo: ce ne può essere uno solo
+  const [replaced, setReplaced] = useState<{ id: number; titolo: string }[]>([]);
 
   useEffect(() => {
     if (isNew) return;
@@ -372,6 +375,24 @@ function Edit({ id }: { id: string }) {
   );
 
   const isWs = String(f.livello) === "Workshop";
+
+  /** Altri corsi (i workshop no) già "In evidenza": può essercene uno solo. */
+  const otherFeatured = async () => {
+    let q = supabase.from("corsi").select("id_corso, titolo, data_it").eq("in_evidenza", true).neq("livello", "Workshop");
+    if (!isNew) q = q.neq("id_corso", Number(id));
+    const { data } = await q;
+    return ((data as Row[] | null) ?? []).map((r) => ({ id: Number(r.id_corso), titolo: String(r.titolo ?? ""), date: String(r.data_it ?? "") }));
+  };
+  const featuredLabel = (o: { titolo: string; date?: string }) => `«${o.titolo}»${o.date ? ` (${o.date})` : ""}`;
+  const askReplace = (others: { titolo: string; date?: string }[]) => {
+    const many = others.length > 1;
+    const names = others.map(featuredLabel).join(", ");
+    return confirm(
+      `${many ? "Questi corsi sono già in evidenza" : "Il corso"} ${names}${many ? "" : " è già in evidenza"}.\n\n` +
+        `Può esserci un solo corso in evidenza: se confermi, al salvataggio l'evidenza verrà tolta a ${many ? "quei corsi" : "quel corso"} e passerà a questo.\n\n` +
+        "Vuoi sostituirlo?"
+    );
+  };
 
   const upload = async (file: File) => {
     if (!file.type.startsWith("image/")) return setMsg("Scegli un file immagine (JPG, PNG o WebP).");
@@ -451,13 +472,39 @@ function Edit({ id }: { id: string }) {
       setBusy(false);
       return;
     }
+    // un solo corso in evidenza: se nel frattempo un altro lo è diventato, si chiede di nuovo
+    let toUnfeature = replaced;
+    if (!isWs && data.in_evidenza) {
+      const others = (await otherFeatured()).filter((o) => !replaced.some((r) => r.id === o.id));
+      if (others.length) {
+        if (!askReplace(others)) {
+          setBusy(false);
+          return;
+        }
+        toUnfeature = [...replaced, ...others];
+      }
+    } else {
+      toUnfeature = [];
+    }
+    const unfeature = async () => {
+      if (!toUnfeature.length) return "";
+      const r = await supabase.from("corsi").update({ in_evidenza: false }).in("id_corso", toUnfeature.map((o) => o.id));
+      if (r.error) return ` Attenzione: non sono riuscito a togliere l'evidenza a ${toUnfeature.map(featuredLabel).join(", ")} (${r.error.message}).`;
+      setReplaced([]);
+      return ` L'evidenza è stata tolta a ${toUnfeature.map(featuredLabel).join(", ")}.`;
+    };
     if (isNew) {
       const r = await supabase.from("corsi").insert(data).select("id_corso").single();
       if (r.error) setMsg(r.error.message);
-      else go(`/admin/corso/${(r.data as Row).id_corso}`);
+      else {
+        await unfeature();
+        go(`/admin/corso/${(r.data as Row).id_corso}`);
+      }
     } else {
       const r = await supabase.from("corsi").update(data).eq("id_corso", Number(id)).select("id_corso");
-      setMsg(r.error ? r.error.message : r.data?.length ? "Corso salvato." : "Nessuna modifica salvata: permessi insufficienti?");
+      if (r.error) setMsg(r.error.message);
+      else if (!r.data?.length) setMsg("Nessuna modifica salvata: permessi insufficienti?");
+      else setMsg(`Corso salvato.${await unfeature()}`);
     }
     setBusy(false);
   };
@@ -601,7 +648,25 @@ function Edit({ id }: { id: string }) {
           {F("posti_totali", "Posti totali", text("posti_totali", { type: "number", min: 0 }), "Opzionale: se vuoto, il sito non mostra la barra dei posti.")}
           {F("posti_disponibili", "Posti disponibili", text("posti_disponibili", { type: "number", min: 0 }))}
           <div className="flex flex-wrap items-center gap-6 md:col-span-2">
-            {check("in_evidenza", "In evidenza (pulsante Iscriviti del menu e card dell'introduzione)")}
+            <label className="flex items-center gap-2 text-[14px]">
+              <input
+                type="checkbox"
+                checked={!!f.in_evidenza}
+                className="size-4 accent-flame"
+                onChange={async (e) => {
+                  if (!e.target.checked) {
+                    set("in_evidenza", false);
+                    setReplaced([]);
+                    return;
+                  }
+                  const others = await otherFeatured();
+                  if (others.length && !askReplace(others)) return; // l'operatore annulla: la casella resta com'era
+                  setReplaced(others);
+                  set("in_evidenza", true);
+                }}
+              />
+              In evidenza (pulsante Iscriviti del menu e card dell'introduzione). Ce ne può essere uno solo
+            </label>
             {check("iscrizioni_aperte", "Iscrizioni aperte")}
             {check("sconto_privati", "Sconto privati attivo per questa edizione")}
           </div>
