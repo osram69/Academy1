@@ -5,6 +5,8 @@ import { Btn, Reveal, Tag } from "../components/ui";
 import { featuredCourse } from "../data";
 import * as COPY from "../content/course-copy";
 import { CERT, CERT_FAQS } from "../content/cert-copy";
+import { ECO } from "../content/ecosystem-copy";
+import { EcosystemCards, EcosystemCollab } from "../components/Ecosystem";
 import { LANDING } from "../content/landing-copy";
 import { t } from "../i18n";
 
@@ -79,7 +81,16 @@ export function Certification() {
           </div>
         </section>
 
-        <section className="py-20" aria-labelledby="who-h">
+        <section id="altre-certificazioni" className="scroll-mt-24 border-t border-ink/8 py-20" aria-labelledby="eco-h">
+          <div className="mx-auto max-w-7xl px-5 lg:px-8">
+            <h2 id="eco-h" className="font-display text-[clamp(1.7rem,3.2vw,2.5rem)] font-bold tracking-tight text-ink">{t(ECO.title)}</h2>
+            <p className="mt-4 max-w-3xl text-[16px] leading-[1.75] text-ink/70">{t(ECO.lead)}</p>
+            <div className="mt-8"><EcosystemCards /></div>
+            <div className="mt-12 max-w-3xl"><EcosystemCollab /></div>
+          </div>
+        </section>
+
+        <section className="border-t border-ink/8 bg-sand/35 py-20" aria-labelledby="who-h">
           <div className="mx-auto grid max-w-7xl gap-12 px-5 md:grid-cols-2 lg:px-8">
             <div>
               <h2 id="who-h" className="font-display text-[clamp(1.5rem,2.8vw,2.1rem)] font-bold tracking-tight text-ink">{t(CERT.audienceTitle)}</h2>

@@ -21,6 +21,8 @@ import { TRAINER, eur, fmtRange, nextCourse, upcomingCourses } from "../data";
 import { t } from "../i18n";
 import { FaqList } from "../components/FaqList";
 import * as COPY from "../content/course-copy";
+import { ECO } from "../content/ecosystem-copy";
+import { EcosystemCards } from "../components/Ecosystem";
 /* ============================ cos'è CPSA-F ============================ */
 
 const WHY = [
@@ -154,6 +156,28 @@ const FORMATS = COPY.FORMATS_COPY.map((f) => ({
   dark: true,
   img: FORMAT_VISUALS[f.id].img as string | null,
 }));
+
+function EcosystemSection() {
+  return (
+    <section id="certificazioni" className="border-t border-ink/8 bg-sand/35 py-16 lg:py-20" aria-labelledby="eco-title">
+      <div className="mx-auto max-w-7xl px-5 lg:px-8">
+        <Reveal>
+          <Tag>{t(ECO.crumb)}</Tag>
+        </Reveal>
+        <Reveal delay={80}>
+          <h2 id="eco-title" className="mt-5 max-w-3xl font-display text-[clamp(1.8rem,3.6vw,2.9rem)] font-bold leading-[1.06] tracking-[-0.02em] text-ink">{t(ECO.homeTitle)}</h2>
+        </Reveal>
+        <Reveal delay={140}>
+          <p className="mt-5 max-w-3xl text-[16.5px] leading-relaxed text-ink/65">{t(ECO.lead)}</p>
+        </Reveal>
+        <div className="mt-10"><EcosystemCards homeOnly /></div>
+        <p className="mt-8 text-[15px]">
+          <a href="/certificazione-isaqb" className="link-sweep font-semibold text-flame">{t(ECO.more)}</a>
+        </p>
+      </div>
+    </section>
+  );
+}
 
 function FormatsSection() {
   return (
@@ -358,6 +382,7 @@ export function Home() {
       <Hero />
       <WorkshopPromo />
       <CertificationSection />
+      <EcosystemSection />
       <ModalitaSection />
       <FormatsSection />
       <EditionsSection />

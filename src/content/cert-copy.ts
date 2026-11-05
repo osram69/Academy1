@@ -6,7 +6,7 @@
 
 export const CERT = {
   title: "Certificazione iSAQB® CPSA: cos'è e quali livelli",
-  description: "Cos'è la certificazione iSAQB® CPSA per architetti software: i livelli Foundation, Advanced ed Expert, a chi serve e come ottenerla in Italia.",
+  description: "Certificazione iSAQB® CPSA per architetti software: livelli Foundation, Advanced ed Expert, e come si affianca a IREB, ISTQB e TOGAF.",
   h1: "Certificazione iSAQB® CPSA: cos'è, a chi serve e come si ottiene",
   lead: "La CPSA, Certified Professional for Software Architecture, è la certificazione di iSAQB® per chi progetta software. Qui trovi che cos'è, come sono fatti i livelli e da dove si parte.",
   crumb: "Certificazione iSAQB®",
@@ -57,6 +57,22 @@ export const CERT_FAQS: { q: string; a: string }[] = [
   {
     q: "A cosa serve la certificazione CPSA-F?",
     a: "Attesta le conoscenze di base di architettura software e dà un linguaggio comune per progettare, documentare e valutare architetture. Non garantisce assunzioni, promozioni o il titolo professionale di Software Architect.",
+  },
+  {
+    q: "Qual è la differenza tra iSAQB®, IREB® e ISTQB®?",
+    a: "iSAQB® certifica l'architettura software, IREB® i requisiti e ISTQB® il testing. Sono tre fasi dello stesso progetto, quindi si completano: i tre enti hanno accordi di collaborazione per allineare terminologia e curricula.",
+  },
+  {
+    q: "TOGAF® o iSAQB®: quale scelgo?",
+    a: "Non sono alternative. TOGAF® riguarda l'architettura di impresa, cioè come strategia, processi e sistemi informativi stanno insieme in un'organizzazione. iSAQB® riguarda l'architettura del singolo sistema software: struttura, decisioni, qualità e documentazione. Chi progetta software parte di solito da iSAQB®; chi lavora sulla strategia IT dell'organizzazione guarda anche a TOGAF®.",
+  },
+  {
+    q: "Da quale certificazione devo partire?",
+    a: "Dipende dal tuo ruolo: sviluppatori senior e tech lead partono da iSAQB® CPSA-F, chi lavora sui requisiti da IREB® CPRE, chi si occupa di qualità e test da ISTQB® CTFL, chi lavora sull'architettura di impresa da TOGAF®. Molti professionisti le combinano nel tempo.",
+  },
+  {
+    q: "Cube Academy eroga anche corsi IREB®, ISTQB® e TOGAF®?",
+    a: "No: oggi erogiamo i corsi di preparazione iSAQB® CPSA-Foundation. Per le altre certificazioni ti indichiamo gli enti ufficiali nella sezione dedicata.",
   },
   {
     q: "Cube Academy è un ente accreditato iSAQB®?",

@@ -3,7 +3,7 @@ import { SITE, SITE_URL } from "./site";
 import { getCourses, getEvents, type SeoCourse, type SeoEvent } from "./server-data";
 import { leadingId } from "./slug";
 import { LANG_CODES, LOCALE, OG_LOCALE, tx, type L, type TextKey } from "./seo-text";
-import { aboutSections, certFaqJsonLd, certSections, courseSections, examFaqJsonLd, examSections, faqJsonLd, faqSection, landingSections, tr, venueSection, type ShellSection } from "./seo-content";
+import { aboutSections, certFaqJsonLd, ecosystemSection, certSections, courseSections, examFaqJsonLd, examSections, faqJsonLd, faqSection, landingSections, tr, venueSection, type ShellSection } from "./seo-content";
 import { LANDING } from "../content/landing-copy";
 import { EXAM } from "../content/exam-copy";
 import { CERT } from "../content/cert-copy";
@@ -140,7 +140,7 @@ export async function resolvePath(all: string[]): Promise<Resolved> {
           : []),
         faqJsonLd(L),
       ],
-      shell: { h1: T("homeH1"), intro: T("homeIntro"), links: [...courseLinks(courses), ...MAIN_LINKS], sections: [faqSection(L)] },
+      shell: { h1: T("homeH1"), intro: T("homeIntro"), links: [...courseLinks(courses), ...MAIN_LINKS], sections: [ecosystemSection(L, true), faqSection(L)] },
     };
   }
 

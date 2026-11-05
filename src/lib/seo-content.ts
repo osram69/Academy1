@@ -8,6 +8,7 @@ import { LANDING } from "../content/landing-copy";
 import { EXAM, EXAM_FAQS } from "../content/exam-copy";
 import { CERT, CERT_FAQS } from "../content/cert-copy";
 import { ABOUT, PERSON } from "../content/about-copy";
+import { ECO } from "../content/ecosystem-copy";
 import type { L } from "./seo-text";
 
 const DICT: Record<L, Record<string, string>> = { it: {}, en, fr, de };
@@ -86,6 +87,16 @@ export const examFaqJsonLd = (l: L) => ({
   mainEntity: examFaqItems(l).map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: plain(f.a) } })),
 });
 
+/** Le certificazioni del software (iSAQB, IREB, ISTQB, TOGAF, cloud): pagina della certificazione e home. */
+export const ecosystemSection = (l: L, homeOnly = false): ShellSection => ({
+  heading: tr(l, homeOnly ? ECO.homeTitle : ECO.title),
+  items: [
+    tr(l, ECO.lead),
+    ...ECO.items.filter((i) => !homeOnly || i.home).map((i) => `${tr(l, i.name)} (${tr(l, i.area)}): ${tr(l, i.text)}${i.url && i.id !== "isaqb" ? ` [${tr(l, ECO.official)}](${i.url})` : ""}`),
+    ...(homeOnly ? [] : [...ECO.collab.map((s) => tr(l, s)), tr(l, ECO.notice)]),
+  ],
+});
+
 /** Contenuto della pagina "Chi siamo". */
 export function aboutSections(l: L): ShellSection[] {
   return [
@@ -106,6 +117,7 @@ export function certSections(l: L): ShellSection[] {
     { items: CERT.facts.map((s) => tr(l, s)) },
     { heading: tr(l, CERT.whatTitle), items: [tr(l, CERT.whatText)] },
     { heading: tr(l, CERT.levelsTitle), items: [tr(l, COPY.CURRICULUM_NOTE), ...CERT.levels.map((v) => `${tr(l, v.name)}: ${tr(l, v.text)}`)] },
+    ecosystemSection(l),
     { heading: tr(l, CERT.audienceTitle), items: COPY.AUDIENCE.map((s) => tr(l, s)) },
     { heading: tr(l, CERT.limitTitle), items: [tr(l, LANDING.examLimit)] },
     { heading: tr(l, CERT.pathTitle), items: CERT.path.map((s) => tr(l, s)) },
