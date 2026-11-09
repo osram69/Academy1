@@ -56,6 +56,8 @@ export async function createSession({ provider, order, description, email, origi
       customer_email: email || undefined,
       line_items: [{ quantity: 1, price_data: { currency: "eur", unit_amount: order.total_cents, product_data: { name: description } } }],
       metadata: { ref: order.ref },
+      // descrizione del pagamento (campo "Descrizione" nella dashboard Stripe e nelle ricevute): stessa causale degli altri metodi
+      payment_intent_data: { description: description.slice(0, 1000), metadata: { ref: order.ref } },
       success_url: `${back(order.ref, "stripe", "return")}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: back(order.ref, "stripe", "cancel"),
     });
