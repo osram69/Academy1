@@ -28,7 +28,7 @@ const WHY = [
   {
     n: "01",
     title: t("Uno standard, non un'opinione"),
-    text: t("Il curriculum iSAQB® è mantenuto da una community internazionale di architetti: ciò che studi è ciò che il mercato riconosce."),
+    text: t("Il curriculum iSAQB® è mantenuto da un'associazione internazionale di esperti di architettura software, con oltre 190 membri, aziende associate e partner accademici: ciò che studi è ciò che il mercato riconosce."),
     icon: BadgeCheck,
   },
   {
@@ -60,7 +60,7 @@ function CertificationSection() {
           </Reveal>
           <Reveal delay={160}>
             <p className="mt-6 max-w-md text-[16.5px] leading-relaxed text-ink/65">
-              <strong className="font-semibold text-ink">{t("iSAQB® CPSA-Foundation")}</strong>{" "}{t("è la certificazione di architettura software più riconosciuta in Europa. Non un badge da LinkedIn: un percorso strutturato che cambia come progetti, documenti e difendi le tue decisioni.")}</p>
+              <strong className="font-semibold text-ink">{t("iSAQB® CPSA-Foundation")}</strong>{" "}{t("è la certificazione di architettura software più riconosciuta in Europa, con più di 40.000 professionisti certificati. Non un badge da LinkedIn: un percorso strutturato che cambia come progetti, documenti e difendi le tue decisioni.")}</p>
           </Reveal>
           <Reveal delay={240} className="mt-8">
             <Btn href="/corsi" variant="ink" withArrow>

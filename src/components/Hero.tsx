@@ -91,7 +91,7 @@ export function Hero() {
           <Reveal delay={90}>
             <h1 className="mt-7 text-balance font-display text-[clamp(2.1rem,4.2vw,3.9rem)] font-bold leading-[1.02] tracking-[-0.03em]">
               {t("L'architettura software")}<br />
-              <em className="font-serif font-normal italic tracking-[-0.01em] text-flame">{t("si disegna.")}</em>
+              <em className="font-serif font-normal italic tracking-[-0.01em] text-flame">{t("si progetta.")}</em>
               <br />
               <span className="text-white/60">{t("L'architetto software")}<br />{t("si certifica.")}</span>
             </h1>
@@ -99,7 +99,7 @@ export function Hero() {
 
           <Reveal delay={180}>
             <p className="mt-7 max-w-xl text-[17px] leading-relaxed text-white/72">
-              {t("Corsi")}{" "}<strong className="font-semibold text-white/85">{t("CPSA-Foundation®")}</strong>{" "}{t("con docenti che progettano sistemi veri, in formato online o in aula. L'esame di certificazione si sostiene a parte, presso gli enti autorizzati iSAQB®.")}</p>
+              {t("Corsi")}{" "}<strong className="font-semibold text-white/85">{t("CPSA-Foundation®")}</strong>{" "}{t("con docenti con esperienza decennale, in formato online o in aula. L'esame di certificazione si sostiene a parte, presso gli enti autorizzati iSAQB®.")}</p>
           </Reveal>
 
           {/* la card con l'offerta è visibile solo da lg in su: sui telefoni il tag resta qui */}

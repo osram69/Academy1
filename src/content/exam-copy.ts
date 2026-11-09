@@ -23,7 +23,7 @@ export const EXAM = {
   ],
   stepsTitle: "Come ti iscrivi all'esame",
   steps: [
-    `Non sono richiesti prerequisiti: ti iscrivi tramite il [servizio di prenotazione online di ITA-STQB](${EXAM_URL}) e scegli la lingua dell'esame, italiano o inglese.`,
+    `Ti iscrivi tramite il [servizio di prenotazione online di ITA-STQB](${EXAM_URL}) e scegli la lingua dell'esame, italiano o inglese.`,
     "Paghi la quota d'esame (280 € + IVA) con PayPal, carta di credito o bonifico.",
     "Pianifichi l'esame in autonomia, seguendo la guida agli esami online dell'ente.",
     "Sostieni l'esame da remoto, con sorveglianza in tempo reale (Live Remote Proctored).",
@@ -64,7 +64,7 @@ export const EXAM_FAQS: { q: string; a: string }[] = [
   },
   {
     q: "Posso sostenere l'esame senza fare il corso?",
-    a: "Per iscriverti all'esame non sono richiesti prerequisiti. Il corso resta il modo più diretto per prepararti: copre il curriculum e nell'ultima giornata include una simulazione d'esame.",
+    a: "Il corso resta il modo più diretto per prepararti: copre il curriculum e nell'ultima giornata include una simulazione d'esame.",
   },
   {
     q: "Il certificato CPSA-F scade?",

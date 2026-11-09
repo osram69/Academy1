@@ -13,17 +13,17 @@ export const CERT = {
   facts: [
     "Certified Professional for Software Architecture (CPSA)",
     "Tre livelli: Foundation, Advanced, Expert",
-    "Si parte dal Foundation, senza prerequisiti per l'esame",
+    "Si parte dal Foundation",
     "Esame online, in Italia tramite ITA-STQB",
   ],
   whatTitle: "Che cos'è iSAQB®",
   whatText:
-    "iSAQB®, International Software Architecture Qualification Board, è l'organismo internazionale indipendente che definisce gli standard di formazione, esame e certificazione, tra cui il programma CPSA per chi lavora nell'architettura software. Il programma si basa su curricula di riferimento e su corsi tenuti da training provider accreditati. In Italia l'iscrizione agli esami passa da ITA-STQB; Cube Academy è Training Provider accreditato iSAQB® dal 2024.",
+    "iSAQB®, International Software Architecture Qualification Board, è l'organismo internazionale indipendente che definisce gli standard di formazione, esame e certificazione, tra cui il programma CPSA per chi lavora nell'architettura software. Il programma si basa su curricula di riferimento e su corsi tenuti da training provider accreditati. In Italia, ITA-STQB è l'ente accreditato per gli esami di certificazione iSAQB®; Cube Academy è Training Provider accreditato iSAQB® dal 2024.",
   levelsTitle: "I livelli della certificazione",
   levels: [
     {
       name: "Foundation (CPSA-F)",
-      text: "Il punto di partenza: le conoscenze per progettare e documentare architetture di sistemi di piccole e medie dimensioni, dai requisiti di qualità alla valutazione. Per sostenere l'esame non servono prerequisiti. È il livello per cui eroghiamo i corsi.",
+      text: "Il punto di partenza: le conoscenze per progettare e documentare architetture di sistemi di piccole e medie dimensioni, dai requisiti di qualità alla valutazione. È il livello per cui eroghiamo i corsi.",
     },
     {
       name: "Advanced (CPSA-A)",
@@ -52,7 +52,7 @@ export const CERT_FAQS: { q: string; a: string }[] = [
   },
   {
     q: "Da quale livello devo partire?",
-    a: "Dal Foundation (CPSA-F): per sostenere l'esame non servono prerequisiti. Il livello Advanced richiede la certificazione Foundation, e l'Expert quella Advanced.",
+    a: "Dal Foundation (CPSA-F). Il livello Advanced richiede la certificazione Foundation, e l'Expert quella Advanced.",
   },
   {
     q: "A cosa serve la certificazione CPSA-F?",

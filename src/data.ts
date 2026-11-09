@@ -98,7 +98,7 @@ export interface Course {
 
 export const FORMAT_META: Record<CourseFormat, { label: string; blurb: string }> = {
   online: { label: t("Live Online"), blurb: t("Aula virtuale interattiva, stessi docenti, zero trasferte.") },
-  aula: { label: t("In Aula"), blurb: t("Corso in presenza a Roma.") },
+  aula: { label: t("In Aula"), blurb: t("Corso in presenza a Roma o presso la vostra sede.") },
   prestige: { label: t("Prestige Residenziale"), blurb: t("Corso residenziale di 4 giorni con albergo e mezza pensione. Presto informazioni.") },
 };
 

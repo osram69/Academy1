@@ -10,7 +10,7 @@ const LINKS = [
   { label: t("Home"), href: "/" },
   { label: t("Calendario corsi"), href: "/corsi" },
   { label: t("Il corso"), href: "/corso-architettura-software" },
-  { label: t("Certificazione"), href: "/certificazione-isaqb" },
+  { label: t("Certificazioni"), href: "/certificazione-isaqb" },
   { label: t("Eventi"), href: "/eventi" },
   { label: t("FAQ"), href: "/", section: "faq" },
   { label: t("Chi siamo"), href: "/chi-siamo" },
