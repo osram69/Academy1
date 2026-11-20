@@ -258,3 +258,38 @@ export async function sendContactEmails(c) {
     return { sent: false, reason: "smtp-error" };
   }
 }
+
+/* ----------------- area materiali: invito e reset della password ----------------- */
+
+const PW_MAIL = {
+  reset: {
+    subject: "Reimposta la password - Materiali Cube Academy",
+    intro: "abbiamo ricevuto una richiesta per reimpostare la password di accesso ai materiali dei corsi Cube Academy.",
+    cta: "Scegli una nuova password",
+    expiry: "Il link è valido per 1 ora e si può usare una sola volta.",
+    ignore: "Se non hai fatto tu la richiesta puoi ignorare questa email: la tua password non cambia.",
+  },
+  invite: {
+    subject: "Il tuo accesso ai materiali - Cube Academy",
+    intro: "è stato creato il tuo accesso all'area materiali dei corsi Cube Academy. Per attivarlo scegli la tua password.",
+    cta: "Imposta la password",
+    expiry: "Il link è valido per 7 giorni e si può usare una sola volta; poi puoi richiederne uno nuovo dalla pagina di accesso.",
+    ignore: "Se non ti aspettavi questa email puoi ignorarla.",
+  },
+};
+
+/** Email con il link per scegliere la password. kind: "reset" (richiesta dell'utente) o "invite" (creato dall'amministratore). */
+export async function sendPasswordEmail({ to, name, username, link, kind }) {
+  if (!mailConfigured()) return { sent: false, reason: "smtp-not-configured" };
+  const T = PW_MAIL[kind] || PW_MAIL.reset;
+  try {
+    const hello = name ? `Gentile ${esc(name)},` : "Buongiorno,";
+    const html = `<div style="font-family:Arial,sans-serif;font-size:14px;line-height:1.55;max-width:560px;color:#131117"><p>${hello}</p><p>${esc(T.intro)}</p><p>Il tuo nome utente è <b>${esc(username)}</b> (puoi accedere anche con questo indirizzo email).</p><p style="margin:24px 0"><a href="${esc(link)}" style="background:#e8321e;color:#fff;text-decoration:none;font-weight:bold;padding:12px 22px;border-radius:8px;display:inline-block">${esc(T.cta)}</a></p><p style="color:#555">${esc(T.expiry)}</p><p style="color:#555">${esc(T.ignore)}</p><p style="color:#777;font-size:12px">Se il pulsante non funziona copia questo indirizzo nel browser:<br>${esc(link)}</p><p>Cube Academy — Cube Engineering S.r.l.</p></div>`;
+    const text = `${name ? `Gentile ${name},` : "Buongiorno,"}\n\n${T.intro}\nNome utente: ${username}\n\n${T.cta}: ${link}\n\n${T.expiry}\n${T.ignore}\n\nCube Academy - Cube Engineering S.r.l.`;
+    await send({ to, subject: T.subject, html, text });
+    return { sent: true };
+  } catch (e) {
+    console.error("Errore invio email password:", e?.message || e);
+    return { sent: false, reason: "smtp-error" };
+  }
+}

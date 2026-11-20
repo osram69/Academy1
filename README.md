@@ -21,9 +21,19 @@ Tutto vive in `MATERIALI_DIR`, una cartella **fuori dall'app**, così file, uten
 - **Studente**: vede solo le cartelle `riservato/` a cui è abilitato e scarica.
 - **Trainer** (`"role": "trainer"`): in più carica file, crea ed elimina cartelle e file (anche in `pubblico/`, dove vede il link da condividere).
   Con `folders: ["*"]` accede a tutti i corsi e può creare/eliminare le cartelle corso di primo livello.
-- Utenti: `node --env-file=.env scripts/materiali-utente.mjs aggiungi <utente> <cartella[,cartella]|*> <studente|trainer> [password]`
-  (anche `password`, `rimuovi`, `elenco`). Senza password ne genera una. In locale lavora su una cartella di prova e carica poi
-  `users.json` via FTP in `_config/`.
+- **Pannello admin** (`/admin/materiali`): scheda **File** (sfoglia corsi e cartella pubblica, carica, crea ed elimina cartelle e file,
+  copia il link dei file pubblici) e scheda **Utenti**.
+- **Pagina dello studente**: dopo il login vede solo i suoi corsi, con numero di file e ultimo aggiornamento, in sola lettura.
+  Gli account di `/materiali` sono separati da quelli del pannello (Supabase): lo studente non ha accesso a `/admin`.
+- **Utenti**: si gestiscono dal pannello, in `/admin/materiali` (nome utente, email, ruolo, cartelle). Alla creazione l'utente riceve
+  un'email d'invito con il link per scegliere la password (valido 7 giorni); si può anche impostarla a mano. Serve la posta SMTP
+  (`SMTP_*`, come per le iscrizioni). Si accede con nome utente **o** email.
+- **Password dimenticata**: dalla pagina di accesso (`/materiali/password-dimenticata`) l'utente riceve un link valido 1 ora e a uso
+  singolo; la risposta è la stessa anche se l'indirizzo non esiste, con limiti di richieste per IP e per account. Cambiando password
+  le sessioni aperte e gli altri link già emessi smettono di valere.
+- Alternativa da riga di comando (senza posta): `node --env-file=.env scripts/materiali-utente.mjs aggiungi <utente> <cartella[,cartella]|*> <studente|trainer> [password]`
+  (anche `password`, `rimuovi`, `elenco`); poi carica `users.json` via FTP in `_config/`. Gli utenti creati così non hanno email:
+  aggiungila dal pannello per abilitare il reset.
 - Il caricamento è limitato da `MATERIALI_MAX_UPLOAD_MB` (default 200) e dal limite del proxy del server.
 
 ## Deploy su Hostinger (app Next.js)
@@ -43,7 +53,9 @@ percorsi veri (`/corsi`, `/admin`, ...) e le API di iscrizione e pagamento sono 
    `supabase/migrazione-3.sql` (sconto privati per corso e ambito dei codici sconto),
    `supabase/migrazione-4.sql` (workshop: immagine, link LinkedIn, archivio immagini),
    `supabase/migrazione-5.sql` (tabella eventi gestita dal pannello) e
-   `supabase/migrazione-6.sql` (titolo dei workshop nelle altre lingue).
+   `supabase/migrazione-6.sql` (titolo dei workshop nelle altre lingue) e
+   `supabase/migrazione-9.sql` (livelli degli amministratori: **superuser** = tutto; **administrator** = tutto tranne Impostazioni;
+   chi è già amministratore diventa superuser. Il livello si assegna da Impostazioni → Amministratori).
 5. Webhook: Stripe → `https://<dominio>/api/webhook/stripe`, PayPal → `https://<dominio>/api/webhook/paypal`.
    (SumUp non ha webhook firmati: il pagamento è verificato dal server al ritorno dal checkout.)
 6. Per passare in produzione: valorizza le chiavi live e, da `/admin/impostazioni`, porta il metodo da Sandbox a Live.

@@ -38,9 +38,12 @@ export function readUsers() {
     return {};
   }
 }
+/** Scrittura atomica: file temporaneo + rinomina, così un'interruzione non lascia un users.json a metà. */
 export function writeUsers(users) {
   fs.mkdirSync(confDir(), { recursive: true });
-  fs.writeFileSync(usersFile(), JSON.stringify({ users }, null, 2) + "\n");
+  const tmp = `${usersFile()}.${process.pid}.tmp`;
+  fs.writeFileSync(tmp, JSON.stringify({ users }, null, 2) + "\n", { mode: 0o600 });
+  fs.renameSync(tmp, usersFile());
 }
 export function hashPassword(pw) {
   const salt = crypto.randomBytes(16).toString("hex");
@@ -54,6 +57,7 @@ function verifyPassword(pw, stored) {
   return a.length === b.length && crypto.timingSafeEqual(a, b);
 }
 const DUMMY = hashPassword("dummy"); // per non rivelare con i tempi se un utente esiste
+export const MIN_PASSWORD = 10;
 
 let secretCache = "";
 function secret() {
@@ -70,25 +74,37 @@ function secret() {
   return secretCache;
 }
 
-// ---------- sessione (cookie firmato, senza stato sul server) ----------
+// ---------- token firmati (sessione e reset password), senza stato sul server ----------
 const b64 = (s) => Buffer.from(s).toString("base64url");
-const sign = (s) => crypto.createHmac("sha256", secret()).update(s).digest("base64url");
+const sign = (domain, s) => crypto.createHmac("sha256", secret()).update(`${domain}:${s}`).digest("base64url");
+/** Impronta della password attuale: cambiando password, sessioni e link di reset già emessi smettono di valere. */
+const fingerprint = (u) => crypto.createHash("sha256").update(String(u.hash)).digest("base64url").slice(0, 12);
 
-export function makeSession(name) {
-  const body = b64(`${name}|${Date.now() + SESSION_DAYS * 864e5}`);
-  return `${body}.${sign(body)}`;
+function makeToken(domain, parts) {
+  const body = b64(parts.join("|"));
+  return `${body}.${sign(domain, body)}`;
 }
-/** Restituisce { name, role, folders } se il cookie è valido e l'utente esiste ancora. */
-export function userFromToken(token) {
+function readToken(domain, token) {
   const [body, sig] = String(token || "").split(".");
   if (!body || !sig) return null;
-  const good = sign(body);
+  const good = sign(domain, body);
   if (sig.length !== good.length || !crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(good))) return null;
-  const [name, exp] = Buffer.from(body, "base64url").toString().split("|");
+  return Buffer.from(body, "base64url").toString().split("|");
+}
+
+export function makeSession(name) {
+  const u = readUsers()[name];
+  return makeToken("sid", [name, Date.now() + SESSION_DAYS * 864e5, fingerprint(u)]);
+}
+/** Restituisce { name, fullName, role, folders } se il cookie è valido e l'utente esiste ancora. */
+export function userFromToken(token) {
+  const t = readToken("sid", token);
+  if (!t) return null;
+  const [name, exp, fp] = t;
   if (!(Number(exp) > Date.now())) return null;
   const u = readUsers()[name];
-  if (!u) return null;
-  return { name, role: u.role === "trainer" ? "trainer" : "studente", folders: Array.isArray(u.folders) ? u.folders : [] };
+  if (!u || fp !== fingerprint(u)) return null;
+  return { name, fullName: u.name || "", role: u.role === "trainer" ? "trainer" : "studente", folders: Array.isArray(u.folders) ? u.folders : [] };
 }
 export function cookieHeader(value, secure) {
   const age = value ? SESSION_DAYS * 86400 : 0;
@@ -97,13 +113,62 @@ export function cookieHeader(value, secure) {
 export const isSecure = (request) =>
   (request.headers.get("x-forwarded-proto") || "").includes("https") || (process.env.SITE_URL || "").startsWith("https");
 
+// ---------- reset della password ----------
+/** Link a uso singolo: vale finché la password non cambia e fino alla scadenza. */
+export function makeResetToken(username, ttlMs = 60 * 60e3) {
+  const u = readUsers()[username];
+  return u ? makeToken("reset", [username, Date.now() + ttlMs, fingerprint(u)]) : "";
+}
+/** Nome utente a cui appartiene il link, oppure null se scaduto, già usato o manomesso. */
+export function checkResetToken(token) {
+  const t = readToken("reset", token);
+  if (!t) return null;
+  const [name, exp, fp] = t;
+  const u = readUsers()[name];
+  return u && Number(exp) > Date.now() && fp === fingerprint(u) ? name : null;
+}
+export function setPassword(username, password) {
+  const users = readUsers();
+  if (!users[username]) return false;
+  users[username].hash = hashPassword(password);
+  writeUsers(users);
+  return true;
+}
+export const passwordOk = (pw) => typeof pw === "string" && pw.length >= MIN_PASSWORD && pw.length <= 200;
+
+const normEmail = (e) => String(e || "").trim().toLowerCase();
+export const validEmail = (e) => /^[^\s@]{1,64}@[^\s@]{1,190}\.[^\s@.]{2,}$/.test(normEmail(e));
+/** Trova un utente per nome utente o per email (senza distinguere maiuscole). */
+export function findUser(id) {
+  const key = String(id || "").trim();
+  const users = readUsers();
+  if (users[key]) return { username: key, ...users[key] };
+  const lower = key.toLowerCase();
+  for (const [username, u] of Object.entries(users)) {
+    if (username.toLowerCase() === lower || (u.email && normEmail(u.email) === lower)) return { username, ...u };
+  }
+  return null;
+}
+
+// richieste di reset: pochi tentativi per indirizzo IP e per account (la risposta è sempre la stessa)
+const resetHits = new Map();
+export function resetAllowed(key, max, windowMs) {
+  const now = Date.now();
+  const h = (resetHits.get(key) || []).filter((t) => now - t < windowMs);
+  if (h.length >= max) return false;
+  h.push(now);
+  resetHits.set(key, h);
+  if (resetHits.size > 5000) resetHits.clear();
+  return true;
+}
+
 // ---------- login con limite di tentativi ----------
 const fails = new Map();
 export function login(name, password, ip) {
   const now = Date.now();
   const f = fails.get(ip);
   if (f && now - f.t < 10 * 60e3 && f.n >= 10) return { error: "limit" };
-  const u = readUsers()[String(name || "").trim()];
+  const u = findUser(name);
   const ok = verifyPassword(String(password || ""), u?.hash || DUMMY) && !!u;
   if (!ok) {
     fails.set(ip, { n: f && now - f.t < 10 * 60e3 ? f.n + 1 : 1, t: f && now - f.t < 10 * 60e3 ? f.t : now });
@@ -111,7 +176,70 @@ export function login(name, password, ip) {
     return { error: "bad" };
   }
   fails.delete(ip);
-  return { token: makeSession(String(name).trim()) };
+  return { token: makeSession(u.username) };
+}
+
+// ---------- gestione utenti (pannello admin) ----------
+const USERNAME = /^[a-zA-Z0-9._-]{3,40}$/;
+
+export function listUsers() {
+  return Object.entries(readUsers())
+    .map(([username, u]) => ({ username, name: u.name || "", email: u.email || "", role: u.role === "trainer" ? "trainer" : "studente", folders: u.folders || [] }))
+    .sort((a, b) => a.username.localeCompare(b.username, "it"));
+}
+/** Cartelle corso esistenti in riservato/ (per le caselle di selezione). */
+export function listCourseFolders() {
+  try {
+    return fs.readdirSync(privDir(), { withFileTypes: true }).filter((e) => e.isDirectory() && validKey(e.name)).map((e) => e.name).sort((a, b) => a.localeCompare(b, "it", { numeric: true }));
+  } catch {
+    return [];
+  }
+}
+function cleanFields(b) {
+  const role = b.role === "trainer" ? "trainer" : "studente";
+  const raw = Array.isArray(b.folders) ? b.folders : [];
+  const folders = raw.includes("*") ? ["*"] : [...new Set(raw.map((f) => String(f).trim()).filter(Boolean))];
+  if (folders.some((f) => f !== "*" && !validKey(f))) return { error: "Nome cartella non valido." };
+  const email = normEmail(b.email);
+  if (email && !validEmail(email)) return { error: "Email non valida." };
+  return { role, folders, email, name: String(b.name || "").trim().slice(0, 100) };
+}
+const emailTaken = (users, email, except) => !!email && Object.entries(users).some(([n, u]) => n !== except && normEmail(u.email) === email);
+
+/** Crea un utente. Senza password ne viene generata una casuale (l'utente la imposta dal link d'invito). */
+export function createUser(b) {
+  const username = String(b.username || "").trim();
+  if (!USERNAME.test(username)) return { error: "Nome utente: 3-40 caratteri tra lettere, numeri, . _ -" };
+  const users = readUsers();
+  if (findUser(username)) return { error: "Esiste già un utente con questo nome." };
+  const f = cleanFields(b);
+  if (f.error) return f;
+  if (!f.email) return { error: "L'email è obbligatoria (serve per il reset della password)." };
+  if (emailTaken(users, f.email)) return { error: "Questa email è già usata da un altro utente." };
+  if (b.password && !passwordOk(b.password)) return { error: `La password deve avere almeno ${MIN_PASSWORD} caratteri.` };
+  const password = b.password || crypto.randomBytes(24).toString("base64url");
+  users[username] = { hash: hashPassword(password), email: f.email, name: f.name, role: f.role, folders: f.folders };
+  writeUsers(users);
+  return { username, generated: !b.password };
+}
+export function updateUser(username, b) {
+  const users = readUsers();
+  if (!users[username]) return { error: "Utente inesistente." };
+  const f = cleanFields(b);
+  if (f.error) return f;
+  if (!f.email) return { error: "L'email è obbligatoria (serve per il reset della password)." };
+  if (emailTaken(users, f.email, username)) return { error: "Questa email è già usata da un altro utente." };
+  if (b.password && !passwordOk(b.password)) return { error: `La password deve avere almeno ${MIN_PASSWORD} caratteri.` };
+  users[username] = { ...users[username], email: f.email, name: f.name, role: f.role, folders: f.folders, ...(b.password ? { hash: hashPassword(b.password) } : {}) };
+  writeUsers(users);
+  return { username };
+}
+export function deleteUser(username) {
+  const users = readUsers();
+  if (!users[username]) return { error: "Utente inesistente." };
+  delete users[username];
+  writeUsers(users);
+  return { username };
 }
 
 // ---------- permessi ----------
@@ -159,8 +287,15 @@ export function listDir(full) {
   return out.sort((a, b) => (a.isDir === b.isDir ? a.name.localeCompare(b.name, "it", { numeric: true }) : a.isDir ? -1 : 1));
 }
 
+/** Crea pubblico/ e riservato/ se mancano (cartella dati appena preparata). */
+export function ensureDirs() {
+  fs.mkdirSync(pubDir(), { recursive: true });
+  fs.mkdirSync(privDir(), { recursive: true });
+}
+
 /** Cartelle di primo livello visibili all'utente. */
 export function listRoots(u) {
+  ensureDirs();
   const out = [];
   try {
     for (const e of fs.readdirSync(privDir(), { withFileTypes: true })) {
@@ -172,6 +307,30 @@ export function listRoots(u) {
   out.sort((a, b) => a.label.localeCompare(b.label, "it", { numeric: true }));
   if (isTrainer(u)) out.push({ key: PUBLIC_KEY, label: "Pubblico (senza login)" });
   return out;
+}
+
+/** Numero di file e data dell'ultima modifica dentro una cartella (per la pagina dello studente). */
+export function folderStats(full, depth = 0) {
+  let files = 0;
+  let last = 0;
+  if (depth > 8) return { files, last };
+  try {
+    for (const e of fs.readdirSync(full, { withFileTypes: true })) {
+      if (e.name.startsWith(".")) continue;
+      const f = path.join(full, e.name);
+      if (e.isDirectory()) {
+        const r = folderStats(f, depth + 1);
+        files += r.files;
+        last = Math.max(last, r.last);
+      } else if (e.isFile()) {
+        files++;
+        last = Math.max(last, fs.statSync(f).mtimeMs);
+      }
+    }
+  } catch {
+    /* cartella non leggibile: conta zero */
+  }
+  return { files, last };
 }
 
 // ---------- scrittura (solo trainer: i controlli stanno nella route) ----------

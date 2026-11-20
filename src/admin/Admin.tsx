@@ -7,6 +7,7 @@ import { MODALITA, WORKSHOP_LANGUAGES, workshopLanguage, workshopTimes } from ".
 import { SettingsPage } from "./Settings";
 import { OrdersPage } from "./Orders";
 import { EventsAdmin } from "./Events";
+import { MaterialiPage } from "./Materiali";
 import { translateFromItalian } from "./translate";
 import { RichEditor } from "./RichEditor";
 
@@ -109,6 +110,9 @@ function toPayload(f: Row): { data: Row; errors: Errors } {
 
 const go = (path: string) => navigate(path);
 
+/** superuser: tutto. administrator: tutto tranne le Impostazioni (e la gestione degli amministratori). */
+type AdminRole = "superuser" | "administrator";
+
 /* ------------------------------- UI helpers ------------------------------ */
 
 export const inputCls =
@@ -116,7 +120,7 @@ export const inputCls =
 export const btnCls = "inline-flex items-center rounded-full px-4 py-2 text-[13px] font-semibold transition-colors";
 export const btnPrimary = `${btnCls} bg-ink text-white hover:bg-flame disabled:opacity-50`;
 
-function Shell({ children, right }: { children: ReactNode; right?: ReactNode }) {
+function Shell({ children, right, role }: { children: ReactNode; right?: ReactNode; role?: AdminRole | null }) {
   return (
     <div className="min-h-screen bg-paper">
       <header className="border-b border-ink/10 bg-ink text-white">
@@ -126,7 +130,7 @@ function Shell({ children, right }: { children: ReactNode; right?: ReactNode }) 
             <span className="border-l border-white/20 pl-3 font-display text-[15px] font-semibold tracking-tight text-ember">Gestione</span>
           </a>
           <nav className="flex items-center gap-5 text-[13px] font-medium" aria-label="Sezioni del pannello">
-            {[["/admin", "Corsi"], ["/admin/eventi", "Eventi"], ["/admin/iscrizioni", "Iscrizioni"], ["/admin/impostazioni", "Impostazioni"]].map(([h, l]) => (
+            {[["/admin", "Corsi"], ["/admin/eventi", "Eventi"], ["/admin/iscrizioni", "Iscrizioni"], ["/admin/materiali", "Materiali"], ["/admin/impostazioni", "Impostazioni"]].filter(([h]) => role !== "administrator" || h !== "/admin/impostazioni").map(([h, l]) => (
               <a key={h} href={h} className="text-white/75 hover:text-white">{l}</a>
             ))}
           </nav>
@@ -806,13 +810,26 @@ export function Admin({ hash }: { hash: string }) {
 
   // l'utente può essere autenticato ma non abilitato (email assente in admin_emails)
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const [role, setRole] = useState<AdminRole | null>(null);
   const uid = session?.user.id;
   useEffect(() => {
     if (!uid) {
       setIsAdmin(null);
+      setRole(null);
       return;
     }
-    supabase.rpc("is_admin").then(({ data, error }) => setIsAdmin(error ? false : data === true));
+    // admin_role() esiste dopo la migrazione 9; prima, ogni amministratore è a tutti gli effetti superuser
+    supabase.rpc("admin_role").then(({ data, error }) => {
+      if (!error) {
+        setRole(data === "administrator" ? "administrator" : data === "superuser" ? "superuser" : null);
+        setIsAdmin(data === "administrator" || data === "superuser");
+        return;
+      }
+      supabase.rpc("is_admin").then(({ data: ok, error: e }) => {
+        setIsAdmin(e ? false : ok === true);
+        setRole(!e && ok === true ? "superuser" : null);
+      });
+    });
   }, [uid]);
 
   if (!supabaseConfigured)
@@ -823,9 +840,10 @@ export function Admin({ hash }: { hash: string }) {
   const m = hash.match(/^#\/admin\/corso\/([^/]+)/);
   return (
     <Shell
+      role={role}
       right={
         <button className="text-white/70 hover:text-white" onClick={() => supabase.auth.signOut()}>
-          Esci ({session.user.email})
+          Esci ({session.user.email}{role === "administrator" ? " · administrator" : ""})
         </button>
       }
     >
@@ -848,7 +866,16 @@ export function Admin({ hash }: { hash: string }) {
       ) : /^#\/admin\/(eventi|evento\/)/.test(hash) ? (
         <EventsAdmin hash={hash} />
       ) : /^#\/admin\/impostazioni/.test(hash) ? (
-        <SettingsPage session={session} />
+        role === "administrator" ? (
+          <div className="max-w-2xl rounded-2xl border border-ink/10 bg-white p-6">
+            <h1 className="font-display text-xl font-bold">Impostazioni riservate</h1>
+            <p className="mt-2 text-[14px] text-ink/70">Con il livello administrator non hai accesso alle Impostazioni (pagamenti, codici sconto, amministratori). Se ti servono, chiedi a un superuser.</p>
+          </div>
+        ) : (
+          <SettingsPage session={session} />
+        )
+      ) : /^#\/admin\/materiali/.test(hash) ? (
+        <MaterialiPage session={session} />
       ) : /^#\/admin\/iscrizioni/.test(hash) ? (
         <OrdersPage session={session} />
       ) : (

@@ -4,6 +4,6 @@ import { respond } from "@server/http.mjs";
 export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
-  const denied = await adminGate(request.headers.get("authorization"));
+  const denied = await adminGate(request.headers.get("authorization"), "superuser");
   return respond(denied ?? (await adminStatus()));
 }

@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabase";
 import { Field, btnPrimary, inputCls } from "./Admin";
+import { AdminAccounts } from "./AdminAccounts";
 
 /* Impostazioni del sito (tabella public.impostazioni, una riga): metodi di pagamento, sandbox,
    sconto privati e codici sconto globali. Le chiavi segrete NON stanno qui: sono variabili d'ambiente
@@ -91,6 +92,7 @@ export function SettingsPage({ session }: { session: Session }) {
   };
 
   return (
+    <div className="space-y-6">
     <form onSubmit={save} className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-display text-2xl font-bold tracking-tight">Impostazioni</h1>
@@ -216,5 +218,7 @@ export function SettingsPage({ session }: { session: Session }) {
         </div>
       </section>
     </form>
+    <AdminAccounts session={session} />
+    </div>
   );
 }

@@ -260,17 +260,86 @@ export async function checkoutReturn(ref, outcome) {
 }
 
 /* ----------------------- API riservate agli admin -------------------- */
-// il browser admin invia il JWT Supabase; il server verifica utente e appartenenza a admin_emails
+// il browser admin invia il JWT Supabase; il server verifica utente, appartenenza a admin_emails e livello (superuser / administrator)
 
-export async function adminGate(authHeader) {
-  if (!db) return fail(503, "Database non configurato.");
+// Livelli: "superuser" (tutto, comprese Impostazioni e amministratori) e "administrator" (tutto tranne Impostazioni).
+// Prima della migrazione 9 la colonna ruolo non esiste: gli amministratori già presenti restano superuser.
+const adminRole = (row) => (row?.ruolo === "administrator" ? "administrator" : "superuser");
+
+/** Verifica il JWT Supabase e il livello richiesto. Restituisce { denied } oppure { email, ruolo }. */
+export async function adminIdentity(authHeader, level = "administrator") {
+  if (!db) return { denied: fail(503, "Database non configurato.") };
   const token = String(authHeader || "").replace(/^Bearer /i, "");
   const { data } = token ? await db.auth.getUser(token) : { data: null };
   const email = data?.user?.email?.toLowerCase();
-  if (!email) return fail(401, "Accesso richiesto.");
-  const { data: row } = await db.from("admin_emails").select("email").ilike("email", email).maybeSingle();
-  if (!row) return fail(403, "Utente non abilitato.");
-  return null;
+  if (!email) return { denied: fail(401, "Accesso richiesto.") };
+  const { data: row } = await db.from("admin_emails").select("*").ilike("email", email).maybeSingle();
+  if (!row) return { denied: fail(403, "Utente non abilitato.") };
+  const ruolo = adminRole(row);
+  if (level === "superuser" && ruolo !== "superuser") return { denied: fail(403, "Serve il livello superuser.") };
+  return { email, ruolo };
+}
+
+export async function adminGate(authHeader, level) {
+  return (await adminIdentity(authHeader, level)).denied ?? null;
+}
+
+/* ----- amministratori del pannello (solo superuser) ----- */
+
+const ROLES = ["administrator", "superuser"];
+const missingColumn = (e) => /ruolo/i.test(e?.message || "") && /column|schema cache/i.test(e?.message || "");
+const MIGRATE = "Esegui prima supabase/migrazione-9.sql nel SQL Editor di Supabase.";
+
+async function adminRows() {
+  const { data, error } = await db.from("admin_emails").select("*").order("email");
+  return { rows: data || [], error };
+}
+
+export async function adminAccountsList() {
+  const { rows, error } = await adminRows();
+  if (error) return fail(500, error.message);
+  return ok({ admins: rows.map((r) => ({ email: r.email, ruolo: adminRole(r) })), migrated: !rows.length || "ruolo" in rows[0] });
+}
+
+export async function adminAccountAdd(body) {
+  const email = String(body?.email || "").trim().toLowerCase();
+  const ruolo = body?.ruolo;
+  if (!isEmail(email)) return fail(400, "Email non valida.");
+  if (!ROLES.includes(ruolo)) return fail(400, "Livello non valido.");
+  const { rows, error } = await adminRows();
+  if (error) return fail(500, error.message);
+  if (rows.some((r) => String(r.email).toLowerCase() === email)) return fail(409, "Questa email è già tra gli amministratori.");
+  const { error: e } = await db.from("admin_emails").insert({ email, ruolo });
+  if (e) return fail(500, missingColumn(e) ? MIGRATE : e.message);
+  return ok({ email, ruolo });
+}
+
+/** Cambia livello. Si rifiuta di togliere l'ultimo superuser o di declassare chi sta facendo la richiesta. */
+export async function adminAccountUpdate(email, body, self) {
+  const ruolo = body?.ruolo;
+  if (!ROLES.includes(ruolo)) return fail(400, "Livello non valido.");
+  const { rows, error } = await adminRows();
+  if (error) return fail(500, error.message);
+  const row = rows.find((r) => String(r.email).toLowerCase() === String(email).toLowerCase());
+  if (!row) return fail(404, "Amministratore inesistente.");
+  if (ruolo !== "superuser") {
+    if (String(row.email).toLowerCase() === self) return fail(400, "Non puoi declassare te stesso.");
+    if (adminRole(row) === "superuser" && rows.filter((r) => adminRole(r) === "superuser").length <= 1) return fail(400, "Deve restare almeno un superuser.");
+  }
+  const { error: e } = await db.from("admin_emails").update({ ruolo }).eq("email", row.email);
+  if (e) return fail(500, missingColumn(e) ? MIGRATE : e.message);
+  return ok({ email: row.email, ruolo });
+}
+
+export async function adminAccountDelete(email, self) {
+  const { rows, error } = await adminRows();
+  if (error) return fail(500, error.message);
+  const row = rows.find((r) => String(r.email).toLowerCase() === String(email).toLowerCase());
+  if (!row) return fail(404, "Amministratore inesistente.");
+  if (String(row.email).toLowerCase() === self) return fail(400, "Non puoi eliminare te stesso.");
+  if (adminRole(row) === "superuser" && rows.filter((r) => adminRole(r) === "superuser").length <= 1) return fail(400, "Deve restare almeno un superuser.");
+  const { error: e } = await db.from("admin_emails").delete().eq("email", row.email);
+  return e ? fail(500, e.message) : ok({ email: row.email });
 }
 
 // stato dei metodi di pagamento: quali variabili d'ambiente mancano (solo i nomi, mai i valori)

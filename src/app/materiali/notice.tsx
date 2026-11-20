@@ -2,6 +2,7 @@
 const OK: Record<string, string> = {
   creata: "Cartella creata.",
   eliminato: "Eliminato.",
+  pwok: "Password aggiornata: sei connesso.",
 };
 const ERR: Record<string, string> = {
   "err-nome": "Nome non valido (niente / \\ o punto iniziale).",
