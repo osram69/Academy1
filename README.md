@@ -5,6 +5,27 @@ vivono in un database **Supabase** (Postgres) e il sito li legge dal browser; is
 (Stripe, PayPal, SumUp, bonifico) passano dal server, che custodisce le chiavi segrete. Il pannello
 `/admin` sostituisce il plugin WordPress "Cube Academy - Gestione Corsi".
 
+## Area materiali (`/materiali`)
+
+Pagine separate dal sito (nessun link dalla home, `noindex`, `Disallow` in robots) per distribuire slide e materiali.
+Tutto vive in `MATERIALI_DIR`, una cartella **fuori dall'app**, così file, utenti e chiave di sessione restano tra un build e l'altro
+(su Hostinger: `/home/<utente>/domains/cubeacademy.eu/hbuilds/cpsaf_training`, vedi `.env.example`):
+
+```
+<MATERIALI_DIR>/pubblico/…              scaricabili senza login da /materiali/p/<percorso>; la cartella non è elencabile (404)
+<MATERIALI_DIR>/riservato/<corso>/…     con login: elenco e download, solo per gli utenti abilitati a quel corso
+<MATERIALI_DIR>/_config/users.json      utenti (password salvate come hash scrypt)
+<MATERIALI_DIR>/_config/session.secret  chiave dei cookie, creata da sola
+```
+
+- **Studente**: vede solo le cartelle `riservato/` a cui è abilitato e scarica.
+- **Trainer** (`"role": "trainer"`): in più carica file, crea ed elimina cartelle e file (anche in `pubblico/`, dove vede il link da condividere).
+  Con `folders: ["*"]` accede a tutti i corsi e può creare/eliminare le cartelle corso di primo livello.
+- Utenti: `node --env-file=.env scripts/materiali-utente.mjs aggiungi <utente> <cartella[,cartella]|*> <studente|trainer> [password]`
+  (anche `password`, `rimuovi`, `elenco`). Senza password ne genera una. In locale lavora su una cartella di prova e carica poi
+  `users.json` via FTP in `_config/`.
+- Il caricamento è limitato da `MATERIALI_MAX_UPLOAD_MB` (default 200) e dal limite del proxy del server.
+
 ## Deploy su Hostinger (app Next.js)
 
 Il progetto è un'app **Next.js** (come romaofficesharing.it): l'interfaccia è una single-page app a rotte con
