@@ -122,8 +122,8 @@ export function MaterialiUsersPage({ session }: { session: Session }) {
             <Field label="Nome e cognome (facoltativo)">
               <input className={inputCls} value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} />
             </Field>
-            <Field label="Email" hint="Serve per l'invito e per il reset della password. Può accedere anche con questa.">
-              <input className={inputCls} type="email" value={f.email} required onChange={(e) => setF({ ...f, email: e.target.value })} />
+            <Field label="Email (facoltativa con password)" hint="Serve per l'invito e per il reset da parte dell'utente. Lasciala vuota per un account condiviso di corso (imposta la password qui sotto).">
+              <input className={inputCls} type="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} />
             </Field>
             <Field label="Ruolo" hint="Il trainer può caricare, creare ed eliminare file e cartelle.">
               <select className={inputCls} value={f.role} onChange={(e) => setF({ ...f, role: e.target.value as Form["role"] })}>

@@ -27,7 +27,7 @@ export async function adminMaterialiCreate(body, origin) {
   }
   const r = createUser(body);
   if (r.error) return fail(400, r.error);
-  const mail = body.password && !wantsInvite ? null : await invite(r.username, origin);
+  const mail = (body.password && !wantsInvite) || !String(body.email || "").trim() ? null : await invite(r.username, origin);
   return ok({ username: r.username, invited: !!mail?.sent, mailError: mail && !mail.sent ? mail.reason : undefined });
 }
 

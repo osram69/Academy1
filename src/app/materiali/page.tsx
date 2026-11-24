@@ -1,7 +1,8 @@
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { COOKIE, canManageRoots, folderStats, isTrainer, listRoots, rootOf, userFromToken } from "@server/materiali.mjs";
+import { COOKIE, canManageRoots, folderStats, isTrainer, listRoots, listUsers, rootOf, userFromToken } from "@server/materiali.mjs";
 import { areaUrl } from "@server/materiali-http.mjs";
+import { mailConfigured } from "@server/mail.mjs";
 import { Notice } from "./notice";
 
 export const dynamic = "force-dynamic";
@@ -29,7 +30,9 @@ export default async function Materiali({ searchParams }: Props) {
           {q.e && <p role="alert" className="text-sm text-err">{q.e === "2" ? "Troppi tentativi: riprova tra qualche minuto." : "Utente o password errati."}</p>}
           <button className="w-full rounded-lg bg-flame px-4 py-2.5 font-semibold text-white shadow-flame hover:bg-ember">Accedi</button>
         </form>
-        <Link href="/materiali/password-dimenticata" className="mt-4 inline-block text-sm text-flame hover:underline">Password dimenticata?</Link>
+        {mailConfigured() && listUsers().some((u) => u.email) && (
+          <Link href="/materiali/password-dimenticata" className="mt-4 inline-block text-sm text-flame hover:underline">Password dimenticata?</Link>
+        )}
         <p className="mt-5 text-xs text-steel">
           Non hai le credenziali? Scrivi a <a className="underline" href="mailto:academy@cubeng.eu">academy@cubeng.eu</a>.
         </p>

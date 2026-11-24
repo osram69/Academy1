@@ -214,9 +214,10 @@ export function createUser(b) {
   if (findUser(username)) return { error: "Esiste già un utente con questo nome." };
   const f = cleanFields(b);
   if (f.error) return f;
-  if (!f.email) return { error: "L'email è obbligatoria (serve per il reset della password)." };
+  // senza email serve una password impostata dall'admin (account condiviso di corso: nessun invito né reset via email)
+  if (!f.email && !b.password) return { error: "Inserisci l'email (per l'invito) oppure imposta una password." };
   if (emailTaken(users, f.email)) return { error: "Questa email è già usata da un altro utente." };
-  if (b.password && !passwordOk(b.password)) return { error: `La password deve avere almeno ${MIN_PASSWORD} caratteri.` };
+  if (b.password &&!passwordOk(b.password)) return { error: `La password deve avere almeno ${MIN_PASSWORD} caratteri.` };
   const password = b.password || crypto.randomBytes(24).toString("base64url");
   users[username] = { hash: hashPassword(password), email: f.email, name: f.name, role: f.role, folders: f.folders };
   writeUsers(users);
@@ -227,7 +228,6 @@ export function updateUser(username, b) {
   if (!users[username]) return { error: "Utente inesistente." };
   const f = cleanFields(b);
   if (f.error) return f;
-  if (!f.email) return { error: "L'email è obbligatoria (serve per il reset della password)." };
   if (emailTaken(users, f.email, username)) return { error: "Questa email è già usata da un altro utente." };
   if (b.password && !passwordOk(b.password)) return { error: `La password deve avere almeno ${MIN_PASSWORD} caratteri.` };
   users[username] = { ...users[username], email: f.email, name: f.name, role: f.role, folders: f.folders, ...(b.password ? { hash: hashPassword(b.password) } : {}) };
