@@ -1,4 +1,4 @@
-import { adminAccountAdd, adminAccountDelete, adminAccountUpdate, adminAccountsList, adminIdentity } from "@server/core.mjs";
+import { adminAccountAdd, adminAccountDelete, adminAccountResetPassword, adminAccountUpdate, adminAccountsList, adminIdentity } from "@server/core.mjs";
 import { respond } from "@server/http.mjs";
 
 export const dynamic = "force-dynamic";
@@ -17,9 +17,12 @@ export async function POST(request: Request) {
   return respond(who.denied ?? (await adminAccountAdd(await request.json().catch(() => ({})))));
 }
 
+// PATCH: { action: "reset", password? } reimposta la password provvisoria; altrimenti { ruolo } cambia il livello
 export async function PATCH(request: Request) {
   const who = await guard(request);
-  return respond(who.denied ?? (await adminAccountUpdate(email(request), await request.json().catch(() => ({})), who.email)));
+  if (who.denied) return respond(who.denied);
+  const body = await request.json().catch(() => ({}));
+  return respond(body?.action === "reset" ? await adminAccountResetPassword(email(request), body) : await adminAccountUpdate(email(request), body, who.email));
 }
 
 export async function DELETE(request: Request) {

@@ -5,6 +5,7 @@ import { createClient } from "@supabase/supabase-js";
 import { MAX_SEATS, computeTotals, earlyPriceEuro } from "../shared/pricing.mjs";
 import { isCapItalia, isCodiceFiscale, isCodiceFiscaleAny, isEmail, isPartitaIva, isVatIdEstero } from "../shared/validators.mjs";
 import { courseCode } from "./course.mjs";
+import { createAdminUser, resetAdminPassword } from "./admin-accounts.mjs";
 import { translateFields, translatorProvider } from "./translate.mjs";
 import { bankDetails, createSession, isPaid, methodStatus, paypalVerifyWebhook, stripeClient, stripeWebhookSecret } from "./payments.mjs";
 import { findGlobalCoupon, getSettings, invalidateSettings } from "./settings.mjs";
@@ -288,7 +289,9 @@ export async function adminGate(authHeader, level) {
 
 /* ----- amministratori del pannello (solo superuser) ----- */
 
-const ROLES = ["trainer", "administrator", "superuser"];
+// Livelli assegnabili dalla pagina; il superuser si gestisce solo da SQL (le righe superuser non si modificano né si rimuovono da qui)
+const ROLES = ["trainer", "administrator"];
+const SUPERUSER_SQL = "Il superuser si gestisce solo da SQL.";
 const missingColumn = (e) => /ruolo/i.test(e?.message || "") && /column|schema cache/i.test(e?.message || "");
 const MIGRATE = "Esegui prima supabase/migrazione-9.sql nel SQL Editor di Supabase.";
 
@@ -303,31 +306,29 @@ export async function adminAccountsList() {
   return ok({ admins: rows.map((r) => ({ email: r.email, ruolo: adminRole(r) })), migrated: !rows.length || "ruolo" in rows[0] });
 }
 
+/** Crea un administrator o trainer: utente Supabase con password provvisoria (mostrata una volta) + livello. Vedi server/admin-accounts.mjs. */
 export async function adminAccountAdd(body) {
-  const email = String(body?.email || "").trim().toLowerCase();
-  const ruolo = body?.ruolo;
-  if (!isEmail(email)) return fail(400, "Email non valida.");
-  if (!ROLES.includes(ruolo)) return fail(400, "Livello non valido.");
-  const { rows, error } = await adminRows();
-  if (error) return fail(500, error.message);
-  if (rows.some((r) => String(r.email).toLowerCase() === email)) return fail(409, "Questa email è già tra gli amministratori.");
-  const { error: e } = await db.from("admin_emails").insert({ email, ruolo });
-  if (e) return fail(500, missingColumn(e) ? MIGRATE : e.message);
-  return ok({ email, ruolo });
+  if (!db) return fail(503, "Database non configurato.");
+  return createAdminUser(db, body);
 }
 
-/** Cambia livello. Si rifiuta di togliere l'ultimo superuser o di declassare chi sta facendo la richiesta. */
+/** Nuova password provvisoria per un administrator o trainer (mai per il superuser). */
+export async function adminAccountResetPassword(email, body) {
+  if (!db) return fail(503, "Database non configurato.");
+  return resetAdminPassword(db, email, body);
+}
+
+/** Cambia livello tra administrator e trainer. Il superuser non si tocca da qui; non si declassa chi fa la richiesta. */
 export async function adminAccountUpdate(email, body, self) {
   const ruolo = body?.ruolo;
+  if (ruolo === "superuser") return fail(403, SUPERUSER_SQL);
   if (!ROLES.includes(ruolo)) return fail(400, "Livello non valido.");
   const { rows, error } = await adminRows();
   if (error) return fail(500, error.message);
   const row = rows.find((r) => String(r.email).toLowerCase() === String(email).toLowerCase());
   if (!row) return fail(404, "Amministratore inesistente.");
-  if (ruolo !== "superuser") {
-    if (String(row.email).toLowerCase() === self) return fail(400, "Non puoi declassare te stesso.");
-    if (adminRole(row) === "superuser" && rows.filter((r) => adminRole(r) === "superuser").length <= 1) return fail(400, "Deve restare almeno un superuser.");
-  }
+  if (adminRole(row) === "superuser") return fail(403, SUPERUSER_SQL);
+  if (String(row.email).toLowerCase() === self) return fail(400, "Non puoi declassare te stesso.");
   const { error: e } = await db.from("admin_emails").update({ ruolo }).eq("email", row.email);
   if (e) return fail(500, missingColumn(e) ? MIGRATE : e.message);
   return ok({ email: row.email, ruolo });
@@ -338,8 +339,8 @@ export async function adminAccountDelete(email, self) {
   if (error) return fail(500, error.message);
   const row = rows.find((r) => String(r.email).toLowerCase() === String(email).toLowerCase());
   if (!row) return fail(404, "Amministratore inesistente.");
+  if (adminRole(row) === "superuser") return fail(403, SUPERUSER_SQL);
   if (String(row.email).toLowerCase() === self) return fail(400, "Non puoi eliminare te stesso.");
-  if (adminRole(row) === "superuser" && rows.filter((r) => adminRole(r) === "superuser").length <= 1) return fail(400, "Deve restare almeno un superuser.");
   const { error: e } = await db.from("admin_emails").delete().eq("email", row.email);
   return e ? fail(500, e.message) : ok({ email: row.email });
 }
