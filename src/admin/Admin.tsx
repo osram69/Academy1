@@ -793,6 +793,41 @@ function Edit({ id }: { id: string }) {
   );
 }
 
+/** Apre la lavagna (Board Cube Academy) come trainer: il server firma un link valido alcune ore. */
+function BoardButton({ session }: { session: Session }) {
+  const [busy, setBusy] = useState(false);
+  const open = async () => {
+    // la finestra va aperta subito, nel gesto dell'utente, altrimenti il browser blocca il popup
+    const win = window.open("", "_blank");
+    let last = "";
+    try { last = localStorage.getItem("board_room") || ""; } catch { /* storage non disponibile */ }
+    const room = (window.prompt("Nome della board (lettere, numeri, - e _):", last || "aula") || "").trim();
+    if (!room) { win?.close(); return; }
+    try { localStorage.setItem("board_room", room); } catch { /* storage non disponibile */ }
+    setBusy(true);
+    try {
+      const r = await fetch("/api/admin/board", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${session.access_token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ room }),
+      });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok || !j.url) throw new Error(j.error || "Impossibile aprire la board.");
+      if (win) win.location.href = j.url; else window.location.href = j.url;
+    } catch (e) {
+      win?.close();
+      alert(e instanceof Error ? e.message : "Impossibile aprire la board.");
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <button className="rounded-full bg-flame px-3 py-1 font-semibold text-white hover:bg-ember disabled:opacity-50" onClick={open} disabled={busy}>
+      {busy ? "Apro…" : "Accedi alla board"}
+    </button>
+  );
+}
+
 /* --------------------------------- entry --------------------------------- */
 
 export function Admin({ hash }: { hash: string }) {
@@ -842,9 +877,12 @@ export function Admin({ hash }: { hash: string }) {
     <Shell
       role={role}
       right={
-        <button className="text-white/70 hover:text-white" onClick={() => supabase.auth.signOut()}>
-          Esci ({session.user.email}{role === "administrator" ? " · administrator" : ""})
-        </button>
+        <>
+          {isAdmin && <BoardButton session={session} />}
+          <button className="text-white/70 hover:text-white" onClick={() => supabase.auth.signOut()}>
+            Esci ({session.user.email}{role === "administrator" ? " · administrator" : ""})
+          </button>
+        </>
       }
     >
       {isAdmin === false ? (
