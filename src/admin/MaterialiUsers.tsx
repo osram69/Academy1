@@ -1,23 +1,31 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import type { Session } from "@supabase/supabase-js";
+import { generatePassword } from "../../shared/password.mjs";
 import { Field, btnCls, btnPrimary, inputCls } from "./Admin";
 
 /* Utenti dell'area /materiali (slide e materiali dei corsi). Si salvano nella cartella dati del server (MATERIALI_DIR),
-   non in Supabase. Studente: legge le cartelle abilitate. Trainer: in più carica, crea ed elimina file e cartelle.
-   L'utente sceglie la password dal link ricevuto per email (invito) e la può reimpostare da solo dalla pagina di accesso. */
+   non in Supabase. Si definiscono solo nome utente, password e cartelle visibili: l'account si comunica a tutti i ragazzi del corso.
+   La password resta visibile e copiabile (il server la conserva anche in chiaro). Gli utenti sono in sola lettura;
+   i file si gestiscono dalla scheda "File". */
 
-interface MUser { username: string; name: string; email: string; role: "studente" | "trainer"; folders: string[] }
-interface Data { users: MUser[]; folders: string[]; mail: boolean; persistent: boolean }
-interface Form { username: string; name: string; email: string; role: "studente" | "trainer"; all: boolean; folders: string[]; extra: string; password: string; invite: boolean }
+interface MUser { username: string; role: "studente" | "trainer"; folders: string[]; password: string }
+interface Data { users: MUser[]; folders: string[]; persistent: boolean }
+interface Form { username: string; all: boolean; folders: string[]; extra: string; password: string }
 
-const EMPTY: Form = { username: "", name: "", email: "", role: "studente", all: false, folders: [], extra: "", password: "", invite: true };
+const EMPTY: Form = { username: "", all: false, folders: [], extra: "", password: "" };
 const card = "rounded-2xl border border-ink/10 bg-white p-6";
+
+/** Testo da incollare in una mail o in chat per comunicare l'account agli studenti. */
+function inviteText(username: string, password: string): string {
+  return `Accesso ai materiali del corso\nIndirizzo: ${location.origin}/materiali\nNome utente: ${username}\nPassword: ${password}`;
+}
 
 export function MaterialiUsersPage({ session }: { session: Session }) {
   const [data, setData] = useState<Data | null>(null);
   const [err, setErr] = useState("");
   const [msg, setMsg] = useState("");
   const [edit, setEdit] = useState<string | "new" | null>(null);
+  const [orig, setOrig] = useState("");
   const [f, setF] = useState<Form>(EMPTY);
   const [busy, setBusy] = useState(false);
 
@@ -37,11 +45,17 @@ export function MaterialiUsersPage({ session }: { session: Session }) {
   const load = useCallback(() => call("GET").then(setData).catch((e: Error) => setErr(e.message)), [call]);
   useEffect(() => void load(), [load]);
 
+  const copy = (text: string, done: string) => {
+    setErr("");
+    navigator.clipboard?.writeText(text).then(() => setMsg(done), () => setErr("Non riesco a copiare: seleziona il testo e copialo a mano."));
+  };
+
   const open = (u?: MUser) => {
     setErr("");
     setMsg("");
     setEdit(u ? u.username : "new");
-    setF(u ? { ...EMPTY, username: u.username, name: u.name, email: u.email, role: u.role, all: u.folders.includes("*"), folders: u.folders.filter((x) => x !== "*"), invite: false } : EMPTY);
+    setOrig(u?.password ?? "");
+    setF(u ? { ...EMPTY, username: u.username, all: u.folders.includes("*"), folders: u.folders.filter((x) => x !== "*"), password: u.password } : EMPTY);
   };
 
   const submit = async (e: FormEvent) => {
@@ -49,13 +63,14 @@ export function MaterialiUsersPage({ session }: { session: Session }) {
     setBusy(true);
     setErr("");
     const extra = f.extra.split(",").map((s) => s.trim()).filter(Boolean);
-    const body = { username: f.username.trim(), name: f.name, email: f.email, role: f.role, folders: f.all ? ["*"] : [...new Set([...f.folders, ...extra])], password: f.password || undefined, invite: f.invite };
+    const folders = f.all ? ["*"] : [...new Set([...f.folders, ...extra])];
     try {
       if (edit === "new") {
-        const r = await call("POST", "", body);
-        setMsg(r.invited ? `Utente creato: email d'invito inviata a ${f.email}.` : r.mailError ? `Utente creato, ma l'email non è partita (${r.mailError}). Usa "Invia link password".` : "Utente creato.");
+        await call("POST", "", { username: f.username.trim(), password: f.password, folders, invite: false });
+        setMsg("Utente creato.");
       } else {
-        await call("PATCH", `?user=${encodeURIComponent(edit!)}`, body);
+        // la password si invia solo se è cambiata: rinviarla uguale chiuderebbe le sessioni già aperte
+        await call("PATCH", `?user=${encodeURIComponent(edit!)}`, { folders, ...(f.password && f.password !== orig ? { password: f.password } : {}) });
         setMsg("Utente aggiornato.");
       }
       setEdit(null);
@@ -64,17 +79,6 @@ export function MaterialiUsersPage({ session }: { session: Session }) {
       setErr((x as Error).message);
     } finally {
       setBusy(false);
-    }
-  };
-
-  const sendLink = async (u: MUser) => {
-    if (!window.confirm(`Inviare a ${u.email} il link per scegliere una nuova password?`)) return;
-    setErr("");
-    try {
-      await call("PATCH", `?user=${encodeURIComponent(u.username)}`, { action: "reset" });
-      setMsg(`Link inviato a ${u.email}.`);
-    } catch (x) {
-      setErr((x as Error).message);
     }
   };
 
@@ -95,18 +99,13 @@ export function MaterialiUsersPage({ session }: { session: Session }) {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-[13px] text-steel">Accessi all'area materiali. Lo studente legge le cartelle abilitate; il trainer carica e gestisce anche i file.</p>
+        <p className="text-[13px] text-steel">Un account (nome utente e password) da comunicare a tutti i ragazzi del corso, con le cartelle che possono vedere. Gli utenti leggono e scaricano; i file si gestiscono dalla scheda "File".</p>
         {!edit && <button className={btnPrimary} onClick={() => open()}>Nuovo utente</button>}
       </div>
 
       {data && !data.persistent && (
         <p className="rounded-lg bg-amber-50 px-4 py-3 text-[13px] text-amber-800">
           La variabile <code>MATERIALI_DIR</code> non è impostata: utenti e file finirebbero dentro l'app e si perderebbero a ogni build. Impostala nel pannello Hostinger.
-        </p>
-      )}
-      {data && !data.mail && (
-        <p className="rounded-lg bg-amber-50 px-4 py-3 text-[13px] text-amber-800">
-          La posta (SMTP) non è configurata: non si possono inviare inviti né reset. Imposta tu la password di ogni utente.
         </p>
       )}
       {msg && <p className="rounded-lg bg-mint/10 px-4 py-3 text-[13px] font-medium text-mint">{msg}</p>}
@@ -119,24 +118,18 @@ export function MaterialiUsersPage({ session }: { session: Session }) {
             <Field label="Nome utente" hint="3-40 caratteri: lettere, numeri, . _ -">
               <input className={inputCls} value={f.username} disabled={edit !== "new"} required onChange={(e) => setF({ ...f, username: e.target.value })} />
             </Field>
-            <Field label="Nome e cognome (facoltativo)">
-              <input className={inputCls} value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} />
-            </Field>
-            <Field label="Email (facoltativa con password)" hint="Serve per l'invito e per il reset da parte dell'utente. Lasciala vuota per un account condiviso di corso (imposta la password qui sotto).">
-              <input className={inputCls} type="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} />
-            </Field>
-            <Field label="Ruolo" hint="Il trainer può caricare, creare ed eliminare file e cartelle.">
-              <select className={inputCls} value={f.role} onChange={(e) => setF({ ...f, role: e.target.value as Form["role"] })}>
-                <option value="studente">Studente (sola lettura)</option>
-                <option value="trainer">Trainer (carica e gestisce)</option>
-              </select>
+            <Field label="Password" hint={edit === "new" ? "Da 8 caratteri. Resta visibile in elenco." : orig ? "Da 8 caratteri. Cambiarla chiude gli accessi già aperti." : "Password attuale non rileggibile: scrivine una nuova o lascia vuoto per non cambiarla."}>
+              <div className="flex gap-2">
+                <input className={inputCls} type="text" autoComplete="off" value={f.password} required={edit === "new"} minLength={8} maxLength={200} onChange={(e) => setF({ ...f, password: e.target.value })} />
+                <button type="button" className={`${btnCls} shrink-0 border border-ink/20 hover:border-flame`} onClick={() => setF({ ...f, password: generatePassword(8) })} title="Compila il campo con una password casuale di 8 caratteri">Genera</button>
+              </div>
             </Field>
           </div>
 
           <fieldset className="space-y-2">
-            <legend className="mb-1 text-[12px] font-semibold text-ink/70">Cartelle abilitate</legend>
+            <legend className="mb-1 text-[12px] font-semibold text-ink/70">Cartelle visibili</legend>
             <label className="flex items-center gap-2 text-[14px]">
-              <input type="checkbox" checked={f.all} onChange={(e) => setF({ ...f, all: e.target.checked })} /> Tutte le cartelle {f.role === "trainer" && <span className="text-steel">(il trainer può anche creare ed eliminare i corsi)</span>}
+              <input type="checkbox" checked={f.all} onChange={(e) => setF({ ...f, all: e.target.checked })} /> Tutte le cartelle
             </label>
             {!f.all && (
               <>
@@ -146,7 +139,7 @@ export function MaterialiUsersPage({ session }: { session: Session }) {
                       <input type="checkbox" checked={f.folders.includes(n)} onChange={() => toggle(n)} /> {n}
                     </label>
                   ))}
-                  {data && !data.folders.length && <span className="text-[13px] text-steel">Nessuna cartella ancora: scrivi i nomi qui sotto, oppure creale da /materiali.</span>}
+                  {data && !data.folders.length && <span className="text-[13px] text-steel">Nessuna cartella ancora: scrivi i nomi qui sotto, oppure creale dalla scheda "File".</span>}
                 </div>
                 <input className={inputCls} placeholder="Altre cartelle, separate da virgola (es. CPSA-F_Dic26)" value={f.extra} onChange={(e) => setF({ ...f, extra: e.target.value })} />
                 {edit !== "new" && f.folders.filter((x) => !data?.folders.includes(x)).length > 0 && (
@@ -155,17 +148,6 @@ export function MaterialiUsersPage({ session }: { session: Session }) {
               </>
             )}
           </fieldset>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label={edit === "new" ? "Password (facoltativa)" : "Nuova password (facoltativa)"} hint={edit === "new" ? "Se la lasci vuota, l'utente riceve un'email con il link per sceglierla." : "Lasciala vuota per non cambiarla. Minimo 10 caratteri."}>
-              <input className={inputCls} type="text" autoComplete="off" value={f.password} onChange={(e) => setF({ ...f, password: e.target.value })} />
-            </Field>
-            {edit === "new" && (
-              <label className="flex items-center gap-2 self-end pb-2 text-[14px]">
-                <input type="checkbox" checked={f.invite} disabled={!data?.mail} onChange={(e) => setF({ ...f, invite: e.target.checked })} /> Invia l'email d'invito
-              </label>
-            )}
-          </div>
 
           <div className="flex gap-2">
             <button className={btnPrimary} disabled={busy}>{busy ? "Salvo…" : "Salva"}</button>
@@ -182,18 +164,23 @@ export function MaterialiUsersPage({ session }: { session: Session }) {
         ) : (
           <table className="w-full text-left text-[13.5px]">
             <thead className="border-b border-ink/10 text-[12px] uppercase tracking-wide text-steel">
-              <tr><th className="px-4 py-3">Utente</th><th className="px-4 py-3">Email</th><th className="px-4 py-3">Ruolo</th><th className="px-4 py-3">Cartelle</th><th className="px-4 py-3" /></tr>
+              <tr><th className="px-4 py-3">Utente</th><th className="px-4 py-3">Password</th><th className="px-4 py-3">Cartelle</th><th className="px-4 py-3" /></tr>
             </thead>
             <tbody className="divide-y divide-ink/5">
               {data.users.map((u) => (
                 <tr key={u.username}>
-                  <td className="px-4 py-3"><b>{u.username}</b>{u.name && <div className="text-[12px] text-steel">{u.name}</div>}</td>
-                  <td className="px-4 py-3">{u.email || <span className="text-err">manca</span>}</td>
-                  <td className="px-4 py-3"><span className={`rounded-full px-2.5 py-0.5 text-[12px] font-semibold ${u.role === "trainer" ? "bg-flame/10 text-flame" : "bg-ink/5 text-ink/70"}`}>{u.role === "trainer" ? "Trainer" : "Studente"}</span></td>
+                  <td className="px-4 py-3"><b>{u.username}</b>{u.role === "trainer" && <div className="text-[12px] text-flame">vecchio account trainer</div>}</td>
+                  <td className="px-4 py-3">
+                    {u.password ? (
+                      <><code>{u.password}</code> <button className="ml-2 text-flame hover:underline" onClick={() => copy(u.password, "Password copiata.")}>Copia</button></>
+                    ) : (
+                      <span className="text-steel">non rileggibile</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3">{u.folders.includes("*") ? "Tutte" : u.folders.join(", ") || <span className="text-steel">nessuna</span>}</td>
                   <td className="whitespace-nowrap px-4 py-3 text-right">
                     <button className="mr-3 text-flame hover:underline" onClick={() => open(u)}>Modifica</button>
-                    {data.mail && u.email && <button className="mr-3 text-flame hover:underline" onClick={() => sendLink(u)}>Invia link password</button>}
+                    {u.password && <button className="mr-3 text-flame hover:underline" onClick={() => copy(inviteText(u.username, u.password), "Messaggio copiato: incollalo in una mail o in chat.")}>Copia messaggio</button>}
                     <button className="text-err hover:underline" onClick={() => remove(u)}>Elimina</button>
                   </td>
                 </tr>

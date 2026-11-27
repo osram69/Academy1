@@ -17,7 +17,7 @@ export default async function Materiali({ searchParams }: Props) {
     return (
       <div className="mx-auto max-w-md rounded-2xl bg-white p-7 shadow-card">
         <h1 className="font-display text-2xl font-bold">Accedi ai materiali</h1>
-        <p className="mt-2 text-sm text-steel">Inserisci le credenziali ricevute da Cube Academy per il tuo corso.</p>
+        <p className="mt-2 text-sm text-steel">Inserisci il nome utente e la password ricevuti da Cube Academy per il tuo corso.</p>
         <form method="post" action="/materiali/login" className="mt-5 space-y-4">
           <label className="block text-sm font-medium">
             Utente o email
@@ -50,7 +50,7 @@ export default async function Materiali({ searchParams }: Props) {
       <>
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h1 className="font-display text-3xl font-bold tracking-tight">{`Ciao ${first}`}</h1>
+            <h1 className="font-display text-3xl font-bold tracking-tight">{user.fullName ? `Ciao ${first}` : "Benvenuto"}</h1>
             <p className="mt-1 text-steel">Ecco i materiali dei tuoi corsi Cube Academy: slide, dispense ed esercizi.</p>
           </div>
           <form method="post" action="/materiali/logout">
