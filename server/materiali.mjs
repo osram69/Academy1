@@ -57,7 +57,7 @@ function verifyPassword(pw, stored) {
   return a.length === b.length && crypto.timingSafeEqual(a, b);
 }
 const DUMMY = hashPassword("dummy"); // per non rivelare con i tempi se un utente esiste
-export const MIN_PASSWORD = 10;
+export const MIN_PASSWORD = 8;
 
 let secretCache = "";
 function secret() {
@@ -184,7 +184,8 @@ const USERNAME = /^[a-zA-Z0-9._-]{3,40}$/;
 
 export function listUsers() {
   return Object.entries(readUsers())
-    .map(([username, u]) => ({ username, name: u.name || "", email: u.email || "", role: u.role === "trainer" ? "trainer" : "studente", folders: u.folders || [] }))
+    // `password` è la password in chiaro (campo `clear`), vuota per gli account creati prima: serve solo alla scheda Utenti del pannello admin
+    .map(([username, u]) => ({ username, name: u.name || "", email: u.email || "", role: u.role === "trainer" ? "trainer" : "studente", folders: u.folders || [], password: u.clear || "" }))
     .sort((a, b) => a.username.localeCompare(b.username, "it"));
 }
 /** Cartelle corso esistenti in riservato/ (per le caselle di selezione). */
@@ -219,18 +220,21 @@ export function createUser(b) {
   if (emailTaken(users, f.email)) return { error: "Questa email è già usata da un altro utente." };
   if (b.password &&!passwordOk(b.password)) return { error: `La password deve avere almeno ${MIN_PASSWORD} caratteri.` };
   const password = b.password || crypto.randomBytes(24).toString("base64url");
-  users[username] = { hash: hashPassword(password), email: f.email, name: f.name, role: f.role, folders: f.folders };
+  // la password scritta dal trainer si conserva anche in chiaro (`clear`) per poterla rivedere e rimandare; una generata per l'invito no
+  users[username] = { hash: hashPassword(password), email: f.email, name: f.name, role: f.role, folders: f.folders, ...(b.password ? { clear: b.password } : {}) };
   writeUsers(users);
   return { username, generated: !b.password };
 }
 export function updateUser(username, b) {
   const users = readUsers();
-  if (!users[username]) return { error: "Utente inesistente." };
-  const f = cleanFields(b);
+  const cur = users[username];
+  if (!cur) return { error: "Utente inesistente." };
+  // i campi non inviati restano quelli di prima: il modulo semplificato manda solo cartelle e password e non deve cancellare ruolo, email o nome
+  const f = cleanFields({ role: cur.role, email: cur.email, name: cur.name, folders: cur.folders, ...Object.fromEntries(Object.entries(b).filter(([k, v]) => v !== undefined)) });
   if (f.error) return f;
   if (emailTaken(users, f.email, username)) return { error: "Questa email è già usata da un altro utente." };
   if (b.password && !passwordOk(b.password)) return { error: `La password deve avere almeno ${MIN_PASSWORD} caratteri.` };
-  users[username] = { ...users[username], email: f.email, name: f.name, role: f.role, folders: f.folders, ...(b.password ? { hash: hashPassword(b.password) } : {}) };
+  users[username] = { ...cur, email: f.email, name: f.name, role: f.role, folders: f.folders, ...(b.password ? { hash: hashPassword(b.password), clear: b.password } : {}) };
   writeUsers(users);
   return { username };
 }
