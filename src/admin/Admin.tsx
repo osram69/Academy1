@@ -796,36 +796,55 @@ function Edit({ id }: { id: string }) {
 
 /** Apre la lavagna (Board Cube Academy) come trainer: il server firma un link valido alcune ore. */
 function BoardButton({ session }: { session: Session }) {
+  const [openForm, setOpenForm] = useState(false);
+  const [room, setRoom] = useState(() => {
+    try { return localStorage.getItem("board_room") || "aula"; } catch { return "aula"; }
+  });
   const [busy, setBusy] = useState(false);
-  const open = async () => {
-    // la finestra va aperta subito, nel gesto dell'utente, altrimenti il browser blocca il popup
+  const [err, setErr] = useState("");
+
+  const go = async (e: FormEvent) => {
+    e.preventDefault();
+    const name = room.trim();
+    if (!name) return;
+    setErr("");
+    // la scheda va aperta qui, nel gesto dell'utente (invio/clic), altrimenti il browser blocca il popup
     const win = window.open("", "_blank");
-    let last = "";
-    try { last = localStorage.getItem("board_room") || ""; } catch { /* storage non disponibile */ }
-    const room = (window.prompt("Nome della board (lettere, numeri, - e _):", last || "aula") || "").trim();
-    if (!room) { win?.close(); return; }
-    try { localStorage.setItem("board_room", room); } catch { /* storage non disponibile */ }
+    try { localStorage.setItem("board_room", name); } catch { /* storage non disponibile */ }
     setBusy(true);
     try {
       const r = await fetch("/api/admin/board", {
         method: "POST",
         headers: { Authorization: `Bearer ${session.access_token}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ room }),
+        body: JSON.stringify({ room: name }),
       });
       const j = await r.json().catch(() => ({}));
-      if (!r.ok || !j.url) throw new Error(j.error || "Impossibile aprire la board.");
+      if (!r.ok || !j.url) throw new Error(j.error || `Impossibile aprire la board (errore ${r.status}).`);
       if (win) win.location.href = j.url; else window.location.href = j.url;
-    } catch (e) {
+      setOpenForm(false);
+    } catch (e2) {
       win?.close();
-      alert(e instanceof Error ? e.message : "Impossibile aprire la board.");
+      setErr(e2 instanceof Error ? e2.message : "Impossibile aprire la board.");
     } finally {
       setBusy(false);
     }
   };
+
   return (
-    <button className="rounded-full bg-flame px-3 py-1 font-semibold text-white hover:bg-ember disabled:opacity-50" onClick={open} disabled={busy}>
-      {busy ? "Apro…" : "Accedi alla board"}
-    </button>
+    <div className="relative">
+      <button type="button" className="rounded-full bg-flame px-3 py-1 font-semibold text-white hover:bg-ember" onClick={() => { setOpenForm((v) => !v); setErr(""); }} aria-expanded={openForm}>
+        Accedi alla board
+      </button>
+      {openForm && (
+        <form onSubmit={go} className="absolute right-0 top-full z-20 mt-2 w-72 rounded-xl border border-ink/10 bg-white p-4 text-ink shadow-card">
+          <label className="block text-[12px] font-semibold text-ink/70" htmlFor="board-room">Nome della board</label>
+          <input id="board-room" className={`${inputCls} mt-1`} value={room} onChange={(e) => setRoom(e.target.value)} maxLength={64} pattern="[A-Za-z0-9_\-]+" title="Solo lettere, numeri, - e _" autoFocus required />
+          <p className="mt-1 text-[11.5px] text-steel">Solo lettere, numeri, - e _. Se non esiste, viene creata.</p>
+          {err && <p className="mt-2 text-[12px] font-medium text-err">{err}</p>}
+          <button type="submit" className={`${btnPrimary} mt-3 w-full justify-center`} disabled={busy}>{busy ? "Apro…" : "Apri la board"}</button>
+        </form>
+      )}
+    </div>
   );
 }
 
