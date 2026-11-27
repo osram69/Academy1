@@ -264,7 +264,8 @@ export async function checkoutReturn(ref, outcome) {
 
 // Livelli: "superuser" (tutto, comprese Impostazioni e amministratori) e "administrator" (tutto tranne Impostazioni).
 // Prima della migrazione 9 la colonna ruolo non esiste: gli amministratori già presenti restano superuser.
-const adminRole = (row) => (row?.ruolo === "administrator" ? "administrator" : "superuser");
+// "trainer": solo Materiali (file) e Board; le rotte lo ammettono esplicitamente con level "trainer", tutte le altre lo respingono.
+const adminRole = (row) => (row?.ruolo === "trainer" ? "trainer" : row?.ruolo === "administrator" ? "administrator" : "superuser");
 
 /** Verifica il JWT Supabase e il livello richiesto. Restituisce { denied } oppure { email, ruolo }. */
 export async function adminIdentity(authHeader, level = "administrator") {
@@ -277,6 +278,7 @@ export async function adminIdentity(authHeader, level = "administrator") {
   if (!row) return { denied: fail(403, "Utente non abilitato.") };
   const ruolo = adminRole(row);
   if (level === "superuser" && ruolo !== "superuser") return { denied: fail(403, "Serve il livello superuser.") };
+  if (ruolo === "trainer" && level !== "trainer") return { denied: fail(403, "Il livello trainer non ha accesso a questa funzione.") };
   return { email, ruolo };
 }
 
@@ -286,7 +288,7 @@ export async function adminGate(authHeader, level) {
 
 /* ----- amministratori del pannello (solo superuser) ----- */
 
-const ROLES = ["administrator", "superuser"];
+const ROLES = ["trainer", "administrator", "superuser"];
 const missingColumn = (e) => /ruolo/i.test(e?.message || "") && /column|schema cache/i.test(e?.message || "");
 const MIGRATE = "Esegui prima supabase/migrazione-9.sql nel SQL Editor di Supabase.";
 

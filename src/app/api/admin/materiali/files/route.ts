@@ -4,19 +4,20 @@ import { adminFilesDelete, adminFilesDownload, adminFilesList, adminFilesMkdir, 
 
 export const dynamic = "force-dynamic";
 
+// Accessibile anche ai trainer (level "trainer"); la gestione degli utenti (../route.ts) resta solo per gli amministratori.
 // File dell'area /materiali gestiti dal pannello admin. Percorso = segmenti separati da "/" ("" = radice).
 const partsOf = (v: unknown) => String(v ?? "").split("/").filter(Boolean);
 const pathOf = (request: Request) => partsOf(new URL(request.url).searchParams.get("path"));
 
 export async function GET(request: Request) {
-  const denied = await adminGate(request.headers.get("authorization"));
+  const denied = await adminGate(request.headers.get("authorization"), "trainer");
   if (denied) return respond(denied);
   const download = new URL(request.url).searchParams.get("file");
   return download ? adminFilesDownload(pathOf(request), request) : respond(adminFilesList(pathOf(request)));
 }
 
 export async function POST(request: Request) {
-  const denied = await adminGate(request.headers.get("authorization"));
+  const denied = await adminGate(request.headers.get("authorization"), "trainer");
   if (denied) return respond(denied);
 
   if ((request.headers.get("content-type") || "").includes("application/json")) {
@@ -32,6 +33,6 @@ export async function POST(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  const denied = await adminGate(request.headers.get("authorization"));
+  const denied = await adminGate(request.headers.get("authorization"), "trainer");
   return respond(denied ?? adminFilesDelete(pathOf(request)));
 }

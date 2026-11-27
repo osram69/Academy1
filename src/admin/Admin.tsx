@@ -110,8 +110,9 @@ function toPayload(f: Row): { data: Row; errors: Errors } {
 
 const go = (path: string) => navigate(path);
 
-/** superuser: tutto. administrator: tutto tranne le Impostazioni (e la gestione degli amministratori). */
-type AdminRole = "superuser" | "administrator";
+/** superuser: tutto. administrator: tutto tranne le Impostazioni (e la gestione degli amministratori).
+ *  trainer: solo Materiali (file) e "Accedi alla board". */
+type AdminRole = "superuser" | "administrator" | "trainer";
 
 /* ------------------------------- UI helpers ------------------------------ */
 
@@ -130,7 +131,7 @@ function Shell({ children, right, role }: { children: ReactNode; right?: ReactNo
             <span className="border-l border-white/20 pl-3 font-display text-[15px] font-semibold tracking-tight text-ember">Gestione</span>
           </a>
           <nav className="flex items-center gap-5 text-[13px] font-medium" aria-label="Sezioni del pannello">
-            {[["/admin", "Corsi"], ["/admin/eventi", "Eventi"], ["/admin/iscrizioni", "Iscrizioni"], ["/admin/materiali", "Materiali"], ["/admin/impostazioni", "Impostazioni"]].filter(([h]) => role !== "administrator" || h !== "/admin/impostazioni").map(([h, l]) => (
+            {[["/admin", "Corsi"], ["/admin/eventi", "Eventi"], ["/admin/iscrizioni", "Iscrizioni"], ["/admin/materiali", "Materiali"], ["/admin/impostazioni", "Impostazioni"]].filter(([h]) => (role === "trainer" ? h === "/admin/materiali" : role !== "administrator" || h !== "/admin/impostazioni")).map(([h, l]) => (
               <a key={h} href={h} className="text-white/75 hover:text-white">{l}</a>
             ))}
           </nav>
@@ -856,8 +857,8 @@ export function Admin({ hash }: { hash: string }) {
     // admin_role() esiste dopo la migrazione 9; prima, ogni amministratore è a tutti gli effetti superuser
     supabase.rpc("admin_role").then(({ data, error }) => {
       if (!error) {
-        setRole(data === "administrator" ? "administrator" : data === "superuser" ? "superuser" : null);
-        setIsAdmin(data === "administrator" || data === "superuser");
+        setRole(data === "trainer" ? "trainer" : data === "administrator" ? "administrator" : data === "superuser" ? "superuser" : null);
+        setIsAdmin(data === "trainer" || data === "administrator" || data === "superuser");
         return;
       }
       supabase.rpc("is_admin").then(({ data: ok, error: e }) => {
@@ -880,7 +881,7 @@ export function Admin({ hash }: { hash: string }) {
         <>
           {isAdmin && <BoardButton session={session} />}
           <button className="text-white/70 hover:text-white" onClick={() => supabase.auth.signOut()}>
-            Esci ({session.user.email}{role === "administrator" ? " · administrator" : ""})
+            Esci ({session.user.email}{role === "administrator" || role === "trainer" ? ` · ${role}` : ""})
           </button>
         </>
       }
@@ -899,6 +900,9 @@ export function Admin({ hash }: { hash: string }) {
         </div>
       ) : isAdmin === null ? (
         <p className="text-steel">Verifica permessi…</p>
+      ) : role === "trainer" ? (
+        // il trainer vede solo i file dei materiali, qualunque sia l'indirizzo (le API lo respingono comunque altrove)
+        <MaterialiPage session={session} filesOnly />
       ) : m ? (
         <Edit key={m[1]} id={m[1]} />
       ) : /^#\/admin\/(eventi|evento\/)/.test(hash) ? (

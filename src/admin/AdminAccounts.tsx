@@ -6,10 +6,10 @@ import { Field, btnPrimary, inputCls } from "./Admin";
    superuser: tutto, comprese Impostazioni e questa sezione. administrator: tutto tranne le Impostazioni.
    L'utente si crea prima da Supabase > Authentication > Users; qui gli si assegna il livello. */
 
-type Role = "administrator" | "superuser";
+type Role = "trainer" | "administrator" | "superuser";
 interface Row { email: string; ruolo: Role }
 
-const LABEL: Record<Role, string> = { superuser: "Superuser", administrator: "Administrator" };
+const LABEL: Record<Role, string> = { superuser: "Superuser", administrator: "Administrator", trainer: "Trainer (solo Materiali e Board)" };
 
 export function AdminAccounts({ session }: { session: Session }) {
   const [rows, setRows] = useState<Row[] | null>(null);
