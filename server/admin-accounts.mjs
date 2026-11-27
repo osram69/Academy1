@@ -11,6 +11,7 @@ export const ASSIGNABLE = ["administrator", "trainer"];
 const MIN_PASSWORD = 10;
 const MAX_PASSWORD = 200;
 const SUPERUSER_ONLY_SQL = "Il superuser si gestisce solo da SQL.";
+const MIGRATE = "Esegui prima supabase/migrazione-9.sql e supabase/migrazione-10.sql nel SQL Editor di Supabase.";
 
 const norm = (e) => String(e || "").trim().toLowerCase();
 /** Come in core.mjs: senza la colonna `ruolo` (prima della migrazione 9) ogni riga è superuser. */
@@ -49,7 +50,8 @@ export async function createAdminUser(db, body) {
   const { error: insertError } = await db.from("admin_emails").insert({ email, ruolo });
   if (insertError) {
     if (created && newId) await db.auth.admin.deleteUser(newId); // niente account orfano
-    return fail(500, insertError.message || "Salvataggio del livello non riuscito.");
+    const text = insertError.message || "";
+    return fail(500, /ruolo|check constraint/i.test(text) ? MIGRATE : text || "Salvataggio del livello non riuscito.");
   }
   return ok(created ? { email, ruolo, created, password } : { email, ruolo, created });
 }

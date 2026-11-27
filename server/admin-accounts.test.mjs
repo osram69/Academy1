@@ -103,6 +103,14 @@ test("se la scrittura in admin_emails fallisce, l'utente appena creato viene eli
   assert.deepEqual(db.calls.deleteUser, ["id-1"]);
 });
 
+test("migrazione non eseguita (vincolo sul livello): messaggio comprensibile e utente appena creato eliminato", async () => {
+  const db = fakeDb({ insertError: 'new row for relation "admin_emails" violates check constraint "admin_emails_ruolo_check"' });
+  const r = await createAdminUser(db, { email: "migra@x.it", ruolo: "trainer", password: "Provvisoria-1" });
+  assert.equal(r.status, 500);
+  assert.match(r.body.error, /migrazione-9\.sql.*migrazione-10\.sql/);
+  assert.deepEqual(db.calls.deleteUser, ["id-1"]);
+});
+
 test("reimposta la password di un administrator scorrendo le pagine degli utenti Supabase", async () => {
   const authUsers = Array.from({ length: 1001 }, (_, i) => ({ id: `u${i}`, email: `utente${i}@x.it` }));
   authUsers.push({ id: "cercato", email: "admin@x.it" });
