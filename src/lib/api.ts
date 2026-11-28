@@ -2,9 +2,7 @@
 import { t } from "../i18n";
 
 export interface BankDetails { holder: string; iban: string; bank: string; bic: string }
-/** Codice sconto da pubblicizzare con il banner del sito (`text` = testo scelto in pannello per lingua, vuoto = automatico). */
-export interface ApiPromo { code: string; percent: number; text: Partial<Record<"it" | "en" | "fr" | "de", string>>; until: string | null }
-export interface ApiConfig { testMode: boolean; methods: Record<"stripe" | "paypal" | "sumup" | "bonifico", boolean>; privateDiscount: number; promo?: ApiPromo | null }
+export interface ApiConfig { testMode: boolean; methods: Record<"stripe" | "paypal" | "sumup" | "bonifico", boolean>; privateDiscount: number }
 export interface OrderSummary {
   ref: string; id_corso: number; seats: number; total_cents: number; method: "stripe" | "paypal" | "sumup" | "bonifico";
   status: "pending" | "paid" | "cancelled" | "failed" | "refunded"; test_mode: boolean; bank?: BankDetails;

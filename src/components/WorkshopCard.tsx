@@ -1,5 +1,4 @@
 import { navigate } from "../lib/nav";
-import { setRibbonPart } from "../lib/ribbon";
 import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight, CalendarDays, CheckCircle2, Clock, Globe, MapPin, Presentation, Video } from "lucide-react";
 import { cn } from "../utils/cn";
@@ -235,8 +234,10 @@ export function WorkshopTicker() {
   const w = upcomingWorkshops().find((x) => x.ribbon); // solo se "attiva nastro" è spuntato nel pannello
   useEffect(() => {
     if (!w) return;
-    setRibbonPart("workshop", 36);
-    return () => setRibbonPart("workshop", 0);
+    document.documentElement.style.setProperty("--ribbon-h", "36px");
+    return () => {
+      document.documentElement.style.removeProperty("--ribbon-h");
+    };
   }, [w]);
   if (!w) return null;
   const live = isLive(w, now);

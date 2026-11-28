@@ -8,7 +8,7 @@ import { courseCode } from "./course.mjs";
 import { createAdminUser, resetAdminPassword } from "./admin-accounts.mjs";
 import { translateFields, translatorProvider } from "./translate.mjs";
 import { bankDetails, createSession, isPaid, methodStatus, paypalVerifyWebhook, stripeClient, stripeWebhookSecret } from "./payments.mjs";
-import { activePromo, findGlobalCoupon, getSettings, invalidateSettings } from "./settings.mjs";
+import { findGlobalCoupon, getSettings, invalidateSettings } from "./settings.mjs";
 import { CONTACT_TOPICS, mailConfigured, mailMissing, sendContactEmails, sendOrderEmails } from "./mail.mjs";
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL;
@@ -123,7 +123,7 @@ export async function apiConfig() {
   const st = methodStatus(settings);
   const methods = Object.fromEntries(Object.entries(st).map(([k, v]) => [k, v.available]));
   const sandbox = Object.entries(st).some(([k, v]) => v.available && v.sandbox && k !== "bonifico");
-  return ok({ testMode: sandbox, methods, privateDiscount: settings.private.enabled ? settings.private.percent : 0, promo: activePromo(settings) });
+  return ok({ testMode: sandbox, methods, privateDiscount: settings.private.enabled ? settings.private.percent : 0 });
 }
 
 export async function apiCoupon(body, ip) {

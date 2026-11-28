@@ -4,7 +4,6 @@ import { ChevronDown, Menu, X } from "lucide-react";
 import { cn } from "../utils/cn";
 import { featuredCourse, fmtRange } from "../data";
 import { WorkshopTicker } from "./WorkshopCard";
-import { PromoTicker } from "./PromoTicker";
 
 import { LANGS, lang, setLang, t } from "../i18n";
 const LINKS = [
@@ -147,7 +146,6 @@ export function Nav({ route }: { route: string }) {
       </div>
 
       <WorkshopTicker />
-      <PromoTicker />
 
       {/* mobile menu */}
       <div

@@ -189,7 +189,6 @@ export const en: Record<string, string> = {
   "Seleziona lingua": "Select language",
   "Lingue disponibili": "Available languages",
   "Iscriviti": "Enrol",
-  "Promozione: −{pct}% con il codice {code}": "Promotion: −{pct}% with code {code}",
   "Chiudi menu": "Close menu",
   "Apri menu": "Open menu",
   "Menu mobile": "Mobile menu",
