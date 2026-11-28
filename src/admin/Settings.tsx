@@ -9,7 +9,18 @@ import { AdminAccounts } from "./AdminAccounts";
    del server (Hostinger); questa pagina mostra solo quali mancano. */
 
 type MethodId = "stripe" | "paypal" | "sumup" | "bonifico";
-interface Coupon { code: string; label: string; percent: number; start: string; end: string; scopes: string[]; enabled: boolean }
+type BannerLang = "it" | "en" | "fr" | "de";
+const BANNER_LANGS: [BannerLang, string][] = [["it", "Italiano"], ["en", "English"], ["fr", "Français"], ["de", "Deutsch"]];
+const BANNER_MAX = 200;
+interface Coupon {
+  code: string; label: string; percent: number; start: string; end: string; scopes: string[]; enabled: boolean;
+  /** Banner sul sito (nastro sotto il menu) che pubblicizza il codice; il testo è per lingua, vuoto = testo automatico. */
+  banner: boolean; bannerText: Record<BannerLang, string>;
+}
+const emptyBannerText = (): Record<BannerLang, string> => ({ it: "", en: "", fr: "", de: "" });
+/** Il banner di questo codice è visibile oggi sul sito? (acceso, banner attivo e nel periodo: stessa regola del server) */
+const bannerLive = (c: Coupon, today = new Date().toISOString().slice(0, 10)) =>
+  c.banner && c.enabled && c.percent > 0 && !(c.start && today < c.start) && !(c.end && today > c.end);
 interface Config {
   methods: Record<MethodId, { enabled: boolean; sandbox?: boolean }>;
   private: { enabled: boolean; percent: number };
@@ -38,7 +49,7 @@ function withDefaults(raw: Partial<Config> | null | undefined): Config {
   return {
     methods,
     private: { enabled: r.private?.enabled !== false, percent: r.private?.percent ?? 50 },
-    coupons: (r.coupons ?? []).map((c) => ({ code: c.code, label: c.label ?? "", percent: c.percent, start: c.start ?? "", end: c.end ?? "", scopes: c.scopes ?? SCOPES.map(([s]) => s), enabled: c.enabled !== false })),
+    coupons: (r.coupons ?? []).map((c) => ({ code: c.code, label: c.label ?? "", percent: c.percent, start: c.start ?? "", end: c.end ?? "", scopes: c.scopes ?? SCOPES.map(([s]) => s), enabled: c.enabled !== false, banner: c.banner === true, bannerText: { ...emptyBannerText(), ...(c.bannerText ?? {}) } })),
   };
 }
 
@@ -84,7 +95,11 @@ export function SettingsPage({ session }: { session: Session }) {
     if (new Set(codes).size !== codes.length) { setBad(true); setMsg("Ci sono codici sconto duplicati."); return; }
     if (cfg.coupons.some((c) => c.scopes.length === 0)) { setBad(true); setMsg("Seleziona almeno una tipologia di fatturazione per ogni codice."); return; }
     setBusy(true);
-    const config: Config = { ...cfg, coupons: cfg.coupons.map((c, i) => ({ ...c, code: codes[i] })) };
+    const clean = (s: string) => s.replace(/[<>]/g, " ").replace(/\s+/g, " ").trim().slice(0, BANNER_MAX);
+    const config: Config = {
+      ...cfg,
+      coupons: cfg.coupons.map((c, i) => ({ ...c, code: codes[i], bannerText: Object.fromEntries(BANNER_LANGS.map(([l]) => [l, clean(c.bannerText[l])])) as Record<BannerLang, string> })),
+    };
     const { error } = await supabase.from("impostazioni").upsert({ id: 1, config, updated_at: new Date().toISOString() });
     setBad(!!error);
     setMsg(error ? error.message : "Impostazioni salvate. Il sito le applica entro pochi secondi.");
@@ -190,7 +205,7 @@ export function SettingsPage({ session }: { session: Session }) {
             </p>
           </div>
           <button type="button" className={`${btnPrimary} shrink-0`} disabled={cfg.coupons.length >= MAX_COUPONS}
-            onClick={() => setCfg({ ...cfg, coupons: [...cfg.coupons, { code: "", label: "", percent: 10, start: "", end: "", scopes: SCOPES.map(([s]) => s), enabled: true }] })}>
+            onClick={() => setCfg({ ...cfg, coupons: [...cfg.coupons, { code: "", label: "", percent: 10, start: "", end: "", scopes: SCOPES.map(([s]) => s), enabled: true, banner: false, bannerText: emptyBannerText() }] })}>
             + Nuovo codice
           </button>
         </div>
@@ -212,6 +227,34 @@ export function SettingsPage({ session }: { session: Session }) {
                 ))}
                 <label className="ml-auto flex items-center gap-1.5"><input type="checkbox" className="size-4 accent-flame" checked={c.enabled} onChange={(e) => setCoupon(i, { enabled: e.target.checked })} />Attivo</label>
                 <button type="button" className="text-err hover:underline" onClick={() => setCfg({ ...cfg, coupons: cfg.coupons.filter((_, idx) => idx !== i) })}>Elimina</button>
+              </div>
+              <div className="mt-3 border-t border-ink/10 pt-3">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                  <label className="flex items-center gap-2 text-[13px] font-semibold">
+                    <input type="checkbox" className="size-4 accent-flame" checked={c.banner} onChange={(e) => setCoupon(i, { banner: e.target.checked })} />
+                    Mostra come banner sul sito
+                  </label>
+                  {c.banner && (
+                    bannerLive(c)
+                      ? <span className="rounded-full bg-mint/15 px-2.5 py-0.5 text-[12px] font-semibold text-mint">Visibile ora</span>
+                      : <span className="rounded-full bg-sand px-2.5 py-0.5 text-[12px] font-semibold text-steel">Non visibile: codice spento o fuori dal periodo</span>
+                  )}
+                </div>
+                {c.banner && (
+                  <>
+                    <div className="mt-3 grid gap-3 md:grid-cols-2">
+                      {BANNER_LANGS.map(([l, name]) => (
+                        <Field key={l} label={`Testo del banner · ${name}`}>
+                          <input className={inputCls} value={c.bannerText[l]} maxLength={BANNER_MAX} onChange={(e) => setCoupon(i, { bannerText: { ...c.bannerText, [l]: e.target.value } })} placeholder={l === "it" ? `Es. Promozione di Natale: -${c.percent}% con il codice ${c.code || "CODICE"}` : "Vuoto = come l'italiano"} />
+                        </Field>
+                      ))}
+                    </div>
+                    <p className="mt-2 text-[12px] text-steel">
+                      Compare in un nastro scorrevole sotto il menu, in tutte le pagine, con il pulsante «Iscriviti». Scrivi il codice nel testo, perché il cliente lo deve inserire al momento dell'iscrizione.
+                      Una lingua lasciata vuota usa il testo italiano; se anche l'italiano è vuoto, il sito scrive da solo «Promozione: −{c.percent || "…"}% con il codice {c.code || "…"}». Se più codici hanno il banner attivo, si mostra il primo dell'elenco che è in corso.
+                    </p>
+                  </>
+                )}
               </div>
             </div>
           ))}

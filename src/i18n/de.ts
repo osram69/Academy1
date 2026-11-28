@@ -189,6 +189,7 @@ export const de: Record<string, string> = {
   "Seleziona lingua": "Sprache wählen",
   "Lingue disponibili": "Verfügbare Sprachen",
   "Iscriviti": "Anmelden",
+  "Promozione: −{pct}% con il codice {code}": "Aktion: −{pct} % mit dem Code {code}",
   "Chiudi menu": "Menü schließen",
   "Apri menu": "Menü öffnen",
   "Menu mobile": "Mobiles Menü",
