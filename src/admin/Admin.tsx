@@ -2,7 +2,7 @@ import { navigate } from "../lib/nav";
 import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase, supabaseConfigured } from "../lib/supabase";
-import { CalendarClock, CheckCheck, CircleCheck, CircleHelp, EyeOff, Menu, Play, X, type LucideIcon } from "lucide-react";
+import { CalendarClock, CheckCheck, CircleCheck, CircleHelp, Eye, EyeOff, Menu, Play, X, type LucideIcon } from "lucide-react";
 import { MODALITA, WORKSHOP_LANGUAGES, workshopLanguage, workshopTimes } from "../data";
 import { SettingsPage } from "./Settings";
 import { OrdersPage } from "./Orders";
@@ -180,6 +180,7 @@ export function Field({ label, error, children, hint }: { label: string; error?:
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setP] = useState("");
+  const [show, setShow] = useState(false);
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -212,7 +213,19 @@ function Login() {
             <input className={inputCls} type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="username" autoFocus required />
           </Field>
           <Field label="Password">
-            <input className={inputCls} type="password" value={password} onChange={(e) => setP(e.target.value)} autoComplete="current-password" required />
+            <div className="relative">
+              <input className={`${inputCls} pr-11`} type={show ? "text" : "password"} value={password} onChange={(e) => setP(e.target.value)} autoComplete="current-password" required />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 grid w-11 place-items-center text-steel hover:text-ink"
+                aria-label={show ? "Nascondi la password" : "Mostra la password"}
+                aria-pressed={show}
+                title={show ? "Nascondi la password" : "Mostra la password"}
+                onClick={() => setShow((v) => !v)}
+              >
+                {show ? <EyeOff size={18} aria-hidden /> : <Eye size={18} aria-hidden />}
+              </button>
+            </div>
           </Field>
         </div>
         {err && <p role="alert" className="mt-4 text-[13px] font-medium text-err">{err}</p>}
