@@ -8,6 +8,7 @@ import { SettingsPage } from "./Settings";
 import { OrdersPage } from "./Orders";
 import { EventsAdmin } from "./Events";
 import { MaterialiPage } from "./Materiali";
+import { AulePage, aulaStatus, type Aula } from "./Aule";
 import { translateFromItalian } from "./translate";
 import { RichEditor } from "./RichEditor";
 
@@ -147,7 +148,7 @@ function Shell({ children, right, role }: { children: ReactNode; right?: ReactNo
             className={`${menu ? "flex" : "hidden"} w-full flex-col gap-4 border-t border-white/10 pt-4 md:flex md:w-auto md:flex-1 md:flex-row md:items-center md:justify-between md:gap-4 md:border-0 md:pt-0`}
           >
             <nav className="flex flex-col gap-1 text-[14px] font-medium md:flex-row md:items-center md:gap-5 md:text-[13px]" aria-label="Sezioni del pannello">
-              {[["/admin", "Corsi"], ["/admin/eventi", "Eventi"], ["/admin/iscrizioni", "Iscrizioni"], ["/admin/materiali", "Materiali"], ["/admin/impostazioni", "Impostazioni"]].filter(([h]) => (role === "trainer" ? h === "/admin/materiali" : role !== "administrator" || h !== "/admin/impostazioni")).map(([h, l]) => (
+              {[["/admin", "Corsi"], ["/admin/eventi", "Eventi"], ["/admin/iscrizioni", "Iscrizioni"], ["/admin/materiali", "Materiali"], ["/admin/aule", "Aule"], ["/admin/impostazioni", "Impostazioni"]].filter(([h]) => (role === "trainer" ? h === "/admin/materiali" : role !== "administrator" || h !== "/admin/impostazioni")).map(([h, l]) => (
                 <a key={h} href={h} className="py-1.5 text-white/75 hover:text-white md:py-0" onClick={() => setMenu(false)}>{l}</a>
               ))}
             </nav>
@@ -811,7 +812,28 @@ function Edit({ id }: { id: string }) {
   );
 }
 
-/** Apre la lavagna (Board Cube Academy) come trainer: il server firma un link valido alcune ore. */
+/** Apre la board `name` come trainer in una nuova scheda: il server firma un link valido alcune ore. Restituisce il messaggio d'errore, o `null` se è andata bene.
+ *  Va chiamata direttamente da un clic: la scheda si apre subito (prima di qualunque attesa), altrimenti il browser blocca il popup. */
+export async function openBoard(session: Session, name: string): Promise<string | null> {
+  const win = window.open("", "_blank");
+  try { localStorage.setItem("board_room", name); } catch { /* storage non disponibile */ }
+  try {
+    const r = await fetch("/api/admin/board", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${session.access_token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ room: name }),
+    });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || !j.url) throw new Error(j.error || `Impossibile aprire la board (errore ${r.status}).`);
+    if (win) win.location.href = j.url; else window.location.href = j.url;
+    return null;
+  } catch (e) {
+    win?.close();
+    return e instanceof Error ? e.message : "Impossibile aprire la board.";
+  }
+}
+
+/** Apre la lavagna (Board Cube Academy) come trainer: elenco delle aule da cui scegliere, oppure un nome nuovo. */
 function BoardButton({ session }: { session: Session }) {
   const [openForm, setOpenForm] = useState(false);
   const [room, setRoom] = useState(() => {
@@ -819,33 +841,32 @@ function BoardButton({ session }: { session: Session }) {
   });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
+  // aule esistenti sul server della board; se non si riesce a leggerle resta il solo campo del nome
+  const [aule, setAule] = useState<Aula[] | null>(null);
 
-  const go = async (e: FormEvent) => {
-    e.preventDefault();
-    const name = room.trim();
-    if (!name) return;
+  useEffect(() => {
+    if (!openForm) return;
+    let alive = true;
+    fetch("/api/admin/aule", { headers: { Authorization: `Bearer ${session.access_token}` } })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => alive && setAule(Array.isArray(j?.aule) ? (j.aule as Aula[]) : null))
+      .catch(() => alive && setAule(null));
+    return () => {
+      alive = false;
+    };
+  }, [openForm, session.access_token]);
+
+  const go = async (name: string) => {
+    name = name.trim();
+    if (!name || busy) return;
     setErr("");
-    // la scheda va aperta qui, nel gesto dell'utente (invio/clic), altrimenti il browser blocca il popup
-    const win = window.open("", "_blank");
-    try { localStorage.setItem("board_room", name); } catch { /* storage non disponibile */ }
     setBusy(true);
-    try {
-      const r = await fetch("/api/admin/board", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${session.access_token}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ room: name }),
-      });
-      const j = await r.json().catch(() => ({}));
-      if (!r.ok || !j.url) throw new Error(j.error || `Impossibile aprire la board (errore ${r.status}).`);
-      if (win) win.location.href = j.url; else window.location.href = j.url;
-      setOpenForm(false);
-    } catch (e2) {
-      win?.close();
-      setErr(e2 instanceof Error ? e2.message : "Impossibile aprire la board.");
-    } finally {
-      setBusy(false);
-    }
+    const e = await openBoard(session, name); // la scheda si apre subito, nel gesto dell'utente
+    setBusy(false);
+    if (e) setErr(e);
+    else setOpenForm(false);
   };
+  const sorted = aule && [...aule].sort((a, b) => Number(b.active) - Number(a.active) || a.name.localeCompare(b.name));
 
   return (
     <div className="relative">
@@ -853,9 +874,25 @@ function BoardButton({ session }: { session: Session }) {
         Accedi alla board
       </button>
       {openForm && (
-        <form onSubmit={go} className="absolute left-0 top-full z-20 mt-2 w-72 max-w-[calc(100vw-2.5rem)] rounded-xl md:left-auto md:right-0 border border-ink/10 bg-white p-4 text-ink shadow-card">
-          <label className="block text-[12px] font-semibold text-ink/70" htmlFor="board-room">Nome della board</label>
-          <input id="board-room" className={`${inputCls} mt-1`} value={room} onChange={(e) => setRoom(e.target.value)} maxLength={64} pattern="[A-Za-z0-9_\-]+" title="Solo lettere, numeri, - e _" autoFocus required />
+        <form onSubmit={(e: FormEvent) => { e.preventDefault(); void go(room); }} className="absolute left-0 top-full z-20 mt-2 w-80 max-w-[calc(100vw-2.5rem)] rounded-xl md:left-auto md:right-0 border border-ink/10 bg-white p-4 text-ink shadow-card">
+          {sorted && sorted.length > 0 && (
+            <>
+              <p className="text-[12px] font-semibold text-ink/70">Scegli l'aula</p>
+              <ul className="mt-1 max-h-56 divide-y divide-ink/5 overflow-y-auto rounded-lg border border-ink/10">
+                {sorted.map((a) => (
+                  <li key={a.name}>
+                    <button type="button" disabled={busy} onClick={() => void go(a.name)} className="flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-[13.5px] hover:bg-sand/60 disabled:opacity-60">
+                      <span className={`min-w-0 truncate font-semibold ${a.active ? "" : "text-ink/50"}`}>{a.name}</span>
+                      <span className="shrink-0 text-[11.5px] text-steel">{a.online ? `${a.online} collegati` : aulaStatus(a)}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-3 text-[12px] font-semibold text-ink/70">…oppure una nuova</p>
+            </>
+          )}
+          <label className={`block text-[12px] font-semibold text-ink/70 ${sorted && sorted.length > 0 ? "sr-only" : ""}`} htmlFor="board-room">Nome della board</label>
+          <input id="board-room" className={`${inputCls} mt-1`} value={room} onChange={(e) => setRoom(e.target.value)} maxLength={64} pattern="[A-Za-z0-9_\-]+" title="Solo lettere, numeri, - e _" autoFocus={!(sorted && sorted.length > 0)} required />
           <p className="mt-1 text-[11.5px] text-steel">Solo lettere, numeri, - e _. Se non esiste, viene creata.</p>
           {err && <p className="mt-2 text-[12px] font-medium text-err">{err}</p>}
           <button type="submit" className={`${btnPrimary} mt-3 w-full justify-center`} disabled={busy}>{busy ? "Apro…" : "Apri la board"}</button>
@@ -952,6 +989,8 @@ export function Admin({ hash }: { hash: string }) {
         ) : (
           <SettingsPage session={session} />
         )
+      ) : /^#\/admin\/aule/.test(hash) ? (
+        <AulePage session={session} />
       ) : /^#\/admin\/materiali/.test(hash) ? (
         <MaterialiPage session={session} />
       ) : /^#\/admin\/iscrizioni/.test(hash) ? (
