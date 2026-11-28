@@ -2,7 +2,7 @@ import { navigate } from "../lib/nav";
 import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase, supabaseConfigured } from "../lib/supabase";
-import { CalendarClock, CheckCheck, CircleCheck, CircleHelp, EyeOff, Play, type LucideIcon } from "lucide-react";
+import { CalendarClock, CheckCheck, CircleCheck, CircleHelp, EyeOff, Menu, Play, X, type LucideIcon } from "lucide-react";
 import { MODALITA, WORKSHOP_LANGUAGES, workshopLanguage, workshopTimes } from "../data";
 import { SettingsPage } from "./Settings";
 import { OrdersPage } from "./Orders";
@@ -122,22 +122,39 @@ export const btnCls = "inline-flex items-center rounded-full px-4 py-2 text-[13p
 export const btnPrimary = `${btnCls} bg-ink text-white hover:bg-flame disabled:opacity-50`;
 
 function Shell({ children, right, role }: { children: ReactNode; right?: ReactNode; role?: AdminRole | null }) {
+  // sul telefono il menu sta dietro al pulsante a hamburger; da md in su resta in linea come prima
+  const [menu, setMenu] = useState(false);
   return (
     <div className="min-h-screen bg-paper">
       <header className="border-b border-ink/10 bg-ink text-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-4">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-3 px-5 py-4">
           <a href="/admin" className="flex items-center gap-3" aria-label="Cube Academy — Gestione corsi">
             <img src="/img/logo-cube-academy.webp" alt="Cube Academy" width={640} height={111} className="h-7 w-auto" />
             <span className="border-l border-white/20 pl-3 font-display text-[15px] font-semibold tracking-tight text-ember">Gestione</span>
           </a>
-          <nav className="flex items-center gap-5 text-[13px] font-medium" aria-label="Sezioni del pannello">
-            {[["/admin", "Corsi"], ["/admin/eventi", "Eventi"], ["/admin/iscrizioni", "Iscrizioni"], ["/admin/materiali", "Materiali"], ["/admin/impostazioni", "Impostazioni"]].filter(([h]) => (role === "trainer" ? h === "/admin/materiali" : role !== "administrator" || h !== "/admin/impostazioni")).map(([h, l]) => (
-              <a key={h} href={h} className="text-white/75 hover:text-white">{l}</a>
-            ))}
-          </nav>
-          <div className="flex items-center gap-3 text-[13px]">
-            <a href="/" className="text-white/70 hover:text-white">Vai al sito</a>
-            {right}
+          <button
+            type="button"
+            className="-mr-2 rounded-lg p-2 text-white/85 hover:text-white md:hidden"
+            aria-label={menu ? "Chiudi il menu" : "Apri il menu"}
+            aria-expanded={menu}
+            aria-controls="admin-menu"
+            onClick={() => setMenu((v) => !v)}
+          >
+            {menu ? <X size={24} aria-hidden /> : <Menu size={24} aria-hidden />}
+          </button>
+          <div
+            id="admin-menu"
+            className={`${menu ? "flex" : "hidden"} w-full flex-col gap-4 border-t border-white/10 pt-4 md:flex md:w-auto md:flex-1 md:flex-row md:items-center md:justify-between md:gap-4 md:border-0 md:pt-0`}
+          >
+            <nav className="flex flex-col gap-1 text-[14px] font-medium md:flex-row md:items-center md:gap-5 md:text-[13px]" aria-label="Sezioni del pannello">
+              {[["/admin", "Corsi"], ["/admin/eventi", "Eventi"], ["/admin/iscrizioni", "Iscrizioni"], ["/admin/materiali", "Materiali"], ["/admin/impostazioni", "Impostazioni"]].filter(([h]) => (role === "trainer" ? h === "/admin/materiali" : role !== "administrator" || h !== "/admin/impostazioni")).map(([h, l]) => (
+                <a key={h} href={h} className="py-1.5 text-white/75 hover:text-white md:py-0" onClick={() => setMenu(false)}>{l}</a>
+              ))}
+            </nav>
+            <div className="flex flex-col items-start gap-3 border-t border-white/10 pt-4 text-[13px] md:flex-row md:items-center md:border-0 md:pt-0">
+              <a href="/" className="text-white/70 hover:text-white">Vai al sito</a>
+              {right}
+            </div>
           </div>
         </div>
       </header>
@@ -836,7 +853,7 @@ function BoardButton({ session }: { session: Session }) {
         Accedi alla board
       </button>
       {openForm && (
-        <form onSubmit={go} className="absolute right-0 top-full z-20 mt-2 w-72 rounded-xl border border-ink/10 bg-white p-4 text-ink shadow-card">
+        <form onSubmit={go} className="absolute left-0 top-full z-20 mt-2 w-72 max-w-[calc(100vw-2.5rem)] rounded-xl md:left-auto md:right-0 border border-ink/10 bg-white p-4 text-ink shadow-card">
           <label className="block text-[12px] font-semibold text-ink/70" htmlFor="board-room">Nome della board</label>
           <input id="board-room" className={`${inputCls} mt-1`} value={room} onChange={(e) => setRoom(e.target.value)} maxLength={64} pattern="[A-Za-z0-9_\-]+" title="Solo lettere, numeri, - e _" autoFocus required />
           <p className="mt-1 text-[11.5px] text-steel">Solo lettere, numeri, - e _. Se non esiste, viene creata.</p>
